@@ -2,5 +2,7 @@
 
 ## Building
 
-`pdflatex -interaction=nonstopmode Dyplom.tex`
+```bash
+bibtex Dyplom && pdflatex -f  -interaction=nonstopmode Dyplom.tex
+```
 
