@@ -2,5 +2,5 @@
 
 ## Building
 
-`pdflatex -f -interaction=nonstopmode Dyplom.tex`
+`pdflatex -interaction=nonstopmode Dyplom.tex`
 
