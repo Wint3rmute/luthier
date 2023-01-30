@@ -1,27 +1,142 @@
 \chapter{Wstęp}
 \section{Wprowadzenie}
-Niniejszy dokument powstał z myślą o ujednoliceniu sposobu redagowania prac dyplomowych magisterskich i inżynierskich. Cel ten starano się osiągnąć poprzez sformułowanie reguł redakcyjnych oraz dostarczenie gotowego do wykorzystania kodu źródłowego, przygotowanego do kompilacji w systemie \LaTeX{}. W dokumencie zebrano więc zalecenia i uwagi o charakterze technicznym (dotyczące takich zagadnień, jak na przykład: formatowanie tekstu, załączanie rysunków, układ strony) oraz redakcyjnym (odnoszące się do stylu wypowiedzi, sposobów tworzenia referencji itp.). Ponadto skomentowano stworzony kod źródłowy, by na podstawie przekazanych wskazówek lepiej można było zrozumieć znaczenie użytych komend. W efekcie prezentowany dokument (a raczej zestaw dokumentów wchodzących w skład \LaTeX{}-owego projektu) pełnić może rolę szablonu, w którym wystarczy zmienić treść, aby po kompilacji uzyskać dobrze sformatowaną pracę dyplomową w~postaci dokumentu \texttt{pdf}.  
 
 
+Rozpowszechnione algorytmy sztucznej inteligencji wspomagające pracę inżynierów dźwięku można podzielić na dwie główne dziedziny \cite{analysis_generative} \label{traditional_algos}:
 
-Szablon przygotowano do kompilacji narzędziem \texttt{pdflatex} należącym do dystrybucji systemu \LaTeX. Aby skorzystać z szablonu należy wcześniej zainstalować ten system  bądź też skorzystać z usług kompilacji \LaTeX-owych źródeł dostępnych on-line (jak \texttt{OverLeaf}). Na pierwszy rzut oka kod źródłowy szablonu (w szczególności głównego dokumentu \texttt{Dyplom.tex}) może wydać się nieco skomplikowany. Zdecydowano bowiem, by zamiast tworzyć osobną klasę dokumentu lepiej będzie wykorzystać jakąś istniejącą klasę, oferującą zestaw komend ułatwiających składanie tekstu. Wybór padł na klasę \texttt{memoir}. W efekcie szablon utworzono jako sparametryzowaną instancję tej klasy. 
-Samo zaś użycie szablonu jest dość proste. Wystarczy podmienić wartości atrybutów komend użytych do zdefiniowania zawartości strony tytułowej (metadane dokumentu: tytuł, autor, promotor, kierunek, specjalność, słowa kluczowe), a później zadbać o~właściwą strukturę reszty dokumentu. 
+\begin{enumerate}
+    \item algorytmy generujące symboliczny zapis muzyki (nuty lub dane MIDI) (\ref{fig:lamus_notes}),
+    \item algorytmy generujące gotowy plik audio (\ref{fig:riffusion_spectro}).
+\end{enumerate}
 
-W szablonie zamieszczono komendy zapewniające dołączenie  do wynikowego dokumentu \texttt{pdf} metadanych z podstawowymi informacjami (tytuł, autor, temat, słowa kluczowe, data). Metadane te będą widoczne we właściwościach dokumentu, gdy zacznie się go przeglądać w jakiejś przeglądarce \texttt{pdf} (np.~\texttt{SumatraPD}F lub \texttt{Acrobat Reader}). Niestety, system \LaTeX{} nie wspiera tworzenia dostępnych plików \texttt{pdf} (zgodnych ze standardami PDF/UA, WCAG 2.0/2.1/2.2).
+Pierwsza grupa algorytmów znana jest już od lat 80, gdyż zagadnienie generowania zapisu symbolicznego jest mniej wymagające niż wytworzenie pełnego pliku audio.
+Powszechnie wykorzystywana jest w nich teoria muzyki, pozwalająca określić matematyczne relacje w rytmach, melodiach i progresjach akordów.
+Wiedza dotyczącą teorii muzyki pozwala na wyznaczenie możliwej przestrzeni stanów, w której generowana jest kompozycja,
+natomiast modele matematyczne takie jak łańcuchy \textit{Markowa} służą za mechanizmy decyzyjne, które ,,nawigują'' w przestrzeni stanów.
 
-Szablon pracy dyplomowej nie wiąże się bezpośrednio z tzw.\ ,,Kartą tematu pracy dyplomowej''. Karty tematów są syntetycznymi opisami, które podlegają oficjalnej procedurze zgłaszania, zatwierdzania i wybierania (finalizowanej dokonaniem wpisu studenta na kurs ,,Praca dyplomowa''). Formalnie zawartość kart tematów prac dyplomowych regulowana jest zarządzeniami odpowiedniego Dziekana. Przystępując do redakcji pracy dyplomowej z wykorzystaniem niniejszego szablonu należy pamiętać o obowiązku zachowania zgodności prezentowanych treści z zawartością odpowiedniej karty tematu (merytorycznie musi się wszystko zgadzać).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{rys01/lamus_notes.jpg}
+    \caption{Zapis nutowy utworu \textit{Opus One}, wygenerowany przez komputer \textit{Lamus}.}
+    \label{fig:lamus_notes}
+\end{figure}
 
-Zasadniczo tematy prac inżynierskich wiążą się z wykonaniem jakiegoś konkretnego dzieła (produktu). Formułując cel używa się zwrotów:
-budowa, implementacja, projekt, przeprowadzenia itp. Rolą dyplomanta (na kierunku informatyka) jest dostarczenie dzieła (przynajmniej w~formie prototypu, spełniającego podstawowe wymagania funkcjonalne). Niniejszy szablon pozwolić ma na opisanie tego dzieła.
+Druga grupa algorytmów, generująca pliki audio, rozwija się na bazie nowych możliwości,
+które zapewniają algorytmy wywodzące się ze \textit{Stable Diffusion} \cite{stablediffusion}.
+Najnowsze modele generujące pliki audio zgodne z opisem tekstowym 
+(przykładowo   \texttt{,,smutny jazz''} bądź \texttt{,,muzyka taneczna w stylu Depeche Mode''})
+szkolone są w taki sam sposób jak algorytmy stable diffusion. 
+Jednakże zamiast na obrazach artystów, modele takie jak \textit{Stable Riffusion} \cite{riffusion} 
+uczą się na spektrogramach, które następnie są w stanie wygenerować (\ref{fig:riffusion_spectro}).
+Po wygenerowaniu spektrogramu przez model,
+jest on konwertowany do pliku audio za pomocą odwrotnej transformaty Fouriera.
 
-Nieco inaczej jest w przypadku tematów prac magisterskich. Tutaj temat wraz z opisem celu i zakresu wyznaczać mają jakiś kierunek badań czy analiz. Od razu nie wiadomo przecież, do czego się dojdzie. A jeśli byłoby wiadomo, to nie byłoby sensu robić badań.  Na tym właśnie polega "piękno" pracy badawczej. 
-Zwykle więc podczas formułowania tematów i opisów tego typu prac stosuje się słowa: badanie, analiza, przegląd, charakterystyka itp. Rolą magistranta jest eksploracja wyznaczonego kierunku, dobre uwarunkowanie analizowanych problemów, przeprowadzenie badań, dostarczenie odpowiedzi. Niniejszy szablon w tym przypadku posłużyć ma za ramy, dzięki którym praca może przyjąć formę dokumentu naukowego.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\linewidth]{rys01/riffusion_spectro.jpg}
+    \caption{Przykładowy spektrogram wygenerowany przez algorytm \textit{Stable Riffusion} dla danych wejściowych \texttt{funk bassline with a jazzy saxophone solo}.}
+    \label{fig:riffusion_spectro}
+\end{figure}
 
-Po kompilacji wynikowy dokument \texttt{Dyplom.pdf} należy załadować do systemu APD USOS (\url{https://apd.usos.pwr.edu.pl/}) celem weryfikacji antyplagiatowej i dalszego procesowania. System ten zmienia nazwę załadowanemu plikowi na taką, w której ukryty jest kod wydziału, kod kierunku, typ pracy i jeszcze parę innych danych. Nazwa ta przyjmuje, przykładowo, następującą postać: \texttt{W4N\_\#\#\#\#\#\#\_W04-ITE-INZ\_W04-ITEP-000P-OSIW7.pdf}, gdzie \texttt{\#\#\#\#\#\#} to miejscec na numer indeksu dyplomanta. Z tej racji trudno przewidzieć, jak ostatecznie należy się odwoływać do pliku zarejestrowanego w systemie. Jest to o tyle istotne, iż podczas składania prac dyplomowych wciąż stosowaną praktyką jest dołączanie płyty CD/DVD z jej wynikami (zawierającej dokumentem \texttt{pdf} z tekstem pracy, jak również kodami źródłowymi stworzonego dzieła, instalatorami itp.). Proszę zajrzeć do dodatku \ref{chap:opis-plyty} po dodatkowe wyjaśnienia.
+% TODO: check later
+% https://github.com/Kinyugo/msanii
 
-\section{Układ dokumentu}
-W rozdziale pierwszym przedstawiono w zarysie czym jest i czego dotyczy niniejszy dokument (jest to szablon, który można zastosować podczas redagowania pracy dyplomowej inżynierskiej bądź magisterskiej). W rozdziale drugim opisano sposób pracy z szablonem. W kolejnym, trzecim rozdziale, przedstawiono zalecenia dotyczące formatowania dokumentu. Rozdział ten pełni rolę czysto informacyjną (dostarczony szablon zapewnia uzyskanie opisanego tam formatowania).
-W rozdziale czwartym zwrócono uwagę na redakcję pracy dyplomowej (od strony edytorskiej i merytorycznej).
-Rozdział piąty poświęcono na uwagi techniczne. Ostatni, szósty rozdział, przeznaczono na kilka słów podsumowania oraz ,,lorem ipsum'' -- wygenerowany tekst, pełniący rolę ,,wypełniacza'', wykorzystany w celach poglądowych (jak dzielić dokument na sekcje).
-Pracy towarzyszy przykładowy wykaz literatury oraz przykładowe dwa dodatki. 
+Obie metody opisane w rozdziale~\ref{traditional_algos} można porównać pod względem ich przydatności
+dla użytkownika końcowego, czyli osoby zajmującej się produkcją nagrań muzycznych. Metoda pierwsza, 
+generowanie zapisu symbolicznego, może wydawać się mniej zaawansowana niż generowanie całych plików dźwiękowych.
+Jednakże, z perspektywy użytkownika, zapis symboliczny jest bardziej praktyczny,
+ponieważ możliwe jest zaimportowanie go do programu DAW i późniejsza modyfikacja zapisu nutowego.
+Obecnie dostępne modele generujące pełne nagrania z muzyką nie umożliwiają
+szczegółowego edytowania parametrów wygenerowanego dźwięku, ponieważ operują bardzo wysokopoziomowo 
+-- syntezują muzykę na podstawie opisu słownego.
+
+Niniejsza praca realizuje zadanie,
+którego nie da się zaklasyfikować do żadnej z dwóch wyżej wymienionych (\ref{traditional_algos}) dziedzin.
+Wynik pracy algorytmu implementowanego w ramach pracy magisterskiej jest \textbf{gotowym elektronicznym
+instrumentem muzycznym}, który może być wykorzystany w programie do komponowania muzyki.
+Tego typu proces generowania grafów przetwarzania sygnałów dźwiękowych może być porównany z procesem projektowania instrumentu muzycznego.
+
+Proces dynamicznego modyfikowania grafu przetwarzania sygnału jest często wykorzystywany w muzyce
+elektronicznej, do tworzenia dźwięków o interesującej barwie bądź dynamice. Syntezatory dźwięku
+dostępne na rynku często wyposażone są w \textit{patch bay}, pozwalający na modyfikowanie
+grafu przepływu sygnałów wewnątrz syntezatora, bądź połączenie go z zewnętrznym sprzętem muzycznym
+bądź elektronicznym (\ref{fig:mother32}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{rys01/mother32.jpg}
+    \caption{Syntezator \textit{Mother 32} firmy \textit{Moog}, po prawej stronie widoczny
+    jest \textit{patch bay} z podłączonymi przewodami, które zmieniają konfigurację
+    połączeń między układami generującymi i przetwarzającymi sygnał dźwiękowy.}
+    \label{fig:mother32}
+\end{figure}
+
+
+\section{Cel pracy}
+
+
+Celem pracy jest zbadanie, czy algorytmy optymalizacyjne są w stanie
+wytworzyć graf przetwarzania sygnałów audio, który wykona syntezę próbki
+dźwięku zadanej przez użytkownika.
+Problem poruszany w pracy można zakwalifikować do grupy zagadnień związanych
+z pojęciem \textit{computer-aided design} w dziedzienie inżynierii dźwięku. Docelowo
+zaimplementowany algorytm będzie automatyzował pracę inżyniera dźwięku,
+tworząc i konfigurując grafy przetwarzania sygnałów dźwiękowych, dostępne w
+programach typu \textit{digital audio workstation}~\ref{fig:ableton_patch}. Badania obejmują dwa zagadnienia:
+\begin{enumerate} \label{research_types}
+    \item metody generowania grafu przetwarzania sygnałów oraz późniejszej modyfikacji grafu,
+    \item dobór funkcji celu, na podstawie której algorytm optymalizujący będzie przeszukiwał
+możliwą przestrzeń grafów przetwarzania sygnałów.
+\end{enumerate}
+
+Pierwsze zagadnienie sprowadza się do przetestowania szeregu algorytmów pozwalających na wygenerowanie
+grafu przetwarzania sygnałów DSP oraz ich modyfikację. Przykładem modyfikacji grafu
+może być wprowadzanie w nim losowych zmian lub krzyżowanie dwóch grafów DSP w przypadku
+wykorzystania algorytmu genetycznego.
+
+Drugie zagadnienie obejmuje przetestowanie szeregu algorytmów, które można wykorzystać jako funkcję celu,
+która będzie optymalizowana poprzez ,,dostrajanie'' grafu przetwarzania sygnałów dźwiękowych.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{rys01/ableton_patch.jpg}
+    \caption{
+      Zbiór parametrów konfigurujących przykładowy syntezator dźwięku w programie \textit{Ableton}}
+    \label{fig:ableton_patch}
+\end{figure}
+
+
+\section{Zakres pracy, plan badań}
+
+\subsection{Metody generowania grafu przetwarzania sygnałów oraz późniejsza modyfikacja grafu}
+
+Głównym problemem przy generowaniu grafu przetwarzania sygnałów są ograniczenia nałożone na strukturę grafu,
+które należy spełnić, by graf był logicznie interpretowalny jako łańcuch przetwarzania sygnałów.
+Graf musi być grafem skierowanym, który nie zawiera pętli o dodatnim sprzężeniu zwrotnym 
+(lub nie zawiera ich wcale, co można założyć dla uproszczenia problemu).
+Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika. 
+Automatyczna ewolucja może dążyć w kierunku wykorzystania nadmiarowej liczby
+bloków przetwarzania sygnału, jeśli funkcja celu nie będzie zawierała kary za zbyt złożone grafy.
+Podobne prace \cite{evolutionary_puredata} wykorzystują podejście oparte o 
+\textit{mixed-typed carthesian genetic programming}, które będzie punktem startowym dla pracy.
+Finalnie, badania dążą do wyznaczenia algorytmu o następujący właściwościach:
+
+\begin{enumerate}
+    \item algorytm generuje grafy będące logicznie spójnymi łańcuchami przetwarzania dźwięku (skierowany, bez pętli o dodatnim sprzężeniu zwrotnym w natężeniu sygnału),
+    \item algorytm maksymalizuje wykorzystanie poszczególnych bloków przetwarzania w grafie, co minimalizuje finalny rozmiar grafu, czyniąc go bardziej czytelnym,
+    \item generowany graf posiada reprezentację umożliwiającą wykonanie krzyżowania dwóch grafów przetwarzania sygnału. Graf będący wynikiem krzyżowania nadal musi być poprawnym grafem przetwarzania sygnału.
+\end{enumerate}
+
+\subsection{Dobór funkcji błędu -- różnica między wygenerowanym a docelowym sygnałem dźwiękowym}
+
+Funkcja celu poszukiwana w ramach projektu musi określać, jak dobrze sygnał wygenerowany przez
+graf przetwarzania sygnałów pokrywa się z sygnałem docelowym. Porówanie sygnałów musi skupiać się
+na cechach sygnału, które są najbardziej słyszalne dla ludzkiego ucha. Jednocześnie funkcja nie powinna
+,,karać'' sygnałów, które są względem siebie przesunięte w fazie. Wśród algorytmów, które zostały wybrane
+do przetestowania w ramach projektów zawarte są zarówno standardowe techniki porównywania sygnałów 
+oparte o transformatę Fouriera~\cite{sliding_fourier} jak również nowocześniejsze techniki 
+wykorzystywane do generowania ,,cyfrowych podpisów'' sygnałów dźwiękowych (\textit{sound fingerprinting})
+\cite{computer_vision_music_identification}. Przetestowane zostaną również kombinacje liniowe
+wymienionych wyżej metod oraz próby przypisywania różnych wag poszczególnym częściom sygnału,
+w dziedzinie zarówno czasu jak i częstotliwości.
 
