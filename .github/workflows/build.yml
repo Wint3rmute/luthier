@@ -11,4 +11,11 @@ jobs:
           root_file: Dyplom.tex
           compiler: pdflatex
           args: -interaction=nonstopmode
-
+  laczek:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: xu-cheng/texlive-action/full@v1
+        with:
+          run: |
+            ./lacheck_all.sh
