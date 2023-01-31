@@ -14,6 +14,12 @@
   year = {2022}
 }
 
+@online {minilogue_diagram,
+  title = {Korg Minilogue xd User Manual},
+  url = {https://www.korg.com/us/support/download/manual/0/811/4277/},
+  author = {KORG},
+  year = {2019}
+}
 
 @article{analysis_generative,
   title={The Analysis of Generative Music Programs},
@@ -68,7 +74,6 @@ series = {GECCO '14}
   doi={10.1109/CVPR.2005.105}
 }
 
-
 @ARTICLE{sliding_fourier,
   author={Jacobsen, E. and Lyons, R.},
   journal={IEEE Signal Processing Magazine}, 
@@ -90,11 +95,161 @@ series = {GECCO '14}
 	location     = {Vienna, Austria}
 }
 
-
 @inproceedings{gpu_drum,
     title = {GPU-Accelerated Physical Model For Real-time Drumhead Synthesis},
     year = 2022,
     author={Gaster, Benedict. R. and Challinor, Ryan.},
     url = {https://muses-dmi.github.io/pm_gpus/gpu_accelerated_physical_model_for_real_time_drumhead_synthesis/}
 }
+
+
+@misc{ddx7,
+  doi = {10.48550/ARXIV.2208.06169},
+  url = {https://arxiv.org/abs/2208.06169},
+  author = {Caspe, Franco and McPherson, Andrew and Sandler, Mark},
+  keywords = {Sound (cs.SD), Machine Learning (cs.LG), Audio and Speech Processing (eess.AS), Signal Processing (eess.SP), FOS: Computer and information sciences, FOS: Computer and information sciences, FOS: Electrical engineering, electronic engineering, information engineering, FOS: Electrical engineering, electronic engineering, information engineering, H.5.5; I.2.6},
+  title = {DDX7: Differentiable FM Synthesis of Musical Instrument Sounds},
+  publisher = {arXiv},
+  year = {2022},
+  copyright = {arXiv.org perpetual, non-exclusive license}
+}
+
+@BOOK{digital_filters,
+	AUTHOR = "Julius O. Smith",
+	TITLE = "Introduction to Digital Filters with Audio Applications",
+	PUBLISHER = "W3K Publishing",
+	ADDRESS = "\htmladdnormallink{http://www.w3k.org/books/}{http://www.w3k.org/books/}",
+	YEAR = 2007,
+	ISBN = "978-0-9745607-1-7"
+}
+
+@article{freeverb,
+    AUTHOR = "Julius O. Smith",
+    year = 2010,
+    TITLE = "Physical Signal Audio Processing",
+    ADDRESS = "https://ccrma.stanford.edu/~jos/pasp/Freeverb.html"
+}
+
+@article{reverb,
+    AUTHOR = "Jon Dattorro",
+    year = 1997,
+    TITLE = "Effect Design 1: Reverberator and Other Filters",
+    ADDRESS = "https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf"
+}
+
+@BOOK{spectral_audio_processing,
+	AUTHOR = "Julius O. Smith",
+	TITLE = "Spectral Audio Signal Processing",
+	PUBLISHER = "\htmladdnormallink{\texttt{http:}}{http://ccrma.stanford.edu/~jos/sasp/}\texttt{//\-ccrma.stanford.edu/\-\~{}jos/\-sasp/}",
+	YEAR = "accessed <date>",
+  NOTE = "online book, 2011 edition"
+}
+
+@Book{computational_music_synthesis, 
+   author =    { Sean Luke }, 
+   title =     { Computational Music Synthesis },
+   edition =   { first },
+   year =      { 2021 }, 
+   note =      { Available for free at http://cs.gmu.edu/$\sim$sean/book/synthesis/ } 
+}
+
+@Book{lisp_synthesis,
+   author =    { Nicky Hind }, 
+   title =     { Common Lisp Music (CLM) Tutorials },
+   edition =   { first },
+   year =      { 2021 }, 
+   note =      { Available for free at https://ccrma.stanford.edu/software/clm/compmus/clm-tutorials/toc.html } 
+}
+
+@ARTICLE{2020SciPy-NMeth,
+  author  = {Virtanen, Pauli and Gommers, Ralf and Oliphant, Travis E. and
+            Haberland, Matt and Reddy, Tyler and Cournapeau, David and
+            Burovski, Evgeni and Peterson, Pearu and Weckesser, Warren and
+            Bright, Jonathan and {van der Walt}, St{\'e}fan J. and
+            Brett, Matthew and Wilson, Joshua and Millman, K. Jarrod and
+            Mayorov, Nikolay and Nelson, Andrew R. J. and Jones, Eric and
+            Kern, Robert and Larson, Eric and Carey, C J and
+            Polat, {\.I}lhan and Feng, Yu and Moore, Eric W. and
+            {VanderPlas}, Jake and Laxalde, Denis and Perktold, Josef and
+            Cimrman, Robert and Henriksen, Ian and Quintero, E. A. and
+            Harris, Charles R. and Archibald, Anne M. and
+            Ribeiro, Ant{\^o}nio H. and Pedregosa, Fabian and
+            {van Mulbregt}, Paul and {SciPy 1.0 Contributors}},
+  title   = {{{SciPy} 1.0: Fundamental Algorithms for Scientific
+            Computing in Python}},
+  journal = {Nature Methods},
+  year    = {2020},
+  volume  = {17},
+  pages   = {261--272},
+  adsurl  = {https://rdcu.be/b08Wh},
+  doi     = {10.1038/s41592-019-0686-2},
+}
+
+@InProceedings{10.1007/978-3-642-20520-0_20,
+  author="Bozkurt, Batuhan
+  and Y{\"u}ksel, Kamer Ali",
+  editor="Di Chio, Cecilia
+  and Brabazon, Anthony
+  and Di Caro, Gianni A.
+  and Drechsler, Rolf
+  and Farooq, Muddassar
+  and Grahl, J{\"o}rn
+  and Greenfield, Gary
+  and Prins, Christian
+  and Romero, Juan
+  and Squillero, Giovanni
+  and Tarantino, Ernesto
+  and Tettamanzi, Andrea G. B.
+  and Urquhart, Neil
+  and Uyar, A. {\c{S}}ima",
+  title="Parallel Evolutionary Optimization of Digital Sound Synthesis Parameters",
+  booktitle="Applications of Evolutionary Computation",
+  year="2011",
+  publisher="Springer Berlin Heidelberg",
+  address="Berlin, Heidelberg",
+  pages="194--203",
+  abstract="In this research, we propose a novel parallelizable architecture for the optimization of various sound synthesis parameters. The architecture employs genetic algorithms to match the parameters of different sound synthesizer topologies to target sounds. The fitness function is evaluated in parallel to decrease its convergence time. Based on the proposed architecture, we have implemented a framework using the SuperCollider audio synthesis and programming environment and conducted several experiments. The results of the experiments have shown that the framework can be utilized for accurate estimation of the sound synthesis parameters at promising speeds.",
+  isbn="978-3-642-20520-0"
+}
+
+@INPROCEEDINGS{peaq,
+  author={Khalifeh, Ala F. and Al-Tamimi, Abdel-Karim and Darabkh, Khalid A.},
+  booktitle={2017 International Conference on Wireless Communications, Signal Processing and Networking (WiSPNET)}, 
+  title={Perceptual evaluation of audio quality under lossy networks}, 
+  year={2017},
+  volume={},
+  number={},
+  pages={939-943},
+  doi={10.1109/WiSPNET.2017.8299900}
+}
+
+@Article{mfcc,
+author={Zheng, Fang
+and Zhang, Guoliang
+and Song, Zhanjiang},
+title={Comparison of different implementations of MFCC},
+journal={Journal of Computer Science and Technology},
+year={2001},
+month={Nov},
+day={01},
+volume={16},
+number={6},
+pages={582-589},
+abstract={The performance of the Mel-Frequency Cepstrum Coefficients (MFCC) may be affected by (1) the number of filters, (2) the shape of filters, (3) the way in which filters are spaced, and (4) the way in which the power spectrum is warped. In this paper, several comparison experiments are done to find a best implementation. The traditional MFCC calculation excludes the 0th coefficient for the reason that it is regarded as somewhat unreliable. According to the analysis and experiments, the authors find that it can be regarded as the generalized frequency band energy (FBE) and is hence useful, which results in the FBE-MFCC. The authors also propose a better analysis, namely the auto-regressive analysis, on the frame energy, which outperform its 1st and/or 2nd order differential derivatives. Experiments with the ``863'' Speech Database show that, compared with the traditional MFCC with its corresponding auto-regressive analysis coefficients, the FBE-MFCC and the frame energy with their corresponding auto-regressive analysis coefficients form the best combination, reducing the Chinese syllable error rate (CSER) by about 10{\%}, while the FBE-MFCC with the corresponding auto-regressive analysis coefficients reduces CSER by 2.5{\%}. Comparison experiments are also done with a quite casual Chinese speech database, named Chinese Annotated Spontaneous Speech (CASS) corpus. The FBE-MFCC can reduce the error rate by about 2.9{\%} on an average.},
+issn={1860-4749},
+doi={10.1007/BF02943243},
+url={https://doi.org/10.1007/BF02943243}
+}
+
+@misc{frechet_audio_distance,
+  doi = {10.48550/ARXIV.1812.08466},
+  url = {https://arxiv.org/abs/1812.08466},
+  author = {Kilgour, Kevin and Zuluaga, Mauricio and Roblek, Dominik and Sharifi, Matthew},
+  keywords = {Audio and Speech Processing (eess.AS), Sound (cs.SD), FOS: Electrical engineering, electronic engineering, information engineering, FOS: Electrical engineering, electronic engineering, information engineering, FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {Fréchet Audio Distance: A Metric for Evaluating Music Enhancement Algorithms},
+  publisher = {arXiv},
+  year = {2018},
+  copyright = {arXiv.org perpetual, non-exclusive license}
+}
+
 
