@@ -3,6 +3,9 @@
 # Runs lacheck on you .tex files, exits with error 1
 # if lacheck reports any errors with your tex spells
 
+set -Eeuo pipefail
+cd "$(dirname "$(readlink -f "$0")")"/latex
+
 for file in *.tex; do
   if [[ "$file" = "Dyplom.tex" ]]; then
     continue # Don't fix what's broken by PWr :)
