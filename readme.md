@@ -14,3 +14,9 @@ bibtex Dyplom && pdflatex -interaction=nonstopmode Dyplom.tex
 - HAN papery: https://biblioteka.pwr.edu.pl/e-zasoby/zdalny-dostep---han- 
 - Katedra akustyki: https://k76.pwr.edu.pl/
 
+
+### Na seminarkę
+
+1. Dokument deklaracja pisania pracki do 12 marca.
+   Podpis mój i opiekuna pracy
+
