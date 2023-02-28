@@ -2,8 +2,9 @@
 
 ## Building
 
+In the `latex/` folder:
 ```bash
-bibtex Dyplom && pdflatex -f  -interaction=nonstopmode Dyplom.tex
+bibtex Dyplom && pdflatex -interaction=nonstopmode Dyplom.tex
 ```
 
 ## Notatki (pl)
