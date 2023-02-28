@@ -19,4 +19,10 @@ bibtex Dyplom && pdflatex -interaction=nonstopmode Dyplom.tex
 
 1. Dokument deklaracja pisania pracki do 12 marca.
    Podpis mój i opiekuna pracy
+2. Będą 2 prezki:
+  1. Wprowadzająca, opisanie pracy, przedstawienie i porównanie z literaturą
+  2. Prezentacja udająca prezentację przed komisją dyplomową
+
+Na eportalu powinno być wszystko
+
 
