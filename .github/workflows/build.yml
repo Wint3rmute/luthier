@@ -11,6 +11,8 @@ jobs:
           root_file: Dyplom.tex
           compiler: pdflatex
           args: -interaction=nonstopmode
+          working_directory: latex
+
   laczek:
     runs-on: ubuntu-latest
     steps:
