@@ -1,9 +1,12 @@
 [package]
-name = "rust"
+name = "luthier"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+eframe = "0.21.3"
+flume = "0.10.14"
+rodio = { version = "0.17.1", default-features = true }
 rustfft = "6.1.0"
