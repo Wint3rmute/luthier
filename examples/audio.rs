@@ -1,41 +1,34 @@
-const SAMPLE_RATE: u32 = 48000;
+use luthier::constants::SAMPLE_RATE;
+use luthier::node::AudioNodeGraph;
+use luthier::node::NodeConnection;
+use rodio::Source;
 
-trait AudioNode {
-    fn process(&mut self);
-
-    fn send_to_input(&mut self, input_num: usize, input_value: f32);
-    fn get_output(&mut self, output_num: usize) -> f32;
+struct SoundEngine {
+    graph: AudioNodeGraph,
 }
 
-struct SineOscillator {
-    phase: f32,
-    phase_diff: f32,
+impl Source for SoundEngine {
+    fn current_frame_len(&self) -> Option<usize> {
+        None
+    }
 
-    phase_mod: f32,
-}
+    fn channels(&self) -> u16 {
+        1
+    }
 
-impl SineOscillator {
-    fn from_frequency(frequency_hz: f32) -> Self {
-        Self {
-            phase: 0.0,
-            phase_mod: 0.0,
-            phase_diff: (2.0 * std::f32::consts::PI * frequency_hz) / SAMPLE_RATE as f32,
-        }
+    fn sample_rate(&self) -> u32 {
+        SAMPLE_RATE
+    }
+
+    fn total_duration(&self) -> Option<std::time::Duration> {
+        None
     }
 }
 
-impl AudioNode for SineOscillator {
-    fn process(&mut self) {}
-
-    fn get_output(&mut self, output_num: usize) -> f32 {
-        self.phase += self.phase_diff;
-        let result = (self.phase + self.phase_mod).sin();
-
-        result
-    }
-
-    fn send_to_input(&mut self, input_num: usize, input_value: f32) {
-        self.phase_mod = input_value;
+impl Iterator for SoundEngine {
+    type Item = f32;
+    fn next(&mut self) -> Option<Self::Item> {
+        Some(0.0)
     }
 }
 
