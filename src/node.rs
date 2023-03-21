@@ -61,7 +61,7 @@ impl AudioNode for Constant {
 }
 
 impl SineOscillator {
-    fn from_frequency(frequency_hz: f32) -> Self {
+    pub fn from_frequency(frequency_hz: f32) -> Self {
         Self {
             phase: 0.0,
             phase_mod: 0.0,
@@ -105,7 +105,7 @@ pub struct NodeConnection {
 }
 
 pub struct AudioNodeGraph {
-    pub nodes: Vec<Box<dyn AudioNode>>,
+    pub nodes: Vec<Box<dyn AudioNode + Send>>,
     pub connections: Vec<NodeConnection>,
 }
 
