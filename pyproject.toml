@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "luthier"
+version = "0.1.0"
+description = ""
+authors = ["Wint3rmute <mateusz.baczek1998@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+jupyterlab = "^3.6.3"
+scipy = "^1.10.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
