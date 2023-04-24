@@ -1,4 +1,5 @@
 import subprocess
+from itertools import count
 import math
 from abc import ABC, abstractmethod, abstractstaticmethod
 
@@ -19,6 +20,14 @@ class DspGraph:
     def __init__(self):
         self.nodes: list[DspNode] = []
         self.connections: list[DspConnection] = []
+        self.node_id_counter = count()
+
+    def get_next_node_id(self):
+        return next(self.node_id_counter)
+
+    def tick(self):
+        for node in self.nodes:
+            node.tick(self)
 
     def patch(
         self, from_node_index: int, from_output: str, to_node_index: int, to_input: str
@@ -93,6 +102,13 @@ label = "<f0>{node.__class__.__name__} """
 
 
 class DspNode(ABC):
+    def __init__(self, parent_graph: DspGraph):
+        """
+        Each node has a unique `node_id`, which is assigned by the parent `DspGraph`.
+        `node_id` is used to store the connections (patching) with other nodes.
+        """
+        self.node_id = parent_graph.get_next_node_id()
+
     @abstractstaticmethod
     def outputs() -> list[str]:
         ...
@@ -161,13 +177,54 @@ class SineOscilator(DspNode):
         # return result
 
 
+class ConstantSource(DspNode):
+    @staticmethod
+    def inputs() -> list[str]:
+        return []
+
+    @staticmethod
+    def outputs() -> list[str]:
+        return ["output"]
+
+    def tick(self):
+        pass
+
+
+class Multiplier(DspNode):
+    @staticmethod
+    def inputs() -> list[str]:
+        return ["input", "scale"]
+
+    @staticmethod
+    def outputs() -> list[str]:
+        return ["output"]
+
+    def tick(self):
+        pass
+
+
 if __name__ == "__main__":
-    # s = SineOscilator()
     g = DspGraph()
-    g.nodes.extend([SineOscilator(), ADSR(), SineOscilator(), Sum(), Output()])
+    g.nodes.extend(
+        [
+            SineOscilator(),
+            ADSR(),
+            SineOscilator(),
+            Sum(),
+            Output(),
+            ConstantSource(),
+            Multiplier(),
+        ]
+    )
     g.patch(0, "output", 1, "input")
     g.patch(1, "output", 2, "modulation")
     g.patch(0, "output", 3, "in_1")
     g.patch(2, "output", 3, "in_2")
     g.patch(3, "output", 4, "input")
+    g.patch(5, "output", 0, "frequency")
+    g.patch(5, "output", 6, "input")
+    g.patch(6, "output", 2, "frequency")
+
     g.draw()
+
+    val = g.tick()
