@@ -15,6 +15,32 @@ class DspConnection:
         self.to_node = to_node
         self.to_input = to_input
 
+        self.value = 0.0
+
+
+class DspNode(ABC):
+    def __init__(self):
+        """
+        Each node has a unique `node_id`, which is assigned by the parent `DspGraph`.
+        `node_id` is used to store the connections (patching) with other nodes.
+        """
+        self.node_id = None
+        # self.node_id = parent_graph.get_next_node_id()
+        # parent_graph.nodes.append(self)
+        # return self.node_id
+
+    @abstractstaticmethod
+    def outputs() -> list[str]:
+        ...
+
+    @abstractstaticmethod
+    def inputs() -> list[str]:
+        ...
+
+    @abstractmethod
+    def tick(self, dsp_graph: "DspGraph"):
+        ...
+
 
 class DspGraph:
     def __init__(self):
@@ -22,7 +48,12 @@ class DspGraph:
         self.connections: list[DspConnection] = []
         self.node_id_counter = count()
 
-    def get_next_node_id(self):
+    def add_node(self, node: DspNode) -> int:
+        node.node_id = self._get_next_node_id()
+        self.nodes.append(node)
+        return node.node_id
+
+    def _get_next_node_id(self):
         return next(self.node_id_counter)
 
     def tick(self):
@@ -74,9 +105,9 @@ edge [
 ];
         """
 
-        for node_index, node in enumerate(self.nodes):
+        for node in self.nodes:
             result += f"""
-"node{node_index}" [
+"node{node.node_id}" [
 label = "<f0>{node.__class__.__name__} """
 
             for input in node.inputs():
@@ -99,27 +130,6 @@ label = "<f0>{node.__class__.__name__} """
         result += "\n}"
 
         print(result)
-
-
-class DspNode(ABC):
-    def __init__(self, parent_graph: DspGraph):
-        """
-        Each node has a unique `node_id`, which is assigned by the parent `DspGraph`.
-        `node_id` is used to store the connections (patching) with other nodes.
-        """
-        self.node_id = parent_graph.get_next_node_id()
-
-    @abstractstaticmethod
-    def outputs() -> list[str]:
-        ...
-
-    @abstractstaticmethod
-    def inputs() -> list[str]:
-        ...
-
-    @abstractmethod
-    def tick(self, dsp_graph: DspGraph):
-        ...
 
 
 class ADSR(DspNode):
@@ -205,26 +215,17 @@ class Multiplier(DspNode):
 
 if __name__ == "__main__":
     g = DspGraph()
-    g.nodes.extend(
-        [
-            SineOscilator(),
-            ADSR(),
-            SineOscilator(),
-            Sum(),
-            Output(),
-            ConstantSource(),
-            Multiplier(),
-        ]
-    )
-    g.patch(0, "output", 1, "input")
-    g.patch(1, "output", 2, "modulation")
-    g.patch(0, "output", 3, "in_1")
-    g.patch(2, "output", 3, "in_2")
-    g.patch(3, "output", 4, "input")
-    g.patch(5, "output", 0, "frequency")
-    g.patch(5, "output", 6, "input")
-    g.patch(6, "output", 2, "frequency")
+
+    sine_1 = g.add_node(SineOscilator())
+    sine_2 = g.add_node(SineOscilator())
+    adsr = g.add_node(ADSR())
+    sum = g.add_node(Sum())
+    output = g.add_node(Output())
+
+    g.patch(sine_1, "output", sine_2, "modulation")
+    g.patch(sine_2, "output", adsr, "input")
+    g.patch(sine_1, "output", sum, "in_1")
+    g.patch(adsr, "output", sum, "in_2")
+    g.patch(sum, "output", output, "input")
 
     g.draw()
-
-    val = g.tick()
