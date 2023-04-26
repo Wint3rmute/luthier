@@ -1,12 +1,12 @@
+import math
+from enum import Enum
 import subprocess
 import time
-from typing import Optional
-from functools import cache
-from dataclasses import dataclass, is_dataclass
-from itertools import count
-import math
 from abc import ABC, abstractmethod, abstractstaticmethod
-
+from dataclasses import dataclass, is_dataclass
+from functools import cache
+from itertools import count
+from typing import Optional
 
 SAMPLE_RATE = 48000
 
@@ -153,6 +153,9 @@ edge [
 "node{node.node_id}" [
 label = "<f0>{node.__class__.__name__} """
 
+            if isinstance(node, Param):
+                result += f"| ⇒ {node.outputs.output:.2E}"
+
             for input in node.input_names():
                 result += f"|<{input}> ○ {input}  "
 
@@ -182,10 +185,17 @@ label = "<f0>{node.__class__.__name__} """
         out, errors = graphviz_dot_process.communicate(result.encode())
 
         if errors != None:
-            raise ValueError(f"Errors while running dot: {errors}")
+            raise ValueError(f"Errors while running dot: {errors!r}")
 
         return out
 
+
+class AdsrPhase(Enum):
+    ATTACK = 0
+    DECAY = 1
+    SUSTAIN = 2
+    RELEASE = 3
+    FINISHED = 4
 
 class ADSR(DspNode):
     @dataclass
@@ -193,15 +203,31 @@ class ADSR(DspNode):
         input: float = 0
         attack: float = 0
         decay: float = 0
-        sustain: float = 0
-        release: float = 0
+        # sustain: float = 0
+        # release: float = 0
 
     @dataclass
     class Outputs:
         output: float = 0
 
+    def __init__(self) -> None:
+        super().__init__()
+        self.phase = AdsrPhase.ATTACK  # Controls the envelope logic
+        self.state = 0.0  # Value by which the input will be multiplied
+
     def tick(self) -> None:
-        pass
+        if self.phase == AdsrPhase.ATTACK:
+            self.state += self.inputs.attack
+            if self.state > 1.0:
+                self.state = 1.0
+                self.phase = AdsrPhase.DECAY
+        elif self.phase == AdsrPhase.DECAY:
+            self.state -= self.inputs.decay
+            if self.state < 0.0:
+                self.state = 0.0
+
+        self.outputs.output = self.inputs.input * self.state
+
 
 
 class Sum(DspNode):
@@ -213,6 +239,11 @@ class Sum(DspNode):
     @dataclass
     class Outputs:
         out: float = 0
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.inputs = self.Inputs
+        self.outputs = self.Outputs
 
     def tick(self) -> None:
         self.outputs.out = self.inputs.in_1 + self.inputs.in_2
@@ -253,7 +284,7 @@ class SineOscilator(DspNode):
         self.phase += self.phase_diff
 
 
-class ConstantSource(DspNode):
+class Param(DspNode):
     @dataclass
     class Inputs:
         ...
@@ -264,10 +295,11 @@ class ConstantSource(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
-        self.outputs: ConstantSource.Outputs  # type: ignore
-        self.inputs: ConstantSource.Inputs  # type: ignore
+        self.outputs: Param.Outputs  # type: ignore
+        self.inputs: Param.Inputs  # type: ignore
 
-        self.outputs.output = 440
+    def set_value(self, value: float) -> None: 
+        self.outputs.output = value
 
     def tick(self) -> None:
         pass
@@ -295,20 +327,27 @@ if __name__ == "__main__":
     sum = g.add_node(Sum())
     output = g.add_node(Output())
     output = g.add_node(Output())
-    source_1 = g.add_node(ConstantSource())
-    source_2 = g.add_node(ConstantSource())
+    source_1 = g.add_node(Param())
+    source_2 = g.add_node(Param())
 
-    g.nodes[source_2].outputs.output = 440 * 1
+    g.nodes[source_2].set_value(440 * 1)
+
+    g.nodes[adsr].inputs.attack = 1.0
+    g.nodes[adsr].inputs.decay = 0.0001
 
     g.patch(sine_1, "output", sine_2, "modulation")
     g.patch(sine_2, "output", output, "input")
     g.patch(source_1, "output", sine_2, "frequency")
     g.patch(source_2, "output", sine_1, "frequency")
 
+    image = g.draw()
+    with open("/tmp/image.png", "wb") as image_file:
+        image_file.write(image)
+
     # for i in range(100):
-    while True:
-        g.tick()
-        # print(g.nodes[sine_2].outputs.output)
-        print(g.nodes[output].inputs.input)
-        time.sleep(0.01)
-        # break
+    # while True:
+    #     g.tick()
+    #     # print(g.nodes[sine_2].outputs.output)
+    #     print(g.nodes[output].inputs.input)
+    #     time.sleep(0.01)
+    #     # break
