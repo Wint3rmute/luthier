@@ -1,15 +1,15 @@
 import math
-from enum import Enum
+import random
 import subprocess
 import time
-from abc import ABC, abstractmethod, abstractstaticmethod
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, is_dataclass
+from enum import Enum
 from functools import cache
 from itertools import count
 from typing import Optional
 
 SAMPLE_RATE = 48000
-
 NodeId = int
 
 
@@ -121,6 +121,16 @@ class DspGraph:
         if to_input not in to_node.input_names():
             raise ValueError(f"input {to_input} not found in {to_node}")
 
+        for connection in self.connections:
+            if (
+                connection.to_node == to_node_index
+                and connection.to_input == to_node.input_names().index(to_input)
+            ):
+                # print(
+                #     f"Ignoring patching more than one input to {to_node_index}/{to_input}"
+                # )
+                return
+
         self.connections.append(
             DspConnection(
                 from_node_index,
@@ -197,12 +207,13 @@ class AdsrPhase(Enum):
     RELEASE = 3
     FINISHED = 4
 
+
 class ADSR(DspNode):
     @dataclass
     class Inputs:
         input: float = 0
-        attack: float = 0
-        decay: float = 0
+        attack: float = 1
+        decay: float = 0.00001
         # sustain: float = 0
         # release: float = 0
 
@@ -212,6 +223,9 @@ class ADSR(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
+        self.inputs: ADSR.Inputs
+        self.outputs: ADSR.Outputs
+
         self.phase = AdsrPhase.ATTACK  # Controls the envelope logic
         self.state = 0.0  # Value by which the input will be multiplied
 
@@ -227,7 +241,7 @@ class ADSR(DspNode):
                 self.state = 0.0
 
         self.outputs.output = self.inputs.input * self.state
-
+        # print("ADSR", self.outputs.output)
 
 
 class Sum(DspNode):
@@ -242,8 +256,8 @@ class Sum(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
-        self.inputs = self.Inputs
-        self.outputs = self.Outputs
+        self.inputs: Sum.Inputs
+        self.outputs: Sum.Outputs
 
     def tick(self) -> None:
         self.outputs.out = self.inputs.in_1 + self.inputs.in_2
@@ -274,14 +288,17 @@ class SineOscilator(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
-        self.inputs: SineOscilator.Inputs  # type: ignore
-        self.outputs: SineOscilator.Outputs  # type: ignore
+        self.inputs: SineOscilator.Inputs
+        self.outputs: SineOscilator.Outputs
         self.phase = 0.0
 
     def tick(self) -> None:
         self.phase_diff = (2.0 * math.pi * self.inputs.frequency) / SAMPLE_RATE
         self.outputs.output = math.sin(self.phase + self.inputs.modulation)
         self.phase += self.phase_diff
+
+        while self.phase > math.pi * 2.0:
+            self.phase -= math.pi * 2.0
 
 
 class Param(DspNode):
@@ -295,14 +312,35 @@ class Param(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
-        self.outputs: Param.Outputs  # type: ignore
-        self.inputs: Param.Inputs  # type: ignore
+        self.outputs: Param.Outputs
+        self.inputs: Param.Inputs
 
-    def set_value(self, value: float) -> None: 
+    def set_value(self, value: float) -> None:
         self.outputs.output = value
+
+    def get_value(self) -> float:
+        return self.outputs.output
 
     def tick(self) -> None:
         pass
+
+
+class Doubler(DspNode):
+    @dataclass
+    class Inputs:
+        input: float = 0
+
+    @dataclass
+    class Outputs:
+        output: float = 0
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.inputs: Doubler.Inputs
+        self.outputs: Doubler.Outputs
+
+    def tick(self):
+        self.outputs.output = self.inputs.input * 2.0
 
 
 # class Multiplier(DspNode):
@@ -318,31 +356,124 @@ class Param(DspNode):
 #         pass
 
 
-if __name__ == "__main__":
-    g = DspGraph()
-
-    sine_1 = g.add_node(SineOscilator())
-    sine_2 = g.add_node(SineOscilator())
-    adsr = g.add_node(ADSR())
-    sum = g.add_node(Sum())
-    output = g.add_node(Output())
-    output = g.add_node(Output())
-    source_1 = g.add_node(Param())
-    source_2 = g.add_node(Param())
-
-    g.nodes[source_2].set_value(440 * 1)
-
-    g.nodes[adsr].inputs.attack = 1.0
-    g.nodes[adsr].inputs.decay = 0.0001
-
-    g.patch(sine_1, "output", sine_2, "modulation")
-    g.patch(sine_2, "output", output, "input")
-    g.patch(source_1, "output", sine_2, "frequency")
-    g.patch(source_2, "output", sine_1, "frequency")
-
-    image = g.draw()
+def draw_to_temp_file(graph: DspGraph) -> None:
+    image = graph.draw()
     with open("/tmp/image.png", "wb") as image_file:
         image_file.write(image)
+
+
+POSSIBLE_NODES_TO_ADD: list[type[DspNode]] = [
+    SineOscilator,
+    SineOscilator,
+    SineOscilator,
+    SineOscilator,
+    Doubler,
+    ADSR,
+    Sum,
+    Param,
+]
+
+
+def add_random_node(graph: DspGraph) -> None:
+    node = random.choice(POSSIBLE_NODES_TO_ADD)()
+    graph.add_node(node)
+
+
+def add_random_connection(graph: DspGraph) -> None:
+    node_from_id, node_from = random.choice(list(graph.nodes.items()))
+    node_to_id, node_to = random.choice(list(graph.nodes.items()))
+
+    if node_from is node_to:
+        return
+
+    if not any(node_from.output_names()):
+        return
+
+    if not any(node_to.input_names()):
+        return
+
+    output_name = random.choice(node_from.output_names())
+    input_name = random.choice(node_to.input_names())
+
+    graph.patch(node_from_id, output_name, node_to_id, input_name)
+
+
+def remove_random_connection(graph: DspGraph) -> None:
+    if not any(graph.connections):
+        return
+
+    graph.connections.pop(random.randrange(len(graph.connections)))
+
+def _get_random_param(graph: DspGraph) -> Optional[Param]:
+    params = [node for node in graph.nodes if isinstance(node, Param)]
+    if any(params):
+        result_param = random.choice(params)
+        if result_param.get_value() == 440.0:
+            return None
+
+        return result_param
+
+    return None
+
+def randomize_random_param(graph: DspGraph) -> None:
+    if param := _get_random_param(graph):
+        param.set_value(random.uniform(-1, 1))
+
+def nudge_random_param(graph: DspGraph) -> None:
+    if param := _get_random_param(graph):
+        param.set_value( param.get_value() + random.uniform(-0.01, 0.01) )
+
+
+def get_starting_graph() -> DspGraph:
+    graph = DspGraph()
+    output = graph.add_node(Output())
+    sine = graph.add_node(SineOscilator())
+    base_frequency_node = Param()
+    base_frequency_node.set_value(440)
+    base_frequency = graph.add_node(base_frequency_node)
+
+    graph.patch(base_frequency, "output", sine, "frequency")
+    graph.patch(sine, "output", output, "input")
+
+    return graph
+
+
+if __name__ == "__main__":
+    graph = get_starting_graph()
+
+    for _ in range(1):
+        random.choice(
+            [
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                remove_random_connection,
+                randomize_random_param,
+                nudge_random_param
+            ]
+        )(graph)
+        draw_to_temp_file(graph)
+        # time.sleep(0.2)
+
+    # for _ in range(10):
+    #     draw_to_temp_file(graph)
+    #     time.sleep(.5)
+
+    # source_1 = g.add_node(Param())
+    # source_2 = g.add_node(Param())
+
+    # g.nodes[source_2].set_value(440 * 1)
+
+    # g.patch(sine_1, "output", sine_2, "modulation")
+    # g.patch(sine_2, "output", output, "input")
+    # g.patch(source_1, "output", sine_2, "frequency")
+    # g.patch(source_2, "output", sine_1, "frequency")
 
     # for i in range(100):
     # while True:
