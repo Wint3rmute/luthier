@@ -10,6 +10,7 @@ from itertools import count
 from typing import Optional
 
 SAMPLE_RATE = 48000
+BASE_FREQUENCY = 261.63
 NodeId = int
 
 
@@ -408,7 +409,7 @@ def _get_random_param(graph: DspGraph) -> Optional[Param]:
     params = [node for node in graph.nodes if isinstance(node, Param)]
     if any(params):
         result_param = random.choice(params)
-        if result_param.get_value() == 440.0:
+        if result_param.get_value() == BASE_FREQUENCY:
             return None
 
         return result_param
@@ -429,7 +430,7 @@ def get_starting_graph() -> DspGraph:
     output = graph.add_node(Output())
     sine = graph.add_node(SineOscilator())
     base_frequency_node = Param()
-    base_frequency_node.set_value(440)
+    base_frequency_node.set_value(BASE_FREQUENCY)
     base_frequency = graph.add_node(base_frequency_node)
 
     graph.patch(base_frequency, "output", sine, "frequency")
