@@ -9,8 +9,9 @@ from functools import cache
 from itertools import count
 from typing import Optional
 
-SAMPLE_RATE = 48000
-BASE_FREQUENCY = 261.63
+# SAMPLE_RATE = 48000
+SAMPLE_RATE = 22050
+BASE_FREQUENCY = 440
 NodeId = int
 
 
