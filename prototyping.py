@@ -228,7 +228,7 @@ class ADSR(DspNode):
     class Inputs:
         input: float = 0
         attack: float = 1
-        decay: float = 0.00001
+        decay: float = 0.001
         # sustain: float = 0
         # release: float = 0
 
