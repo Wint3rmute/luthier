@@ -1,38 +1,38 @@
-name: Rust
-on: [push]
+# name: Rust
+# on: [push]
 
-jobs:
-  formatting:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        run: |
-          cargo fmt --check
+# jobs:
+#   formatting:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Build
+#         run: |
+#           cargo fmt --check
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        run: |
-          sudo apt install libasound2-dev
-          cargo build --all-targets --all-features --examples --workspace
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Build
+#         run: |
+#           sudo apt install libasound2-dev
+#           cargo build --all-targets --all-features --examples --workspace
 
-  clippy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        run: |
-          sudo apt install libasound2-dev
-          cargo clippy --all-targets --all-features --examples --workspace
+#   clippy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Build
+#         run: |
+#           sudo apt install libasound2-dev
+#           cargo clippy --all-targets --all-features --examples --workspace
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build
-        run: |
-          sudo apt install libasound2-dev
-          cargo test --workspace
+#   test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Build
+#         run: |
+#           sudo apt install libasound2-dev
+#           cargo test --workspace

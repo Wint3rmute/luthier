@@ -1,7 +1,8 @@
 import math
+import numpy
+import numpy.typing
 import random
 import subprocess
-import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, is_dataclass
 from enum import Enum
@@ -12,7 +13,9 @@ from typing import Optional
 # SAMPLE_RATE = 48000
 SAMPLE_RATE = 22050
 BASE_FREQUENCY = 0.440  # Maps to C4 #  440 * 0.01
+
 NodeId = int
+AudioBuffer = numpy.typing.NDArray[numpy.float64]
 
 
 class DspConnection:
@@ -76,6 +79,11 @@ class DspNode(ABC):
         ...
 
 
+class Sample:
+    def __init__(self, audio_buffer: AudioBuffer) -> None:
+        self.buffer = audio_buffer
+
+
 class DspGraph:
     def __init__(self) -> None:
         self.nodes: dict[NodeId, DspNode] = {}
@@ -91,6 +99,14 @@ class DspGraph:
             raise ValueError("Speaker node already present in the graph")
 
         return self._add_node_no_check(node)
+
+    def play(self, num_samples: int) -> AudioBuffer:
+        audio_buffer = numpy.zeros(num_samples)
+
+        for index in range(len(audio_buffer)):
+            audio_buffer[index] = self.tick()
+
+        return audio_buffer
 
     def _add_node_no_check(self, node: DspNode) -> int:
         node.node_id = self._get_next_node_id()
@@ -209,7 +225,7 @@ label = "<f0>{node.__class__.__name__} """
 
         out, errors = graphviz_dot_process.communicate(result.encode())
 
-        if errors != None:
+        if errors is not None:
             raise ValueError(f"Errors while running dot: {errors!r}")
 
         return out
@@ -355,7 +371,7 @@ class Doubler(DspNode):
         self.inputs: Doubler.Inputs
         self.outputs: Doubler.Outputs
 
-    def tick(self):
+    def tick(self) -> None:
         self.outputs.output = self.inputs.input * 2.0
 
 
@@ -371,10 +387,10 @@ class Multiplier(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
-        self.inputs: Self.Inputs
-        self.outputs: Self.Outputs
+        self.inputs: Multiplier.Inputs
+        self.outputs: Multiplier.Outputs
 
-    def tick(self):
+    def tick(self) -> None:
         self.outputs.output = self.inputs.input * self.inputs.scale
 
 
@@ -475,6 +491,8 @@ def get_starting_graph() -> DspGraph:
 
 if __name__ == "__main__":
     graph = get_starting_graph()
+
+    a = graph.play(SAMPLE_RATE * 1)
 
     __import__("pdb").set_trace()
 
