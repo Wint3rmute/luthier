@@ -359,17 +359,23 @@ class Doubler(DspNode):
         self.outputs.output = self.inputs.input * 2.0
 
 
-# class Multiplier(DspNode):
-#     @staticmethod
-#     def inputs() -> list[str]:
-#         return ["input", "scale"]
+class Multiplier(DspNode):
+    @dataclass
+    class Inputs:
+        input: float = 0
+        scale: float = 1.0
 
-#     @staticmethod
-#     def outputs() -> list[str]:
-#         return ["output"]
+    @dataclass
+    class Outputs:
+        output: float = 0
 
-#     def tick(self):
-#         pass
+    def __init__(self) -> None:
+        super().__init__()
+        self.inputs: Self.Inputs
+        self.outputs: Self.Outputs
+
+    def tick(self):
+        self.outputs.output = self.inputs.input * self.inputs.scale
 
 
 def draw_to_temp_file(graph: DspGraph) -> None:
