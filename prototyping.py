@@ -1,14 +1,16 @@
 import math
-import numpy
-import numpy.typing
 import random
 import subprocess
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, is_dataclass
 from enum import Enum
-from functools import cache
+from functools import cache, cached_property
 from itertools import count
-from typing import Optional
+from typing import Any, Optional
+
+import audioflux as af
+import numpy
+import numpy.typing
 
 # SAMPLE_RATE = 48000
 SAMPLE_RATE = 22050
@@ -82,6 +84,16 @@ class DspNode(ABC):
 class Sample:
     def __init__(self, audio_buffer: AudioBuffer) -> None:
         self.buffer = audio_buffer
+
+    @cached_property
+    def spectrogram(self) -> Any:
+        # Create BFT object and extract mel spectrogram
+        bft_obj = af.BFT(num=128, radix2_exp=12, samplate=SAMPLE_RATE,
+                         scale_type=SpectralFilterBankScaleType.MEL)
+
+        spec_arr = bft_obj.bft(self.buffer)
+        spec_arr = numpy.abs(self.buffer)
+        return bft_obj, spec_arr
 
 
 class DspGraph:
