@@ -21,6 +21,7 @@ tqdm = "^4.65.0"
 mypy = "^1.2.0"
 black = "^23.3.0"
 ruff = "^0.0.264"
+isort = "^5.12.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -28,8 +29,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 ignore = [ "E501" ]
-
-[tool.mypy]
-strict = true
-plugins = [ 'numpy.typing.mypy_plugin' ]
-
