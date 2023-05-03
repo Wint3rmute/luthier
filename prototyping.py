@@ -9,8 +9,9 @@ from functools import cache
 from itertools import count
 from typing import Optional
 
-SAMPLE_RATE = 48000
-BASE_FREQUENCY = 261.63
+# SAMPLE_RATE = 48000
+SAMPLE_RATE = 22050
+BASE_FREQUENCY = 0.440  # Maps to C4 #  440 * 0.01
 NodeId = int
 
 
@@ -80,11 +81,18 @@ class DspGraph:
         self.nodes: dict[NodeId, DspNode] = {}
         self.connections: list[DspConnection] = []
         self.node_id_counter = count()
+        self.speaker = self._add_node_no_check(Speaker())
 
     def add_node(self, node: DspNode) -> int:
         """
         Adds a node to the graph and return its unique ID within the graph
         """
+        if isinstance(node, Speaker):
+            raise ValueError("Speaker node already present in the graph")
+
+        return self._add_node_no_check(node)
+
+    def _add_node_no_check(self, node: DspNode) -> int:
         node.node_id = self._get_next_node_id()
         self.nodes[node.node_id] = node
         return node.node_id
@@ -92,7 +100,11 @@ class DspGraph:
     def _get_next_node_id(self) -> NodeId:
         return next(self.node_id_counter)
 
-    def tick(self) -> None:
+    def tick(self) -> float:
+        """
+        Runs a single iteration on all nodes
+        and returns the value on the speaker node
+        """
         for connection in self.connections:
             output_node = self.nodes[connection.from_node]
             value_on_output = output_node.get_output_by_index(connection.from_output)
@@ -102,6 +114,8 @@ class DspGraph:
 
         for node in self.nodes.values():
             node.tick()
+
+        return self.nodes[self.speaker].inputs.input  # type: ignore
 
     def patch(
         self, from_node_index: int, from_output: str, to_node_index: int, to_input: str
@@ -214,7 +228,7 @@ class ADSR(DspNode):
     class Inputs:
         input: float = 0
         attack: float = 1
-        decay: float = 0.00001
+        decay: float = 0.001
         # sustain: float = 0
         # release: float = 0
 
@@ -264,7 +278,7 @@ class Sum(DspNode):
         self.outputs.out = self.inputs.in_1 + self.inputs.in_2
 
 
-class Output(DspNode):
+class Speaker(DspNode):
     @dataclass
     class Inputs:
         input: float = 0
@@ -294,7 +308,8 @@ class SineOscilator(DspNode):
         self.phase = 0.0
 
     def tick(self) -> None:
-        self.phase_diff = (2.0 * math.pi * self.inputs.frequency) / SAMPLE_RATE
+        frequency = self.inputs.frequency * 1000
+        self.phase_diff = (2.0 * math.pi * frequency) / SAMPLE_RATE
         self.outputs.output = math.sin(self.phase + self.inputs.modulation)
         self.phase += self.phase_diff
 
@@ -344,17 +359,23 @@ class Doubler(DspNode):
         self.outputs.output = self.inputs.input * 2.0
 
 
-# class Multiplier(DspNode):
-#     @staticmethod
-#     def inputs() -> list[str]:
-#         return ["input", "scale"]
+class Multiplier(DspNode):
+    @dataclass
+    class Inputs:
+        input: float = 0
+        scale: float = 1.0
 
-#     @staticmethod
-#     def outputs() -> list[str]:
-#         return ["output"]
+    @dataclass
+    class Outputs:
+        output: float = 0
 
-#     def tick(self):
-#         pass
+    def __init__(self) -> None:
+        super().__init__()
+        self.inputs: Self.Inputs
+        self.outputs: Self.Outputs
+
+    def tick(self):
+        self.outputs.output = self.inputs.input * self.inputs.scale
 
 
 def draw_to_temp_file(graph: DspGraph) -> None:
@@ -405,36 +426,49 @@ def remove_random_connection(graph: DspGraph) -> None:
 
     graph.connections.pop(random.randrange(len(graph.connections)))
 
+
 def _get_random_param(graph: DspGraph) -> Optional[Param]:
-    params = [node for node in graph.nodes if isinstance(node, Param)]
+    params = [node for node in graph.nodes.values() if isinstance(node, Param)]
     if any(params):
         result_param = random.choice(params)
-        if result_param.get_value() == BASE_FREQUENCY:
-            return None
-
+        # if result_param.get_value() == BASE_FREQUENCY:
+        #     return None
         return result_param
 
+    print("No params found")
     return None
+
 
 def randomize_random_param(graph: DspGraph) -> None:
     if param := _get_random_param(graph):
         param.set_value(random.uniform(-1, 1))
 
+
 def nudge_random_param(graph: DspGraph) -> None:
     if param := _get_random_param(graph):
-        param.set_value( param.get_value() + random.uniform(-0.01, 0.01) )
+        param.set_value(param.get_value() + random.uniform(-0.01, 0.01))
+
+
+def multiply_random_param_by_harmonic(graph: DspGraph) -> None:
+    if param := _get_random_param(graph):
+        value = param.get_value()
+        param.set_value(
+            value
+            * random.choice(
+                [0.25, 1 / 3, 4 / 5, 0.5, 0.75, 5 / 4, 2 / 3, 2 / 3, 2.5, 3.5, 3]
+            )
+        )
 
 
 def get_starting_graph() -> DspGraph:
     graph = DspGraph()
-    output = graph.add_node(Output())
     sine = graph.add_node(SineOscilator())
     base_frequency_node = Param()
     base_frequency_node.set_value(BASE_FREQUENCY)
     base_frequency = graph.add_node(base_frequency_node)
 
     graph.patch(base_frequency, "output", sine, "frequency")
-    graph.patch(sine, "output", output, "input")
+    graph.patch(sine, "output", graph.speaker, "input")
 
     return graph
 
@@ -442,25 +476,27 @@ def get_starting_graph() -> DspGraph:
 if __name__ == "__main__":
     graph = get_starting_graph()
 
-    for _ in range(1):
-        random.choice(
-            [
-                add_random_node,
-                add_random_node,
-                add_random_node,
-                add_random_connection,
-                add_random_connection,
-                add_random_connection,
-                add_random_connection,
-                add_random_connection,
-                add_random_connection,
-                remove_random_connection,
-                randomize_random_param,
-                nudge_random_param
-            ]
-        )(graph)
-        draw_to_temp_file(graph)
-        # time.sleep(0.2)
+    __import__("pdb").set_trace()
+
+    # for _ in range(1):
+    #     random.choice(
+    #         [
+    #             add_random_node,
+    #             add_random_node,
+    #             add_random_node,
+    #             add_random_connection,
+    #             add_random_connection,
+    #             add_random_connection,
+    #             add_random_connection,
+    #             add_random_connection,
+    #             add_random_connection,
+    #             remove_random_connection,
+    #             randomize_random_param,
+    #             nudge_random_param
+    #         ]
+    #     )(graph)
+    #     draw_to_temp_file(graph)
+    # time.sleep(0.2)
 
     # for _ in range(10):
     #     draw_to_temp_file(graph)
