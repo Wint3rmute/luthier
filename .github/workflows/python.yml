@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build
+      - name: Mypy
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           poetry install
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build
+      - name: Ruff
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           poetry install
@@ -38,10 +38,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build
+      - name: Run notebook
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           poetry install
+          sudo apt install -y graphviz
           poetry run ipython prototyping.ipynb
 
 
