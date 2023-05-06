@@ -382,7 +382,7 @@ class Speaker(DspNode):
         pass
 
 
-class SineOscilator(DspNode):
+class SineOscillator(DspNode):
     @dataclass
     class Inputs:
         frequency: float = 0
@@ -394,8 +394,8 @@ class SineOscilator(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
-        self.inputs: SineOscilator.Inputs
-        self.outputs: SineOscilator.Outputs
+        self.inputs: SineOscillator.Inputs
+        self.outputs: SineOscillator.Outputs
         self.phase = 0.0
 
     def tick(self) -> None:
@@ -476,10 +476,10 @@ def draw_to_temp_file(graph: DspGraph) -> None:
 
 
 POSSIBLE_NODES_TO_ADD: list[type[DspNode]] = [
-    SineOscilator,
-    SineOscilator,
-    SineOscilator,
-    SineOscilator,
+    SineOscillator,
+    SineOscillator,
+    SineOscillator,
+    SineOscillator,
     Doubler,
     ADSR,
     Sum,
@@ -553,7 +553,7 @@ def multiply_random_param_by_harmonic(graph: DspGraph) -> None:
 
 def get_starting_graph() -> DspGraph:
     graph = DspGraph()
-    sine = graph.add_node(SineOscilator())
+    sine = graph.add_node(SineOscillator())
     base_frequency_node = Param()
     base_frequency_node.set_value(BASE_FREQUENCY)
     base_frequency = graph.add_node(base_frequency_node)
