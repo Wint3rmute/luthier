@@ -1,4 +1,5 @@
 import math
+import matplotlib.pyplot as plt
 from dtw import dtw
 import random
 import subprocess
@@ -23,7 +24,7 @@ BASE_FREQUENCY = 0.440  # Maps to C4 #  440 * 0.01
 
 NodeId = int
 AudioBuffer = numpy.typing.NDArray[numpy.float64]
-
+MfccArray = numpy.typing.NDArray[numpy.float64]
 
 class DspConnection:
     def __init__(
@@ -95,7 +96,7 @@ class Sample:
         return len(self.buffer)
 
     @cached_property
-    def mfcc(self):
+    def mfcc(self) -> MfccArray:
         return librosa.feature.mfcc(y=self.buffer, sr=SAMPLE_RATE)
 
     @cached_property
@@ -113,7 +114,7 @@ class Sample:
         spec_arr = numpy.abs(spec_arr)
         return bft_obj, spec_arr
 
-    def plot_spectrogram(self, ax, title="Mel spectrogram") -> None:
+    def plot_spectrogram(self, ax: plt.Axes, title: str = "Mel spectrogram") -> None:
         bft_obj, spec_arr = self.spectrogram
 
         fill_spec(
@@ -126,23 +127,23 @@ class Sample:
             title=title,
         )
 
-    def plot_mfcc(self, ax, title="MFCC") -> None:
+    def plot_mfcc(self, ax: plt.Axes, title: str ="MFCC") -> None:
         ax.set_title(title)
         librosa.display.specshow(self.mfcc, ax=ax)
 
-    def plot_waveform(self, ax, num_samples=400, title="Waveform") -> None:
+    def plot_waveform(self, ax: plt.Axes, num_samples: int=400, title: str ="Waveform") -> None:
         ax.set_title(title)
         ax.plot(self.buffer[:num_samples])
 
-    def show_player(self):
+    def show_player(self) -> None:
         """Display playble audio widget in Jupyter"""
-        display(Audio(data=self.buffer, rate=SAMPLE_RATE))
+        display(Audio(data=self.buffer, rate=SAMPLE_RATE))  # type: ignore
 
     def mfcc_distance(self, other: "Sample") -> float:
         dist, cost, acc_cost, path = dtw(
             self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1)
         )
-        return dist
+        return float(dist)
 
 
 class DspGraph:
@@ -161,7 +162,7 @@ class DspGraph:
 
         return self._add_node_no_check(node)
 
-    def play(self, num_samples: int) -> AudioBuffer:
+    def play(self, num_samples: int) -> Sample:
         audio_buffer = numpy.zeros(num_samples)
 
         for index in range(len(audio_buffer)):
