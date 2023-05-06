@@ -86,7 +86,12 @@ class Sample:
         self.buffer = audio_buffer
 
     @cached_property
+    def mfcc(self):
+        return librosa.feature.mfcc(y=self.buffer, sr=SAMPLE_RATE)
+
+    @cached_property
     def spectrogram(self) -> Any:
+        """Returns objects required to plot a spectrogram in matplotlib"""
         # Create BFT object and extract mel spectrogram
         bft_obj = af.BFT(num=128, radix2_exp=12, samplate=SAMPLE_RATE,
                          scale_type=SpectralFilterBankScaleType.MEL)
@@ -94,6 +99,11 @@ class Sample:
         spec_arr = bft_obj.bft(self.buffer)
         spec_arr = numpy.abs(self.buffer)
         return bft_obj, spec_arr
+
+    def mfcc_distance(self, other: "Sample") -> float:
+        other_mfcc = other.mfcc
+        dist, cost, acc_cost, path = dtw(self.mfcc.T, other.mfcc.T, dist=lambda x, y: norm(x - y, ord=1))
+        return dist
 
 
 class DspGraph:
@@ -118,7 +128,7 @@ class DspGraph:
         for index in range(len(audio_buffer)):
             audio_buffer[index] = self.tick()
 
-        return audio_buffer
+        return Sample(audio_buffer=audio_buffer)
 
     def _add_node_no_check(self, node: DspNode) -> int:
         node.node_id = self._get_next_node_id()
@@ -245,10 +255,8 @@ label = "<f0>{node.__class__.__name__} """
 
 class AdsrPhase(Enum):
     ATTACK = 0
-    DECAY = 1
-    SUSTAIN = 2
-    RELEASE = 3
-    FINISHED = 4
+    SUSTAIN = 1
+    RELEASE = 2
 
 
 class ADSR(DspNode):
@@ -256,9 +264,11 @@ class ADSR(DspNode):
     class Inputs:
         input: float = 0
         attack: float = 1
-        decay: float = 0.001
-        # sustain: float = 0
-        # release: float = 0
+        # There's no key input in the simulation, hence sustain is a parameter
+        # defining how long the sound stay in higest-level attack velocity
+        # before the release phase
+        sustain: float = 0.001
+        release: float = 0.001
 
     @dataclass
     class Outputs:
@@ -271,20 +281,26 @@ class ADSR(DspNode):
 
         self.phase = AdsrPhase.ATTACK  # Controls the envelope logic
         self.state = 0.0  # Value by which the input will be multiplied
+        self.sustain_state = 0.0
 
     def tick(self) -> None:
         if self.phase == AdsrPhase.ATTACK:
             self.state += self.inputs.attack
             if self.state > 1.0:
                 self.state = 1.0
-                self.phase = AdsrPhase.DECAY
-        elif self.phase == AdsrPhase.DECAY:
-            self.state -= self.inputs.decay
+                self.phase = AdsrPhase.SUSTAIN
+
+        elif self.phase == AdsrPhase.SUSTAIN:
+            self.sustain_state += self.sustain
+            if self.sustain_state >= 1.0:
+                self.phase = AdsrPhase.RELEASE
+
+        elif self.phase == AdsrPhase.RELEASE:
+            self.state -= self.inputs.release
             if self.state < 0.0:
                 self.state = 0.0
 
         self.outputs.output = self.inputs.input * self.state
-        # print("ADSR", self.outputs.output)
 
 
 class Sum(DspNode):
