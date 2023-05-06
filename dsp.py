@@ -557,6 +557,7 @@ def get_starting_graph() -> DspGraph:
     base_frequency_node = Param()
     base_frequency_node.set_value(BASE_FREQUENCY)
     base_frequency = graph.add_node(base_frequency_node)
+    graph.base_frequency_node = base_frequency
 
     graph.patch(base_frequency, "output", sine, "frequency")
     graph.patch(sine, "output", graph.speaker, "input")
