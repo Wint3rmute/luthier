@@ -1,18 +1,30 @@
 import math
 import random
 import subprocess
-import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, is_dataclass
 from enum import Enum
-from functools import cache
+from functools import cache, cached_property
 from itertools import count
-from typing import Optional
+from typing import Any, Optional
+
+import audioflux as af
+import librosa
+import matplotlib.pyplot as plt
+import numpy
+import numpy.typing
+from audioflux.display import fill_spec
+from audioflux.type import SpectralFilterBankScaleType
+from dtw import dtw
+from IPython.display import Audio, display
 
 # SAMPLE_RATE = 48000
 SAMPLE_RATE = 22050
 BASE_FREQUENCY = 0.440  # Maps to C4 #  440 * 0.01
+
 NodeId = int
+AudioBuffer = numpy.typing.NDArray[numpy.float64]
+MfccArray = numpy.typing.NDArray[numpy.float64]
 
 
 class DspConnection:
@@ -76,6 +88,67 @@ class DspNode(ABC):
         ...
 
 
+class Sample:
+    def __init__(self, audio_buffer: AudioBuffer) -> None:
+        self.buffer = audio_buffer
+
+    def __len__(self) -> int:
+        """Returns the length of the underlying audio buffer"""
+        return len(self.buffer)
+
+    @cached_property
+    def mfcc(self) -> MfccArray:
+        return librosa.feature.mfcc(y=self.buffer, sr=SAMPLE_RATE)
+
+    @cached_property
+    def spectrogram(self) -> Any:
+        """Returns objects required to plot a spectrogram in matplotlib"""
+        # Create BFT object and extract mel spectrogram
+        bft_obj = af.BFT(
+            num=128,
+            radix2_exp=12,
+            samplate=SAMPLE_RATE,
+            scale_type=SpectralFilterBankScaleType.MEL,
+        )
+
+        spec_arr = bft_obj.bft(self.buffer)
+        spec_arr = numpy.abs(spec_arr)
+        return bft_obj, spec_arr
+
+    def plot_spectrogram(self, ax: plt.Axes, title: str = "Mel spectrogram") -> None:
+        bft_obj, spec_arr = self.spectrogram
+
+        fill_spec(
+            spec_arr,
+            axes=ax,
+            x_coords=bft_obj.x_coords(len(self)),
+            y_coords=bft_obj.y_coords(),
+            x_axis="time",
+            y_axis="log",
+            title=title,
+        )
+
+    def plot_mfcc(self, ax: plt.Axes, title: str = "MFCC") -> None:
+        ax.set_title(title)
+        librosa.display.specshow(self.mfcc, ax=ax)
+
+    def plot_waveform(
+        self, ax: plt.Axes, num_samples: int = 400, title: str = "Waveform"
+    ) -> None:
+        ax.set_title(title)
+        ax.plot(self.buffer[:num_samples])
+
+    def show_player(self) -> None:
+        """Display playble audio widget in Jupyter"""
+        display(Audio(data=self.buffer, rate=SAMPLE_RATE))  # type: ignore
+
+    def mfcc_distance(self, other: "Sample") -> float:
+        dist, cost, acc_cost, path = dtw(
+            self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1)
+        )
+        return float(dist)
+
+
 class DspGraph:
     def __init__(self) -> None:
         self.nodes: dict[NodeId, DspNode] = {}
@@ -91,6 +164,14 @@ class DspGraph:
             raise ValueError("Speaker node already present in the graph")
 
         return self._add_node_no_check(node)
+
+    def play(self, num_samples: int) -> Sample:
+        audio_buffer = numpy.zeros(num_samples)
+
+        for index in range(len(audio_buffer)):
+            audio_buffer[index] = self.tick()
+
+        return Sample(audio_buffer=audio_buffer)
 
     def _add_node_no_check(self, node: DspNode) -> int:
         node.node_id = self._get_next_node_id()
@@ -209,7 +290,7 @@ label = "<f0>{node.__class__.__name__} """
 
         out, errors = graphviz_dot_process.communicate(result.encode())
 
-        if errors != None:
+        if errors is not None:
             raise ValueError(f"Errors while running dot: {errors!r}")
 
         return out
@@ -217,10 +298,8 @@ label = "<f0>{node.__class__.__name__} """
 
 class AdsrPhase(Enum):
     ATTACK = 0
-    DECAY = 1
-    SUSTAIN = 2
-    RELEASE = 3
-    FINISHED = 4
+    SUSTAIN = 1
+    RELEASE = 2
 
 
 class ADSR(DspNode):
@@ -228,9 +307,11 @@ class ADSR(DspNode):
     class Inputs:
         input: float = 0
         attack: float = 1
-        decay: float = 0.001
-        # sustain: float = 0
-        # release: float = 0
+        # There's no key input in the simulation, hence sustain is a parameter
+        # defining how long the sound stay in higest-level attack velocity
+        # before the release phase
+        sustain: float = 0.001
+        release: float = 0.001
 
     @dataclass
     class Outputs:
@@ -243,20 +324,26 @@ class ADSR(DspNode):
 
         self.phase = AdsrPhase.ATTACK  # Controls the envelope logic
         self.state = 0.0  # Value by which the input will be multiplied
+        self.sustain_state = 0.0
 
     def tick(self) -> None:
         if self.phase == AdsrPhase.ATTACK:
             self.state += self.inputs.attack
             if self.state > 1.0:
                 self.state = 1.0
-                self.phase = AdsrPhase.DECAY
-        elif self.phase == AdsrPhase.DECAY:
-            self.state -= self.inputs.decay
+                self.phase = AdsrPhase.SUSTAIN
+
+        elif self.phase == AdsrPhase.SUSTAIN:
+            self.sustain_state += self.inputs.sustain
+            if self.sustain_state >= 1.0:
+                self.phase = AdsrPhase.RELEASE
+
+        elif self.phase == AdsrPhase.RELEASE:
+            self.state -= self.inputs.release
             if self.state < 0.0:
                 self.state = 0.0
 
         self.outputs.output = self.inputs.input * self.state
-        # print("ADSR", self.outputs.output)
 
 
 class Sum(DspNode):
@@ -264,6 +351,8 @@ class Sum(DspNode):
     class Inputs:
         in_1: float = 0
         in_2: float = 0
+        in_3: float = 0
+        in_4: float = 0
 
     @dataclass
     class Outputs:
@@ -275,7 +364,9 @@ class Sum(DspNode):
         self.outputs: Sum.Outputs
 
     def tick(self) -> None:
-        self.outputs.out = self.inputs.in_1 + self.inputs.in_2
+        self.outputs.out = (
+            self.inputs.in_1 + self.inputs.in_2 + self.inputs.in_3 + self.inputs.in_4
+        )
 
 
 class Speaker(DspNode):
@@ -355,7 +446,7 @@ class Doubler(DspNode):
         self.inputs: Doubler.Inputs
         self.outputs: Doubler.Outputs
 
-    def tick(self):
+    def tick(self) -> None:
         self.outputs.output = self.inputs.input * 2.0
 
 
@@ -371,10 +462,10 @@ class Multiplier(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
-        self.inputs: Self.Inputs
-        self.outputs: Self.Outputs
+        self.inputs: Multiplier.Inputs
+        self.outputs: Multiplier.Outputs
 
-    def tick(self):
+    def tick(self) -> None:
         self.outputs.output = self.inputs.input * self.inputs.scale
 
 
@@ -475,6 +566,8 @@ def get_starting_graph() -> DspGraph:
 
 if __name__ == "__main__":
     graph = get_starting_graph()
+
+    a = graph.play(SAMPLE_RATE * 1)
 
     __import__("pdb").set_trace()
 

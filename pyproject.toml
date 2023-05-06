@@ -6,7 +6,7 @@ authors = ["Wint3rmute <mateusz.baczek1998@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.12"
+python = ">=3.10,<3.11"
 jupyterlab = "^3.6.3"
 scipy = "^1.10.1"
 audioflux = "^0.1.4"
@@ -15,11 +15,19 @@ llvmlite = "^0.39.1"
 librosa = "^0.10.0.post2"
 dtw = "^1.4.0"
 tqdm = "^4.65.0"
+ipywidgets = "^8.0.6"
 
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.2.0"
+black = "^23.3.0"
+ruff = "^0.0.264"
+isort = "^5.12.0"
+ipython = "^8.13.2"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+ignore = [ "E501" ]
