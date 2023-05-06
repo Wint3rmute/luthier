@@ -351,6 +351,8 @@ class Sum(DspNode):
     class Inputs:
         in_1: float = 0
         in_2: float = 0
+        in_3: float = 0
+        in_4: float = 0
 
     @dataclass
     class Outputs:
@@ -362,7 +364,9 @@ class Sum(DspNode):
         self.outputs: Sum.Outputs
 
     def tick(self) -> None:
-        self.outputs.out = self.inputs.in_1 + self.inputs.in_2
+        self.outputs.out = (
+            self.inputs.in_1 + self.inputs.in_2 + self.inputs.in_3 + self.inputs.in_4
+        )
 
 
 class Speaker(DspNode):
