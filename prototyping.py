@@ -1,4 +1,5 @@
 import math
+from dtw import dtw
 import random
 import subprocess
 from abc import ABC, abstractmethod
@@ -9,8 +10,12 @@ from itertools import count
 from typing import Any, Optional
 
 import audioflux as af
+import librosa
 import numpy
 import numpy.typing
+from audioflux.display import fill_spec
+from audioflux.type import SpectralFilterBankScaleType
+from IPython.display import Audio, display
 
 # SAMPLE_RATE = 48000
 SAMPLE_RATE = 22050
@@ -85,6 +90,10 @@ class Sample:
     def __init__(self, audio_buffer: AudioBuffer) -> None:
         self.buffer = audio_buffer
 
+    def __len__(self) -> int:
+        """Returns the length of the underlying audio buffer"""
+        return len(self.buffer)
+
     @cached_property
     def mfcc(self):
         return librosa.feature.mfcc(y=self.buffer, sr=SAMPLE_RATE)
@@ -93,16 +102,46 @@ class Sample:
     def spectrogram(self) -> Any:
         """Returns objects required to plot a spectrogram in matplotlib"""
         # Create BFT object and extract mel spectrogram
-        bft_obj = af.BFT(num=128, radix2_exp=12, samplate=SAMPLE_RATE,
-                         scale_type=SpectralFilterBankScaleType.MEL)
+        bft_obj = af.BFT(
+            num=128,
+            radix2_exp=12,
+            samplate=SAMPLE_RATE,
+            scale_type=SpectralFilterBankScaleType.MEL,
+        )
 
         spec_arr = bft_obj.bft(self.buffer)
-        spec_arr = numpy.abs(self.buffer)
+        spec_arr = numpy.abs(spec_arr)
         return bft_obj, spec_arr
 
+    def plot_spectrogram(self, ax, title="Mel spectrogram") -> None:
+        bft_obj, spec_arr = self.spectrogram
+
+        fill_spec(
+            spec_arr,
+            axes=ax,
+            x_coords=bft_obj.x_coords(len(self)),
+            y_coords=bft_obj.y_coords(),
+            x_axis="time",
+            y_axis="log",
+            title=title,
+        )
+
+    def plot_mfcc(self, ax, title="MFCC") -> None:
+        ax.set_title(title)
+        librosa.display.specshow(self.mfcc, ax=ax)
+
+    def plot_waveform(self, ax, num_samples=400, title="Waveform") -> None:
+        ax.set_title(title)
+        ax.plot(self.buffer[:num_samples])
+
+    def show_player(self):
+        """Display playble audio widget in Jupyter"""
+        display(Audio(data=self.buffer, rate=SAMPLE_RATE))
+
     def mfcc_distance(self, other: "Sample") -> float:
-        other_mfcc = other.mfcc
-        dist, cost, acc_cost, path = dtw(self.mfcc.T, other.mfcc.T, dist=lambda x, y: norm(x - y, ord=1))
+        dist, cost, acc_cost, path = dtw(
+            self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1)
+        )
         return dist
 
 
@@ -291,7 +330,7 @@ class ADSR(DspNode):
                 self.phase = AdsrPhase.SUSTAIN
 
         elif self.phase == AdsrPhase.SUSTAIN:
-            self.sustain_state += self.sustain
+            self.sustain_state += self.inputs.sustain
             if self.sustain_state >= 1.0:
                 self.phase = AdsrPhase.RELEASE
 
