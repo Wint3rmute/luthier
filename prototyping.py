@@ -1,6 +1,4 @@
 import math
-import matplotlib.pyplot as plt
-from dtw import dtw
 import random
 import subprocess
 from abc import ABC, abstractmethod
@@ -12,10 +10,12 @@ from typing import Any, Optional
 
 import audioflux as af
 import librosa
+import matplotlib.pyplot as plt
 import numpy
 import numpy.typing
 from audioflux.display import fill_spec
 from audioflux.type import SpectralFilterBankScaleType
+from dtw import dtw
 from IPython.display import Audio, display
 
 # SAMPLE_RATE = 48000
@@ -25,6 +25,7 @@ BASE_FREQUENCY = 0.440  # Maps to C4 #  440 * 0.01
 NodeId = int
 AudioBuffer = numpy.typing.NDArray[numpy.float64]
 MfccArray = numpy.typing.NDArray[numpy.float64]
+
 
 class DspConnection:
     def __init__(
@@ -127,11 +128,13 @@ class Sample:
             title=title,
         )
 
-    def plot_mfcc(self, ax: plt.Axes, title: str ="MFCC") -> None:
+    def plot_mfcc(self, ax: plt.Axes, title: str = "MFCC") -> None:
         ax.set_title(title)
         librosa.display.specshow(self.mfcc, ax=ax)
 
-    def plot_waveform(self, ax: plt.Axes, num_samples: int=400, title: str ="Waveform") -> None:
+    def plot_waveform(
+        self, ax: plt.Axes, num_samples: int = 400, title: str = "Waveform"
+    ) -> None:
         ax.set_title(title)
         ax.plot(self.buffer[:num_samples])
 
