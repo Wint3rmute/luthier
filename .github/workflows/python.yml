@@ -33,3 +33,16 @@ jobs:
           curl -sSL https://install.python-poetry.org | python3 -
           poetry install
           poetry run ruff .
+
+  notebook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry install
+          poetry run ipython prototyping.ipynb
+
+
+
