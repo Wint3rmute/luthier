@@ -6,6 +6,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Restore cached virtualenv
+        id: venv-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            .venv
+          key: venv
+
       - name: Formatting
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
@@ -14,10 +23,26 @@ jobs:
           poetry run isort .
           git status
 
+      - name: Cache virtualenv
+        id: venv-save
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            .venv
+          key: venv
+
   mypy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Restore cached virtualenv
+        id: venv-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            .venv
+          key: venv
+
       - name: Mypy
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
@@ -28,6 +53,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Restore cached virtualenv
+        id: venv-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            .venv
+          key: venv
+
       - name: Ruff
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
@@ -38,6 +71,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Restore cached virtualenv
+        id: venv-restore
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            .venv
+          key: venv
+
       - name: Run notebook
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
