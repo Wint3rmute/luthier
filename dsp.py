@@ -255,8 +255,14 @@ edge [
         """
 
         for node in self.nodes.values():
+
+            if isinstance(node, SineOscillator):
+                color = "red"
+            else:
+                color = "black"
+
             result += f"""
-"node{node.node_id}" [
+"node{node.node_id}" [ color="{color}"
 label = "<f0>{node.__class__.__name__} """
 
             if isinstance(node, Param):
@@ -566,31 +572,32 @@ def get_starting_graph() -> DspGraph:
 
 
 if __name__ == "__main__":
+    import time
     graph = get_starting_graph()
 
-    a = graph.play(SAMPLE_RATE * 1)
+    # a = graph.play(SAMPLE_RATE * 1)
 
-    __import__("pdb").set_trace()
+    # __import__("pdb").set_trace()
 
-    # for _ in range(1):
-    #     random.choice(
-    #         [
-    #             add_random_node,
-    #             add_random_node,
-    #             add_random_node,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             remove_random_connection,
-    #             randomize_random_param,
-    #             nudge_random_param
-    #         ]
-    #     )(graph)
-    #     draw_to_temp_file(graph)
-    # time.sleep(0.2)
+    for _ in range(10):
+        random.choice(
+            [
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                remove_random_connection,
+                randomize_random_param,
+                nudge_random_param
+            ]
+        )(graph)
+        draw_to_temp_file(graph)
+        time.sleep(0.2)
 
     # for _ in range(10):
     #     draw_to_temp_file(graph)
