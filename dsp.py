@@ -90,7 +90,12 @@ class DspNode(ABC):
 
 class Sample:
     def __init__(self, audio_buffer: AudioBuffer) -> None:
-        self.buffer = audio_buffer
+        if sum(abs(audio_buffer)) == 0:
+            self.buffer = audio_buffer
+        else:
+            self.buffer = audio_buffer / numpy.linalg.norm(audio_buffer)
+            self.buffer /= max(self.buffer)
+        # self.buffer /= max(self.buffer) 
 
     def __len__(self) -> int:
         """Returns the length of the underlying audio buffer"""
@@ -535,6 +540,13 @@ def _get_random_param(graph: DspGraph) -> Optional[Param]:
     print("No params found")
     return None
 
+def set_random_param_to_base_frequency(graph: DspGraph) -> None:
+    if param := _get_random_param(graph):
+        param.set_value(BASE_FREQUENCY)
+
+def set_random_param_to_one(graph: DspGraph) -> None:
+    if param := _get_random_param(graph):
+        param.set_value(1.0)
 
 def randomize_random_param(graph: DspGraph) -> None:
     if param := _get_random_param(graph):
