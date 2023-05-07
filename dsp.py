@@ -68,15 +68,22 @@ class DspNode(ABC):
 
     @cache
     def output_names(self) -> list[str]:
-        return sorted(
-            field for field in dir(self.__class__.Outputs) if not field.startswith("_")
-        )
+        # __import__('pdb').set_trace()
+        try:
+            return sorted(
+                field for field in dir(self.outputs) if not field.startswith("_")
+            )
+        except ValueError:
+            return []
 
     @cache
     def input_names(self) -> list[str]:
-        return sorted(
-            field for field in dir(self.__class__.Inputs) if not field.startswith("_")
-        )
+        try:
+            return sorted(
+                field for field in dir(self.inputs) if not field.startswith("_")
+            )
+        except ValueError:
+            return []
 
     def get_output_by_index(self, output_index: int) -> float:
         return float(getattr(self.outputs, self.output_names()[output_index]))
@@ -242,6 +249,19 @@ class DspGraph:
             )
         )
 
+    def save_video(self, output_path: str = "/tmp/output.mp4") -> Sample:
+        with tempfile.TemporaryDirectory() as dir:
+            samples = numpy.zeros(SAMPLE_RATE)
+            for i in range(len(samples)):
+                samples[i] = graph.tick()
+                if i % 100 == 0:
+                    with open(dir + f"/{i}.png", "wb") as drawing_file:
+                        drawing_file.write(graph.draw())
+
+            os.system(f"cat {dir}/*.png | ffmpeg -y -f image2pipe -i - {output_path}")
+
+        return Sample(audio_buffer=samples)
+
     def draw(self) -> bytes:
         cmap = matplotlib.colormaps.get_cmap('bwr')
         result = """
@@ -273,10 +293,12 @@ digraph g {
             if isinstance(node, Param):
                 param_value = float(node.outputs.output)
                 color = matplotlib.colors.to_hex(cmap((param_value + 1) / 2))
-                result += f'<tr><td border="1" bgcolor="{color}"> ⇒ {node.outputs.output:.3} </td></tr> \n'
+                result += f'<tr><td border="1" bgcolor="{color}"> ⇒ {param_value:.3} </td></tr> \n'
 
             for input in node.input_names():
-                result += f'<tr><td border="1" port="{input}"> ○ {input} </td></tr> \n'
+                param_value = float(getattr(node.inputs, input))
+                color = matplotlib.colors.to_hex(cmap((param_value + 1) / 2))
+                result += f'<tr><td border="1" port="{input}" bgcolor="{color}"> ○ {input} </td></tr> \n'
 
             for output in node.output_names():
                 result += f'<tr><td border="1" port="{output}"> {output} ● </td></tr> \n'
@@ -388,6 +410,7 @@ class Speaker(DspNode):
 
     @dataclass
     class Outputs:
+        pass
         """Reading from an output node is handled by DspGraph's logic"""
 
     def tick(self) -> None:
@@ -609,8 +632,10 @@ def get_starting_graph() -> DspGraph:
 
 if __name__ == "__main__":
     import time
-    graph = get_starting_graph()
+    import os
+    import tempfile
 
+    graph = get_starting_graph()
     # a = graph.play(SAMPLE_RATE * 1)
 
     # __import__("pdb").set_trace()
@@ -636,6 +661,8 @@ if __name__ == "__main__":
         draw_to_temp_file(graph)
         time.sleep(0.1)
 
+    graph.save_video()
+
     # for _ in range(10):
     #     draw_to_temp_file(graph)
     #     time.sleep(.5)
@@ -650,10 +677,3 @@ if __name__ == "__main__":
     # g.patch(source_1, "output", sine_2, "frequency")
     # g.patch(source_2, "output", sine_1, "frequency")
 
-    # for i in range(100):
-    # while True:
-    #     g.tick()
-    #     # print(g.nodes[sine_2].outputs.output)
-    #     print(g.nodes[output].inputs.input)
-    #     time.sleep(0.01)
-    #     # break
