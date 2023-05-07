@@ -339,18 +339,18 @@ class ADSR(DspNode):
 
     def tick(self) -> None:
         if self.phase == AdsrPhase.ATTACK:
-            self.state += self.inputs.attack
+            self.state += abs(self.inputs.attack)
             if self.state > 1.0:
                 self.state = 1.0
                 self.phase = AdsrPhase.SUSTAIN
 
         elif self.phase == AdsrPhase.SUSTAIN:
-            self.sustain_state += self.inputs.sustain
+            self.sustain_state += abs(self.inputs.sustain)
             if self.sustain_state >= 1.0:
                 self.phase = AdsrPhase.RELEASE
 
         elif self.phase == AdsrPhase.RELEASE:
-            self.state -= self.inputs.release
+            self.state -= abs(self.inputs.release)
             if self.state < 0.0:
                 self.state = 0.0
 
@@ -410,7 +410,7 @@ class SineOscillator(DspNode):
         self.phase = 0.0
 
     def tick(self) -> None:
-        frequency = self.inputs.frequency * 1000
+        frequency = abs(self.inputs.frequency * 1000)
         self.phase_diff = (2.0 * math.pi * frequency) / SAMPLE_RATE
         self.outputs.output = math.sin(self.phase + self.inputs.modulation)
         self.phase += self.phase_diff
@@ -571,14 +571,37 @@ def multiply_random_param_by_harmonic(graph: DspGraph) -> None:
 
 def get_starting_graph() -> DspGraph:
     graph = DspGraph()
+
     sine = graph.add_node(SineOscillator())
+    amp_adsr = graph.add_node(ADSR())
+
+    amp_attack = Param()
+    amp_attack.set_value(0.01)
+    amp_attack = graph.add_node(amp_attack)
+
+    amp_sustain = Param()
+    amp_sustain.set_value(0.001)
+    amp_sustain = graph.add_node(amp_sustain)
+
+    amp_release = Param()
+    amp_release.set_value(0.0001)
+    amp_release = graph.add_node(amp_release)
+
+    graph.patch(amp_attack, "output", amp_adsr, "attack")
+    graph.patch(amp_sustain, "output", amp_adsr, "sustain")
+    graph.patch(amp_release, "output", amp_adsr, "release")
+
     base_frequency_node = Param()
     base_frequency_node.set_value(BASE_FREQUENCY)
     base_frequency = graph.add_node(base_frequency_node)
     graph.base_frequency_node = base_frequency  # type: ignore
+    graph.amp_attack = amp_attack
+    graph.amp_sustain = amp_sustain
+    graph.amp_release = amp_release
 
     graph.patch(base_frequency, "output", sine, "frequency")
-    graph.patch(sine, "output", graph.speaker, "input")
+    graph.patch(sine, "output", amp_adsr, "input")
+    graph.patch(amp_adsr, "output", graph.speaker, "input")
 
     return graph
 
