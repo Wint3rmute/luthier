@@ -1,4 +1,5 @@
 import math
+import matplotlib
 import random
 import subprocess
 from abc import ABC, abstractmethod
@@ -242,43 +243,45 @@ class DspGraph:
         )
 
     def draw(self) -> bytes:
+        cmap = matplotlib.colormaps.get_cmap('bwr')
         result = """
 digraph g {
-splines="polyline"
-fontname="Helvetica,Arial,sans-serif"
-node [fontname="Helvetica,Arial,sans-serif"]
-edge [fontname="Helvetica,Arial,sans-serif"]
-graph [
-rankdir = "LR"
-];
-node [
-fontsize = "16"
-shape = "record"
-];
-edge [
-];
-        """
+    splines="polyline"
+    rankdir = "LR"
+
+    fontname="Fira Code"
+    node [fontname="Fira Code"]
+"""
 
         for node in self.nodes.values():
+            node_to_color = {
+                SineOscillator: "#FF5370",
+                Param: "white",
+                Doubler: "#C792EA",
+                ADSR: "#FFCB6B",
+            }
 
-            if isinstance(node, SineOscillator):
-                color = "red"
-            else:
-                color = "black"
+            color = node_to_color.get(node.__class__, "white")
 
             result += f"""
-"node{node.node_id}" [ color="{color}"
-label = "<f0>{node.__class__.__name__} """
+"node{node.node_id}" [ 
+    shape = none
+    label = <<table border="0" cellspacing="0">
 
+        <tr><td border="1" bgcolor="{color}">{node.__class__.__name__}</td></tr>
+"""
             if isinstance(node, Param):
-                result += f"| ⇒ {node.outputs.output:.2E}"
+                param_value = float(node.outputs.output)
+                color = matplotlib.colors.to_hex(cmap((param_value + 1) / 2))
+                result += f'<tr><td border="1" bgcolor="{color}"> ⇒ {node.outputs.output:.3} </td></tr> \n'
 
             for input in node.input_names():
-                result += f"|<{input}> ○ {input}  "
+                result += f'<tr><td border="1" port="{input}"> ○ {input} </td></tr> \n'
 
             for output in node.output_names():
-                result += f"|<{output}> {output} ●"
-            result += '"\n];'
+                result += f'<tr><td border="1" port="{output}"> {output} ● </td></tr> \n'
+
+            result += '</table>>\n];'
 
         for connection in self.connections:
             output_name = self.nodes[connection.from_node].output_names()[
@@ -293,10 +296,8 @@ label = "<f0>{node.__class__.__name__} """
             """
 
         result += "\n}"
-
-        # print(result)
         graphviz_dot_process = subprocess.Popen(
-            ["dot", "-T", "jpg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE
+            ["dot", "-T", "png"], stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
 
         out, errors = graphviz_dot_process.communicate(result.encode())
@@ -575,17 +576,17 @@ def get_starting_graph() -> DspGraph:
     sine = graph.add_node(SineOscillator())
     amp_adsr = graph.add_node(ADSR())
 
-    amp_attack = Param()
-    amp_attack.set_value(0.01)
-    amp_attack = graph.add_node(amp_attack)
+    _amp_attack = Param()
+    _amp_attack.set_value(0.01)
+    amp_attack = graph.add_node(_amp_attack)
 
-    amp_sustain = Param()
-    amp_sustain.set_value(0.001)
-    amp_sustain = graph.add_node(amp_sustain)
+    _amp_sustain = Param()
+    _amp_sustain.set_value(0.001)
+    amp_sustain = graph.add_node(_amp_sustain)
 
-    amp_release = Param()
-    amp_release.set_value(0.0001)
-    amp_release = graph.add_node(amp_release)
+    _amp_release = Param()
+    _amp_release.set_value(0.0001)
+    amp_release = graph.add_node(_amp_release)
 
     graph.patch(amp_attack, "output", amp_adsr, "attack")
     graph.patch(amp_sustain, "output", amp_adsr, "sustain")
@@ -595,9 +596,9 @@ def get_starting_graph() -> DspGraph:
     base_frequency_node.set_value(BASE_FREQUENCY)
     base_frequency = graph.add_node(base_frequency_node)
     graph.base_frequency_node = base_frequency  # type: ignore
-    graph.amp_attack = amp_attack
-    graph.amp_sustain = amp_sustain
-    graph.amp_release = amp_release
+    graph.amp_attack = amp_attack # type: ignore
+    graph.amp_sustain = amp_sustain  # type: ignore
+    graph.amp_release = amp_release  # type: ignore
 
     graph.patch(base_frequency, "output", sine, "frequency")
     graph.patch(sine, "output", amp_adsr, "input")
@@ -614,7 +615,7 @@ if __name__ == "__main__":
 
     # __import__("pdb").set_trace()
 
-    for _ in range(10):
+    for _ in range(20):
         random.choice(
             [
                 add_random_node,
@@ -628,11 +629,12 @@ if __name__ == "__main__":
                 add_random_connection,
                 remove_random_connection,
                 randomize_random_param,
+                randomize_random_param,
                 nudge_random_param
             ]
         )(graph)
         draw_to_temp_file(graph)
-        time.sleep(0.2)
+        time.sleep(0.1)
 
     # for _ in range(10):
     #     draw_to_temp_file(graph)
