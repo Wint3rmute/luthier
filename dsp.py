@@ -169,6 +169,24 @@ class DspGraph:
         self.node_id_counter = count()
         self.speaker = self._add_node_no_check(Speaker())
 
+    def iter_params(self) -> int:
+        for node in self.nodes.values():
+            if isinstance(node, Param):
+                yield node
+
+    def num_params(self) -> int:
+        return len(list(self.iter_params()))
+
+    def assign_params(self, values: list[float]) -> None:
+        if len(values) != self.num_params():
+            raise ValueError(f"Number of values to assign ({len(values)}) different from number of params ({self.num_params()})")
+
+        for param, new_value in zip(self.iter_params(), values):
+            param.set_value(new_value)
+
+    def get_param_values(self) -> list[float]:
+        return [p.get_value() for p in self.iter_params() ]
+
     def add_node(self, node: DspNode) -> int:
         """
         Adds a node to the graph and return its unique ID within the graph
@@ -646,6 +664,13 @@ if __name__ == "__main__":
                 add_random_node,
                 add_random_node,
                 add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
                 add_random_connection,
                 add_random_connection,
                 add_random_connection,
@@ -659,9 +684,13 @@ if __name__ == "__main__":
             ]
         )(graph)
         draw_to_temp_file(graph)
-        time.sleep(0.1)
+        # time.sleep(0.1)
 
-    graph.save_video()
+    print(graph.num_params())
+    print(graph.get_param_values())
+
+
+    # graph.save_video()
 
     # for _ in range(10):
     #     draw_to_temp_file(graph)
