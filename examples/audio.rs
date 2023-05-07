@@ -27,14 +27,14 @@ impl SineOscillator {
 impl AudioNode for SineOscillator {
     fn process(&mut self) {}
 
-    fn get_output(&mut self, output_num: usize) -> f32 {
+    fn get_output(&mut self, _output_num: usize) -> f32 {
         self.phase += self.phase_diff;
         let result = (self.phase + self.phase_mod).sin();
 
         result
     }
 
-    fn send_to_input(&mut self, input_num: usize, input_value: f32) {
+    fn send_to_input(&mut self, _input_num: usize, input_value: f32) {
         self.phase_mod = input_value;
     }
 }

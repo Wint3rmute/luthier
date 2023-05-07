@@ -6,60 +6,64 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Restore cached virtualenv
-        id: venv-restore
+      - name: Restore cache
         uses: actions/cache/restore@v3
         with:
           path: |
             .venv
-          key: venv
+            target
+          key: cache
+      - name: Install dependencies
+        run: |
+          ./.github/workflows/setup.sh
 
       - name: Formatting
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry install
           poetry run black .
           poetry run isort .
           git status
 
-      - name: Cache virtualenv
-        id: venv-save
+      - name: Save cache
         uses: actions/cache/save@v3
         with:
           path: |
             .venv
-          key: venv
+            target
+          key: cache
 
   mypy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Restore cached virtualenv
-        id: venv-restore
+      - name: Restore cache
         uses: actions/cache/restore@v3
         with:
           path: |
             .venv
-          key: venv
+            target
+          key: cache
+      - name: Install dependencies
+        run: |
+          ./.github/workflows/setup.sh
 
       - name: Mypy
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry install
           poetry run mypy .
 
   ruff:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Restore cached virtualenv
-        id: venv-restore
+      - name: Restore cache
         uses: actions/cache/restore@v3
         with:
           path: |
             .venv
-          key: venv
+            target
+          key: cache
+      - name: Install dependencies
+        run: |
+          ./.github/workflows/setup.sh
 
       - name: Ruff
         run: |
@@ -71,13 +75,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Restore cached virtualenv
-        id: venv-restore
+      - name: Restore cache
         uses: actions/cache/restore@v3
         with:
           path: |
             .venv
-          key: venv
+            target
+          key: cache
+      - name: Install dependencies
+        run: |
+          ./.github/workflows/setup.sh
 
       - name: Run notebook
         run: |
@@ -90,18 +97,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Restore cached virtualenv
-        id: venv-restore
+      - name: Restore cache
         uses: actions/cache/restore@v3
         with:
           path: |
             .venv
-          key: venv
-
-      - name: Run dsp.py
+            target
+          key: cache
+      - name: Install dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry install
-          sudo apt install -y graphviz ffmpeg
-          poetry run python dsp.py
+          ./.github/workflows/setup.sh
 
+      - name: Run luthier/dsp.py
+        run: |
+          poetry run python luthier/dsp.py
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Restore cache
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            .venv
+            target
+          key: cache
+      - name: Install dependencies
+        run: |
+          ./.github/workflows/setup.sh
+      - name: Run pytest
+        run: |
+          poetry run pytest .
