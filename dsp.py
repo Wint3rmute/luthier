@@ -91,8 +91,8 @@ class DspNode(ABC):
     def set_input_by_index(self, input_index: int, input_value: float) -> None:
         setattr(self.inputs, self.input_names()[input_index], input_value)
 
-    def get_input_by_index(self, input_index: int) -> None:
-        getattr(self.inputs, self.input_names()[input_index])
+    def get_input_by_index(self, input_index: int) -> float:
+        return float(getattr(self.inputs, self.input_names()[input_index]))
 
     @abstractmethod
     def tick(self) -> None:
@@ -172,7 +172,7 @@ class DspGraph:
         self.node_id_counter = count()
         self.speaker = self._add_node_no_check(Speaker())
 
-    def iter_params(self) -> Iterator["Param"]:
+    def iter_params(self) -> Iterator[tuple[int, int]]:
         for node in self.nodes.values():
             for input_index, input_name in enumerate(node.input_names()):
                 if not self.is_modulated(node.node_id, input_index):
@@ -182,6 +182,7 @@ class DspGraph:
         """
         Returns true if a given input of a given node is connected to any node's output
         """
+        connection: DspConnection
         return any(
             filter(
                 lambda connection: connection.to_node == node_id
@@ -204,7 +205,6 @@ class DspGraph:
             self.nodes[node_id].set_input_by_index(input_id, new_value)
 
     def get_param_values(self) -> list[float]:
-        # return [p.get_value() for p in self.iter_params()]
         return [
             self.nodes[node_id].get_input_by_index(input_id)
             for node_id, input_id in self.iter_params()
@@ -405,18 +405,21 @@ class ADSR(DspNode):
 
     def tick(self) -> None:
         if self.phase == AdsrPhase.ATTACK:
-            self.state += abs(self.inputs.attack)
+            state_inc = 0.4 / abs(self.inputs.attack + 0.000001) / SAMPLE_RATE
+            self.state += state_inc
             if self.state > 1.0:
                 self.state = 1.0
                 self.phase = AdsrPhase.SUSTAIN
 
         elif self.phase == AdsrPhase.SUSTAIN:
-            self.sustain_state += abs(self.inputs.sustain)
+            state_inc = 0.4 / abs(self.inputs.sustain + 0.000001) / SAMPLE_RATE
+            self.sustain_state += state_inc
             if self.sustain_state >= 1.0:
                 self.phase = AdsrPhase.RELEASE
 
         elif self.phase == AdsrPhase.RELEASE:
-            self.state -= abs(self.inputs.release)
+            state_dec = 0.4 / abs(self.inputs.release + 0.000001) / SAMPLE_RATE
+            self.state -= state_dec
             if self.state < 0.0:
                 self.state = 0.0
 
@@ -698,11 +701,8 @@ if __name__ == "__main__":
 
     graph = get_starting_graph()
     print(graph.num_params())
-    # a = graph.play(SAMPLE_RATE * 1)
 
-    # __import__("pdb").set_trace()
-
-    for _ in range(20):
+    for _ in range(10):
         random.choice(
             [
                 add_random_node,
@@ -722,9 +722,9 @@ if __name__ == "__main__":
                 add_random_connection,
                 add_random_connection,
                 remove_random_connection,
-                randomize_random_param,
-                randomize_random_param,
-                nudge_random_param,
+                # randomize_random_param,
+                # randomize_random_param,
+                # nudge_random_param,
             ]
         )(graph)
         draw_to_temp_file(graph)
