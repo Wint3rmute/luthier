@@ -306,7 +306,7 @@ digraph g {
     shape = none
     label = <<table border="0" cellspacing="0">
 
-        <tr><td border="1" bgcolor="{color}">{node.__class__.__name__}</td></tr>
+        <tr><td border="1" bgcolor="{color}">{node.__class__.__name__} #{node.node_id}</td></tr>
 """
             if isinstance(node, Param):
                 param_value = float(node.outputs.output)
