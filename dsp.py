@@ -6,10 +6,11 @@ from dataclasses import dataclass, is_dataclass
 from enum import Enum
 from functools import cache, cached_property
 from itertools import count
-from typing import Any, Optional
+from typing import Any, Iterator, Optional
 
 import audioflux as af
 import librosa
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy
 import numpy.typing
@@ -67,15 +68,22 @@ class DspNode(ABC):
 
     @cache
     def output_names(self) -> list[str]:
-        return sorted(
-            field for field in dir(self.__class__.Outputs) if not field.startswith("_")
-        )
+        # __import__('pdb').set_trace()
+        try:
+            return sorted(
+                field for field in dir(self.outputs) if not field.startswith("_")
+            )
+        except ValueError:
+            return []
 
     @cache
     def input_names(self) -> list[str]:
-        return sorted(
-            field for field in dir(self.__class__.Inputs) if not field.startswith("_")
-        )
+        try:
+            return sorted(
+                field for field in dir(self.inputs) if not field.startswith("_")
+            )
+        except ValueError:
+            return []
 
     def get_output_by_index(self, output_index: int) -> float:
         return float(getattr(self.outputs, self.output_names()[output_index]))
@@ -90,7 +98,12 @@ class DspNode(ABC):
 
 class Sample:
     def __init__(self, audio_buffer: AudioBuffer) -> None:
-        self.buffer = audio_buffer
+        if sum(abs(audio_buffer)) == 0:
+            self.buffer = audio_buffer
+        else:
+            self.buffer = audio_buffer / numpy.linalg.norm(audio_buffer)
+            self.buffer /= max(self.buffer)
+        # self.buffer /= max(self.buffer)
 
     def __len__(self) -> int:
         """Returns the length of the underlying audio buffer"""
@@ -155,6 +168,26 @@ class DspGraph:
         self.connections: list[DspConnection] = []
         self.node_id_counter = count()
         self.speaker = self._add_node_no_check(Speaker())
+
+    def iter_params(self) -> Iterator["Param"]:
+        for node in self.nodes.values():
+            if isinstance(node, Param):
+                yield node
+
+    def num_params(self) -> int:
+        return len(list(self.iter_params()))
+
+    def assign_params(self, values: list[float]) -> None:
+        if len(values) != self.num_params():
+            raise ValueError(
+                f"Number of values to assign ({len(values)}) different from number of params ({self.num_params()})"
+            )
+
+        for param, new_value in zip(self.iter_params(), values):
+            param.set_value(new_value)
+
+    def get_param_values(self) -> list[float]:
+        return [p.get_value() for p in self.iter_params()]
 
     def add_node(self, node: DspNode) -> int:
         """
@@ -236,38 +269,63 @@ class DspGraph:
             )
         )
 
+    def save_video(self, output_path: str = "/tmp/output.mp4") -> Sample:
+        with tempfile.TemporaryDirectory() as dir:
+            samples = numpy.zeros(SAMPLE_RATE)
+            for i in range(len(samples)):
+                samples[i] = graph.tick()
+                if i % 100 == 0:
+                    with open(dir + f"/{i}.png", "wb") as drawing_file:
+                        drawing_file.write(graph.draw())
+
+            os.system(f"cat {dir}/*.png | ffmpeg -y -f image2pipe -i - {output_path}")
+
+        return Sample(audio_buffer=samples)
+
     def draw(self) -> bytes:
+        cmap = matplotlib.colormaps.get_cmap("bwr")
         result = """
 digraph g {
-splines="polyline"
-fontname="Helvetica,Arial,sans-serif"
-node [fontname="Helvetica,Arial,sans-serif"]
-edge [fontname="Helvetica,Arial,sans-serif"]
-graph [
-rankdir = "LR"
-];
-node [
-fontsize = "16"
-shape = "record"
-];
-edge [
-];
-        """
+    splines="polyline"
+    rankdir = "LR"
+
+    fontname="Fira Code"
+    node [fontname="Fira Code"]
+"""
 
         for node in self.nodes.values():
-            result += f"""
-"node{node.node_id}" [
-label = "<f0>{node.__class__.__name__} """
+            node_to_color = {
+                SineOscillator: "#FF5370",
+                Param: "white",
+                Doubler: "#C792EA",
+                ADSR: "#FFCB6B",
+            }
 
+            color = node_to_color.get(node.__class__, "white")
+
+            result += f"""
+"node{node.node_id}" [ 
+    shape = none
+    label = <<table border="0" cellspacing="0">
+
+        <tr><td border="1" bgcolor="{color}">{node.__class__.__name__} #{node.node_id}</td></tr>
+"""
             if isinstance(node, Param):
-                result += f"| ⇒ {node.outputs.output:.2E}"
+                param_value = float(node.outputs.output)
+                color = matplotlib.colors.to_hex(cmap((param_value + 1) / 2))
+                result += f'<tr><td border="1" bgcolor="{color}"> ⇒ {param_value:.3} </td></tr> \n'
 
             for input in node.input_names():
-                result += f"|<{input}> ○ {input}  "
+                param_value = float(getattr(node.inputs, input))
+                color = matplotlib.colors.to_hex(cmap((param_value + 1) / 2))
+                result += f'<tr><td border="1" port="{input}" bgcolor="{color}"> ○ {input}: {param_value:.3f} </td></tr> \n'
 
             for output in node.output_names():
-                result += f"|<{output}> {output} ●"
-            result += '"\n];'
+                result += (
+                    f'<tr><td border="1" port="{output}"> {output} ● </td></tr> \n'
+                )
+
+            result += "</table>>\n];"
 
         for connection in self.connections:
             output_name = self.nodes[connection.from_node].output_names()[
@@ -282,10 +340,8 @@ label = "<f0>{node.__class__.__name__} """
             """
 
         result += "\n}"
-
-        # print(result)
         graphviz_dot_process = subprocess.Popen(
-            ["dot", "-T", "jpg"], stdin=subprocess.PIPE, stdout=subprocess.PIPE
+            ["dot", "-T", "png"], stdin=subprocess.PIPE, stdout=subprocess.PIPE
         )
 
         out, errors = graphviz_dot_process.communicate(result.encode())
@@ -328,18 +384,18 @@ class ADSR(DspNode):
 
     def tick(self) -> None:
         if self.phase == AdsrPhase.ATTACK:
-            self.state += self.inputs.attack
+            self.state += abs(self.inputs.attack)
             if self.state > 1.0:
                 self.state = 1.0
                 self.phase = AdsrPhase.SUSTAIN
 
         elif self.phase == AdsrPhase.SUSTAIN:
-            self.sustain_state += self.inputs.sustain
+            self.sustain_state += abs(self.inputs.sustain)
             if self.sustain_state >= 1.0:
                 self.phase = AdsrPhase.RELEASE
 
         elif self.phase == AdsrPhase.RELEASE:
-            self.state -= self.inputs.release
+            self.state -= abs(self.inputs.release)
             if self.state < 0.0:
                 self.state = 0.0
 
@@ -376,13 +432,14 @@ class Speaker(DspNode):
 
     @dataclass
     class Outputs:
+        pass
         """Reading from an output node is handled by DspGraph's logic"""
 
     def tick(self) -> None:
         pass
 
 
-class SineOscilator(DspNode):
+class SineOscillator(DspNode):
     @dataclass
     class Inputs:
         frequency: float = 0
@@ -394,18 +451,31 @@ class SineOscilator(DspNode):
 
     def __init__(self) -> None:
         super().__init__()
-        self.inputs: SineOscilator.Inputs
-        self.outputs: SineOscilator.Outputs
+        self.inputs: SineOscillator.Inputs
+        self.outputs: SineOscillator.Outputs
         self.phase = 0.0
 
     def tick(self) -> None:
-        frequency = self.inputs.frequency * 1000
+        frequency = abs(self.inputs.frequency * 1000)
         self.phase_diff = (2.0 * math.pi * frequency) / SAMPLE_RATE
         self.outputs.output = math.sin(self.phase + self.inputs.modulation)
         self.phase += self.phase_diff
 
         while self.phase > math.pi * 2.0:
             self.phase -= math.pi * 2.0
+
+
+class BaseFrequency(DspNode):
+    @dataclass
+    class Inputs:
+        ...
+
+    @dataclass
+    class Outputs:
+        output: float = BASE_FREQUENCY
+
+    def tick(self) -> None:
+        pass
 
 
 class Param(DspNode):
@@ -432,14 +502,39 @@ class Param(DspNode):
         pass
 
 
-class Doubler(DspNode):
+class HarmonicMultiplier(DspNode):
+    HARMONICS = [0.2, 0.4, 0.5, 0.6, 1.0, 1.5, 2.0, 2.5, 3.0]
+
     @dataclass
     class Inputs:
-        input: float = 0
+        input: float = 0.0
+        scale: float = 0.0
 
     @dataclass
     class Outputs:
-        output: float = 0
+        output: float = 0.0
+
+    def __init__(self) -> None:
+        self.outputs: HarmonicMultiplier.Outputs
+        self.inputs: HarmonicMultiplier.Inputs
+
+    def tick(self) -> None:
+        self.outputs.output = (
+            self.inputs.input
+            * self.HARMONICS[
+                int(((self.inputs.scale + 1) / 2) * len(self.HARMONICS) - 1)
+            ]
+        )
+
+
+class Doubler(DspNode):
+    @dataclass
+    class Inputs:
+        input: float = 0.0
+
+    @dataclass
+    class Outputs:
+        output: float = 0.0
 
     def __init__(self) -> None:
         super().__init__()
@@ -453,12 +548,12 @@ class Doubler(DspNode):
 class Multiplier(DspNode):
     @dataclass
     class Inputs:
-        input: float = 0
-        scale: float = 1.0
+        input: float = 0.0
+        scale: float = 0.0
 
     @dataclass
     class Outputs:
-        output: float = 0
+        output: float = 0.0
 
     def __init__(self) -> None:
         super().__init__()
@@ -476,10 +571,10 @@ def draw_to_temp_file(graph: DspGraph) -> None:
 
 
 POSSIBLE_NODES_TO_ADD: list[type[DspNode]] = [
-    SineOscilator,
-    SineOscilator,
-    SineOscilator,
-    SineOscilator,
+    SineOscillator,
+    SineOscillator,
+    SineOscillator,
+    SineOscillator,
     Doubler,
     ADSR,
     Sum,
@@ -530,6 +625,16 @@ def _get_random_param(graph: DspGraph) -> Optional[Param]:
     return None
 
 
+def set_random_param_to_base_frequency(graph: DspGraph) -> None:
+    if param := _get_random_param(graph):
+        param.set_value(BASE_FREQUENCY)
+
+
+def set_random_param_to_one(graph: DspGraph) -> None:
+    if param := _get_random_param(graph):
+        param.set_value(1.0)
+
+
 def randomize_random_param(graph: DspGraph) -> None:
     if param := _get_random_param(graph):
         param.set_value(random.uniform(-1, 1))
@@ -553,43 +658,79 @@ def multiply_random_param_by_harmonic(graph: DspGraph) -> None:
 
 def get_starting_graph() -> DspGraph:
     graph = DspGraph()
-    sine = graph.add_node(SineOscilator())
-    base_frequency_node = Param()
-    base_frequency_node.set_value(BASE_FREQUENCY)
+    amp_adsr = graph.add_node(ADSR())
+
+    _amp_attack = Param()
+    _amp_attack.set_value(0.01)
+    amp_attack = graph.add_node(_amp_attack)
+
+    _amp_sustain = Param()
+    _amp_sustain.set_value(0.001)
+    amp_sustain = graph.add_node(_amp_sustain)
+
+    _amp_release = Param()
+    _amp_release.set_value(0.0001)
+    amp_release = graph.add_node(_amp_release)
+
+    graph.patch(amp_attack, "output", amp_adsr, "attack")
+    graph.patch(amp_sustain, "output", amp_adsr, "sustain")
+    graph.patch(amp_release, "output", amp_adsr, "release")
+
+    base_frequency_node = BaseFrequency()
     base_frequency = graph.add_node(base_frequency_node)
 
-    graph.patch(base_frequency, "output", sine, "frequency")
-    graph.patch(sine, "output", graph.speaker, "input")
+    graph.base_frequency_node = base_frequency  # type: ignore
+    graph.amp_attack = amp_attack  # type: ignore
+    graph.amp_sustain = amp_sustain  # type: ignore
+    graph.amp_release = amp_release  # type: ignore
+
+    graph.patch(amp_adsr, "output", graph.speaker, "input")
 
     return graph
 
 
 if __name__ == "__main__":
+    import os
+    import tempfile
+    import time
+
     graph = get_starting_graph()
+    # a = graph.play(SAMPLE_RATE * 1)
 
-    a = graph.play(SAMPLE_RATE * 1)
+    # __import__("pdb").set_trace()
 
-    __import__("pdb").set_trace()
+    for _ in range(20):
+        random.choice(
+            [
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_node,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                add_random_connection,
+                remove_random_connection,
+                randomize_random_param,
+                randomize_random_param,
+                nudge_random_param,
+            ]
+        )(graph)
+        draw_to_temp_file(graph)
+        time.sleep(0.1)
 
-    # for _ in range(1):
-    #     random.choice(
-    #         [
-    #             add_random_node,
-    #             add_random_node,
-    #             add_random_node,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             add_random_connection,
-    #             remove_random_connection,
-    #             randomize_random_param,
-    #             nudge_random_param
-    #         ]
-    #     )(graph)
-    #     draw_to_temp_file(graph)
-    # time.sleep(0.2)
+    print(graph.num_params())
+    print(graph.get_param_values())
+
+    # graph.save_video()
 
     # for _ in range(10):
     #     draw_to_temp_file(graph)
@@ -604,11 +745,3 @@ if __name__ == "__main__":
     # g.patch(sine_2, "output", output, "input")
     # g.patch(source_1, "output", sine_2, "frequency")
     # g.patch(source_2, "output", sine_1, "frequency")
-
-    # for i in range(100):
-    # while True:
-    #     g.tick()
-    #     # print(g.nodes[sine_2].outputs.output)
-    #     print(g.nodes[output].inputs.input)
-    #     time.sleep(0.01)
-    #     # break
