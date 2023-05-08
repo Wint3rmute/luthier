@@ -696,8 +696,6 @@ def get_starting_graph() -> DspGraph:
 
 
 if __name__ == "__main__":
-    import os
-    import tempfile
     import time
 
     graph = get_starting_graph()
