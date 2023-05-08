@@ -1,4 +1,6 @@
 import math
+import os
+import tempfile
 import random
 import subprocess
 from abc import ABC, abstractmethod
@@ -293,10 +295,10 @@ class DspGraph:
         with tempfile.TemporaryDirectory() as dir:
             samples = numpy.zeros(SAMPLE_RATE)
             for i in range(len(samples)):
-                samples[i] = graph.tick()
+                samples[i] = self.tick()
                 if i % 100 == 0:
                     with open(dir + f"/{i}.png", "wb") as drawing_file:
-                        drawing_file.write(graph.draw())
+                        drawing_file.write(self.draw())
 
             os.system(f"cat {dir}/*.png | ffmpeg -y -f image2pipe -i - {output_path}")
 
@@ -382,11 +384,11 @@ class ADSR(DspNode):
     @dataclass
     class Inputs:
         input: float = 0
-        attack: float = 1
+        attack: float = 0.1
         # There's no key input in the simulation, hence sustain is a parameter
         # defining how long the sound stay in higest-level attack velocity
         # before the release phase
-        sustain: float = 0.001
+        sustain: float = 0.1
         release: float = 0.001
 
     @dataclass
@@ -573,7 +575,7 @@ class Multiplier(DspNode):
     @dataclass
     class Inputs:
         input: float = 0.0
-        scale: float = 0.0
+        scale: float = 0.5
 
     @dataclass
     class Outputs:
