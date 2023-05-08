@@ -461,6 +461,15 @@ class SineOscillator(DspNode):
             self.phase -= math.pi * 2.0
 
 
+class BaseFrequency(DspNode):
+    @dataclass
+    class Inputs:
+        ...
+
+    class Outputs:
+        output: float = BASE_FREQUENCY
+
+
 class Param(DspNode):
     @dataclass
     class Inputs:
