@@ -1,5 +1,4 @@
 import math
-import matplotlib
 import random
 import subprocess
 from abc import ABC, abstractmethod
@@ -7,10 +6,11 @@ from dataclasses import dataclass, is_dataclass
 from enum import Enum
 from functools import cache, cached_property
 from itertools import count
-from typing import Any, Optional
+from typing import Any, Iterator, Optional
 
 import audioflux as af
 import librosa
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy
 import numpy.typing
@@ -103,7 +103,7 @@ class Sample:
         else:
             self.buffer = audio_buffer / numpy.linalg.norm(audio_buffer)
             self.buffer /= max(self.buffer)
-        # self.buffer /= max(self.buffer) 
+        # self.buffer /= max(self.buffer)
 
     def __len__(self) -> int:
         """Returns the length of the underlying audio buffer"""
@@ -169,7 +169,7 @@ class DspGraph:
         self.node_id_counter = count()
         self.speaker = self._add_node_no_check(Speaker())
 
-    def iter_params(self) -> int:
+    def iter_params(self) -> Iterator["Param"]:
         for node in self.nodes.values():
             if isinstance(node, Param):
                 yield node
@@ -179,13 +179,15 @@ class DspGraph:
 
     def assign_params(self, values: list[float]) -> None:
         if len(values) != self.num_params():
-            raise ValueError(f"Number of values to assign ({len(values)}) different from number of params ({self.num_params()})")
+            raise ValueError(
+                f"Number of values to assign ({len(values)}) different from number of params ({self.num_params()})"
+            )
 
         for param, new_value in zip(self.iter_params(), values):
             param.set_value(new_value)
 
     def get_param_values(self) -> list[float]:
-        return [p.get_value() for p in self.iter_params() ]
+        return [p.get_value() for p in self.iter_params()]
 
     def add_node(self, node: DspNode) -> int:
         """
@@ -281,7 +283,7 @@ class DspGraph:
         return Sample(audio_buffer=samples)
 
     def draw(self) -> bytes:
-        cmap = matplotlib.colormaps.get_cmap('bwr')
+        cmap = matplotlib.colormaps.get_cmap("bwr")
         result = """
 digraph g {
     splines="polyline"
@@ -316,12 +318,14 @@ digraph g {
             for input in node.input_names():
                 param_value = float(getattr(node.inputs, input))
                 color = matplotlib.colors.to_hex(cmap((param_value + 1) / 2))
-                result += f'<tr><td border="1" port="{input}" bgcolor="{color}"> ○ {input} </td></tr> \n'
+                result += f'<tr><td border="1" port="{input}" bgcolor="{color}"> ○ {input}: {param_value:.3f} </td></tr> \n'
 
             for output in node.output_names():
-                result += f'<tr><td border="1" port="{output}"> {output} ● </td></tr> \n'
+                result += (
+                    f'<tr><td border="1" port="{output}"> {output} ● </td></tr> \n'
+                )
 
-            result += '</table>>\n];'
+            result += "</table>>\n];"
 
         for connection in self.connections:
             output_name = self.nodes[connection.from_node].output_names()[
@@ -466,8 +470,12 @@ class BaseFrequency(DspNode):
     class Inputs:
         ...
 
+    @dataclass
     class Outputs:
         output: float = BASE_FREQUENCY
+
+    def tick(self) -> None:
+        pass
 
 
 class Param(DspNode):
@@ -494,14 +502,39 @@ class Param(DspNode):
         pass
 
 
-class Doubler(DspNode):
+class HarmonicMultiplier(DspNode):
+    HARMONICS = [0.2, 0.4, 0.5, 0.6, 1.0, 1.5, 2.0, 2.5, 3.0]
+
     @dataclass
     class Inputs:
-        input: float = 0
+        input: float = 0.0
+        scale: float = 0.0
 
     @dataclass
     class Outputs:
-        output: float = 0
+        output: float = 0.0
+
+    def __init__(self) -> None:
+        self.outputs: HarmonicMultiplier.Outputs
+        self.inputs: HarmonicMultiplier.Inputs
+
+    def tick(self) -> None:
+        self.outputs.output = (
+            self.inputs.input
+            * self.HARMONICS[
+                int(((self.inputs.scale + 1) / 2) * len(self.HARMONICS) - 1)
+            ]
+        )
+
+
+class Doubler(DspNode):
+    @dataclass
+    class Inputs:
+        input: float = 0.0
+
+    @dataclass
+    class Outputs:
+        output: float = 0.0
 
     def __init__(self) -> None:
         super().__init__()
@@ -515,12 +548,12 @@ class Doubler(DspNode):
 class Multiplier(DspNode):
     @dataclass
     class Inputs:
-        input: float = 0
-        scale: float = 1.0
+        input: float = 0.0
+        scale: float = 0.0
 
     @dataclass
     class Outputs:
-        output: float = 0
+        output: float = 0.0
 
     def __init__(self) -> None:
         super().__init__()
@@ -591,13 +624,16 @@ def _get_random_param(graph: DspGraph) -> Optional[Param]:
     print("No params found")
     return None
 
+
 def set_random_param_to_base_frequency(graph: DspGraph) -> None:
     if param := _get_random_param(graph):
         param.set_value(BASE_FREQUENCY)
 
+
 def set_random_param_to_one(graph: DspGraph) -> None:
     if param := _get_random_param(graph):
         param.set_value(1.0)
+
 
 def randomize_random_param(graph: DspGraph) -> None:
     if param := _get_random_param(graph):
@@ -622,8 +658,6 @@ def multiply_random_param_by_harmonic(graph: DspGraph) -> None:
 
 def get_starting_graph() -> DspGraph:
     graph = DspGraph()
-
-    sine = graph.add_node(SineOscillator())
     amp_adsr = graph.add_node(ADSR())
 
     _amp_attack = Param()
@@ -642,25 +676,23 @@ def get_starting_graph() -> DspGraph:
     graph.patch(amp_sustain, "output", amp_adsr, "sustain")
     graph.patch(amp_release, "output", amp_adsr, "release")
 
-    base_frequency_node = Param()
-    base_frequency_node.set_value(BASE_FREQUENCY)
+    base_frequency_node = BaseFrequency()
     base_frequency = graph.add_node(base_frequency_node)
+
     graph.base_frequency_node = base_frequency  # type: ignore
-    graph.amp_attack = amp_attack # type: ignore
+    graph.amp_attack = amp_attack  # type: ignore
     graph.amp_sustain = amp_sustain  # type: ignore
     graph.amp_release = amp_release  # type: ignore
 
-    graph.patch(base_frequency, "output", sine, "frequency")
-    graph.patch(sine, "output", amp_adsr, "input")
     graph.patch(amp_adsr, "output", graph.speaker, "input")
 
     return graph
 
 
 if __name__ == "__main__":
-    import time
     import os
     import tempfile
+    import time
 
     graph = get_starting_graph()
     # a = graph.play(SAMPLE_RATE * 1)
@@ -689,15 +721,14 @@ if __name__ == "__main__":
                 remove_random_connection,
                 randomize_random_param,
                 randomize_random_param,
-                nudge_random_param
+                nudge_random_param,
             ]
         )(graph)
         draw_to_temp_file(graph)
-        # time.sleep(0.1)
+        time.sleep(0.1)
 
     print(graph.num_params())
     print(graph.get_param_values())
-
 
     # graph.save_video()
 
@@ -714,4 +745,3 @@ if __name__ == "__main__":
     # g.patch(sine_2, "output", output, "input")
     # g.patch(source_1, "output", sine_2, "frequency")
     # g.patch(source_2, "output", sine_1, "frequency")
-
