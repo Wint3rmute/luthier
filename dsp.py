@@ -174,6 +174,8 @@ class DspGraph:
 
     def iter_params(self) -> Iterator[tuple[int, int]]:
         for node in self.nodes.values():
+            if node.node_id is None:
+                raise ValueError(f"Node {node} has no node_id assigned")
             for input_index, input_name in enumerate(node.input_names()):
                 if not self.is_modulated(node.node_id, input_index):
                     yield node.node_id, input_index
@@ -182,14 +184,11 @@ class DspGraph:
         """
         Returns true if a given input of a given node is connected to any node's output
         """
-        connection: DspConnection
-        return any(
-            filter(
-                lambda connection: connection.to_node == node_id
-                and connection.to_input == input_id,
-                self.connections,
-            )
-        )
+        for connection in self.connections:
+            if connection.to_node == node_id and connection.to_input == input_id:
+                return True
+
+        return False
 
     def num_params(self) -> int:
         return len(list(self.iter_params()))
