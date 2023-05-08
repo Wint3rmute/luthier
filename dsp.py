@@ -1,4 +1,6 @@
 import math
+import os
+import tempfile
 import random
 import subprocess
 from abc import ABC, abstractmethod
@@ -91,6 +93,9 @@ class DspNode(ABC):
     def set_input_by_index(self, input_index: int, input_value: float) -> None:
         setattr(self.inputs, self.input_names()[input_index], input_value)
 
+    def get_input_by_index(self, input_index: int) -> float:
+        return float(getattr(self.inputs, self.input_names()[input_index]))
+
     @abstractmethod
     def tick(self) -> None:
         ...
@@ -169,10 +174,23 @@ class DspGraph:
         self.node_id_counter = count()
         self.speaker = self._add_node_no_check(Speaker())
 
-    def iter_params(self) -> Iterator["Param"]:
+    def iter_params(self) -> Iterator[tuple[int, int]]:
         for node in self.nodes.values():
-            if isinstance(node, Param):
-                yield node
+            if node.node_id is None:
+                raise ValueError(f"Node {node} has no node_id assigned")
+            for input_index, input_name in enumerate(node.input_names()):
+                if not self.is_modulated(node.node_id, input_index):
+                    yield node.node_id, input_index
+
+    def is_modulated(self, node_id: NodeId, input_id: int) -> bool:
+        """
+        Returns true if a given input of a given node is connected to any node's output
+        """
+        for connection in self.connections:
+            if connection.to_node == node_id and connection.to_input == input_id:
+                return True
+
+        return False
 
     def num_params(self) -> int:
         return len(list(self.iter_params()))
@@ -184,10 +202,14 @@ class DspGraph:
             )
 
         for param, new_value in zip(self.iter_params(), values):
-            param.set_value(new_value)
+            node_id, input_id = param
+            self.nodes[node_id].set_input_by_index(input_id, new_value)
 
     def get_param_values(self) -> list[float]:
-        return [p.get_value() for p in self.iter_params()]
+        return [
+            self.nodes[node_id].get_input_by_index(input_id)
+            for node_id, input_id in self.iter_params()
+        ]
 
     def add_node(self, node: DspNode) -> int:
         """
@@ -273,10 +295,10 @@ class DspGraph:
         with tempfile.TemporaryDirectory() as dir:
             samples = numpy.zeros(SAMPLE_RATE)
             for i in range(len(samples)):
-                samples[i] = graph.tick()
+                samples[i] = self.tick()
                 if i % 100 == 0:
                     with open(dir + f"/{i}.png", "wb") as drawing_file:
-                        drawing_file.write(graph.draw())
+                        drawing_file.write(self.draw())
 
             os.system(f"cat {dir}/*.png | ffmpeg -y -f image2pipe -i - {output_path}")
 
@@ -296,7 +318,7 @@ digraph g {
         for node in self.nodes.values():
             node_to_color = {
                 SineOscillator: "#FF5370",
-                Param: "white",
+                # Param: "white",
                 Doubler: "#C792EA",
                 ADSR: "#FFCB6B",
             }
@@ -310,10 +332,10 @@ digraph g {
 
         <tr><td border="1" bgcolor="{color}">{node.__class__.__name__} #{node.node_id}</td></tr>
 """
-            if isinstance(node, Param):
-                param_value = float(node.outputs.output)
-                color = matplotlib.colors.to_hex(cmap((param_value + 1) / 2))
-                result += f'<tr><td border="1" bgcolor="{color}"> ⇒ {param_value:.3} </td></tr> \n'
+            # if isinstance(node, Param):
+            #     param_value = float(node.outputs.output)
+            #     color = matplotlib.colors.to_hex(cmap((param_value + 1) / 2))
+            #     result += f'<tr><td border="1" bgcolor="{color}"> ⇒ {param_value:.3} </td></tr> \n'
 
             for input in node.input_names():
                 param_value = float(getattr(node.inputs, input))
@@ -362,11 +384,11 @@ class ADSR(DspNode):
     @dataclass
     class Inputs:
         input: float = 0
-        attack: float = 1
+        attack: float = 0.1
         # There's no key input in the simulation, hence sustain is a parameter
         # defining how long the sound stay in higest-level attack velocity
         # before the release phase
-        sustain: float = 0.001
+        sustain: float = 0.1
         release: float = 0.001
 
     @dataclass
@@ -384,18 +406,21 @@ class ADSR(DspNode):
 
     def tick(self) -> None:
         if self.phase == AdsrPhase.ATTACK:
-            self.state += abs(self.inputs.attack)
+            state_inc = 0.4 / abs(self.inputs.attack + 0.000001) / SAMPLE_RATE
+            self.state += state_inc
             if self.state > 1.0:
                 self.state = 1.0
                 self.phase = AdsrPhase.SUSTAIN
 
         elif self.phase == AdsrPhase.SUSTAIN:
-            self.sustain_state += abs(self.inputs.sustain)
+            state_inc = 0.4 / abs(self.inputs.sustain + 0.000001) / SAMPLE_RATE
+            self.sustain_state += state_inc
             if self.sustain_state >= 1.0:
                 self.phase = AdsrPhase.RELEASE
 
         elif self.phase == AdsrPhase.RELEASE:
-            self.state -= abs(self.inputs.release)
+            state_dec = 0.4 / abs(self.inputs.release + 0.000001) / SAMPLE_RATE
+            self.state -= state_dec
             if self.state < 0.0:
                 self.state = 0.0
 
@@ -478,28 +503,28 @@ class BaseFrequency(DspNode):
         pass
 
 
-class Param(DspNode):
-    @dataclass
-    class Inputs:
-        ...
+# class Param(DspNode):
+#     @dataclass
+#     class Inputs:
+#         ...
 
-    @dataclass
-    class Outputs:
-        output: float = 0
+#     @dataclass
+#     class Outputs:
+#         output: float = 0
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.outputs: Param.Outputs
-        self.inputs: Param.Inputs
+#     def __init__(self) -> None:
+#         super().__init__()
+#         self.outputs: Param.Outputs
+#         self.inputs: Param.Inputs
 
-    def set_value(self, value: float) -> None:
-        self.outputs.output = value
+#     def set_value(self, value: float) -> None:
+#         self.outputs.output = value
 
-    def get_value(self) -> float:
-        return self.outputs.output
+#     def get_value(self) -> float:
+#         return self.outputs.output
 
-    def tick(self) -> None:
-        pass
+#     def tick(self) -> None:
+#         pass
 
 
 class HarmonicMultiplier(DspNode):
@@ -515,6 +540,7 @@ class HarmonicMultiplier(DspNode):
         output: float = 0.0
 
     def __init__(self) -> None:
+        super().__init__()
         self.outputs: HarmonicMultiplier.Outputs
         self.inputs: HarmonicMultiplier.Inputs
 
@@ -549,7 +575,7 @@ class Multiplier(DspNode):
     @dataclass
     class Inputs:
         input: float = 0.0
-        scale: float = 0.0
+        scale: float = 0.5
 
     @dataclass
     class Outputs:
@@ -578,7 +604,6 @@ POSSIBLE_NODES_TO_ADD: list[type[DspNode]] = [
     Doubler,
     ADSR,
     Sum,
-    Param,
 ]
 
 
@@ -613,76 +638,57 @@ def remove_random_connection(graph: DspGraph) -> None:
     graph.connections.pop(random.randrange(len(graph.connections)))
 
 
-def _get_random_param(graph: DspGraph) -> Optional[Param]:
-    params = [node for node in graph.nodes.values() if isinstance(node, Param)]
-    if any(params):
-        result_param = random.choice(params)
-        # if result_param.get_value() == BASE_FREQUENCY:
-        #     return None
-        return result_param
+# def _get_random_param(graph: DspGraph) -> Optional[Param]:
+#     params = [node for node in graph.nodes.values() if isinstance(node, Param)]
+#     if any(params):
+#         result_param = random.choice(params)
+#         # if result_param.get_value() == BASE_FREQUENCY:
+#         #     return None
+#         return result_param
 
-    print("No params found")
-    return None
-
-
-def set_random_param_to_base_frequency(graph: DspGraph) -> None:
-    if param := _get_random_param(graph):
-        param.set_value(BASE_FREQUENCY)
+#     print("No params found")
+#     return None
 
 
-def set_random_param_to_one(graph: DspGraph) -> None:
-    if param := _get_random_param(graph):
-        param.set_value(1.0)
+# def set_random_param_to_base_frequency(graph: DspGraph) -> None:
+#     if param := _get_random_param(graph):
+#         param.set_value(BASE_FREQUENCY)
 
 
-def randomize_random_param(graph: DspGraph) -> None:
-    if param := _get_random_param(graph):
-        param.set_value(random.uniform(-1, 1))
+# def set_random_param_to_one(graph: DspGraph) -> None:
+#     if param := _get_random_param(graph):
+#         param.set_value(1.0)
 
 
-def nudge_random_param(graph: DspGraph) -> None:
-    if param := _get_random_param(graph):
-        param.set_value(param.get_value() + random.uniform(-0.01, 0.01))
+# def randomize_random_param(graph: DspGraph) -> None:
+#     if param := _get_random_param(graph):
+#         param.set_value(random.uniform(-1, 1))
 
 
-def multiply_random_param_by_harmonic(graph: DspGraph) -> None:
-    if param := _get_random_param(graph):
-        value = param.get_value()
-        param.set_value(
-            value
-            * random.choice(
-                [0.25, 1 / 3, 4 / 5, 0.5, 0.75, 5 / 4, 2 / 3, 2 / 3, 2.5, 3.5, 3]
-            )
-        )
+# def nudge_random_param(graph: DspGraph) -> None:
+#     if param := _get_random_param(graph):
+#         param.set_value(param.get_value() + random.uniform(-0.01, 0.01))
+
+
+# def multiply_random_param_by_harmonic(graph: DspGraph) -> None:
+#     if param := _get_random_param(graph):
+#         value = param.get_value()
+#         param.set_value(
+#             value
+#             * random.choice(
+#                 [0.25, 1 / 3, 4 / 5, 0.5, 0.75, 5 / 4, 2 / 3, 2 / 3, 2.5, 3.5, 3]
+#             )
+#         )
 
 
 def get_starting_graph() -> DspGraph:
     graph = DspGraph()
     amp_adsr = graph.add_node(ADSR())
 
-    _amp_attack = Param()
-    _amp_attack.set_value(0.01)
-    amp_attack = graph.add_node(_amp_attack)
-
-    _amp_sustain = Param()
-    _amp_sustain.set_value(0.001)
-    amp_sustain = graph.add_node(_amp_sustain)
-
-    _amp_release = Param()
-    _amp_release.set_value(0.0001)
-    amp_release = graph.add_node(_amp_release)
-
-    graph.patch(amp_attack, "output", amp_adsr, "attack")
-    graph.patch(amp_sustain, "output", amp_adsr, "sustain")
-    graph.patch(amp_release, "output", amp_adsr, "release")
-
     base_frequency_node = BaseFrequency()
     base_frequency = graph.add_node(base_frequency_node)
 
     graph.base_frequency_node = base_frequency  # type: ignore
-    graph.amp_attack = amp_attack  # type: ignore
-    graph.amp_sustain = amp_sustain  # type: ignore
-    graph.amp_release = amp_release  # type: ignore
 
     graph.patch(amp_adsr, "output", graph.speaker, "input")
 
@@ -690,16 +696,12 @@ def get_starting_graph() -> DspGraph:
 
 
 if __name__ == "__main__":
-    import os
-    import tempfile
     import time
 
     graph = get_starting_graph()
-    # a = graph.play(SAMPLE_RATE * 1)
+    print(graph.num_params())
 
-    # __import__("pdb").set_trace()
-
-    for _ in range(20):
+    for _ in range(10):
         random.choice(
             [
                 add_random_node,
@@ -719,9 +721,9 @@ if __name__ == "__main__":
                 add_random_connection,
                 add_random_connection,
                 remove_random_connection,
-                randomize_random_param,
-                randomize_random_param,
-                nudge_random_param,
+                # randomize_random_param,
+                # randomize_random_param,
+                # nudge_random_param,
             ]
         )(graph)
         draw_to_temp_file(graph)
