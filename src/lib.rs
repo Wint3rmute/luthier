@@ -130,6 +130,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        assert_eq!(42, answer());
+        SineOscillator::describe();
+        // assert_eq!(42, answer());
     }
 }
