@@ -3,6 +3,7 @@ from typing import Any
 
 def test_graph_build(build_luthier: Any) -> None:
     from luthier import luthier
+
     luthier.DspGraph()
 
 
