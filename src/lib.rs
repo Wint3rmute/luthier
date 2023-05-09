@@ -4,7 +4,7 @@ use pyo3::prelude::*;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
 extern crate node_macro;
-use node_macro::make_answer;
+use node_macro::AnswerFn;
 
 type NodeId = usize;
 type InputId = usize;
@@ -106,4 +106,31 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
 
     Ok(())
+}
+
+
+struct SineOscillatorInputs {
+    frequency: f64,
+    modulation: f64
+}
+
+struct SineOscillatorOutputs {
+    output: f64
+}
+
+#[derive(AnswerFn)]
+struct SineOscillator {
+    state: usize,
+    inputs: SineOscillatorInputs,
+    outputs: SineOscillatorOutputs
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        assert_eq!(42, answer());
+    }
 }
