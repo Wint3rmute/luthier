@@ -1,10 +1,12 @@
 use std::collections::HashMap;
+use std::io::Write;
 
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
 use numpy::ndarray::{Array1, Dim};
 use numpy::{IntoPyArray, PyArray};
 use pyo3::prelude::*;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
+use std::process::{Command, Stdio};
 
 extern crate node_macro;
 use node_macro::DspConnectibleDerive;
@@ -26,6 +28,23 @@ struct Speaker {
 }
 
 impl DspNode for Speaker {
+    fn tick(&mut self) {}
+}
+
+#[derive(DspConnectibleDerive)]
+struct BaseFrequency {
+    output_output: f64,
+}
+
+impl Default for BaseFrequency {
+    fn default() -> Self {
+        BaseFrequency {
+            output_output: 0.440,
+        }
+    }
+}
+
+impl DspNode for BaseFrequency {
     fn tick(&mut self) {}
 }
 
@@ -129,6 +148,102 @@ impl DspGraph {
         graph
     }
 
+    fn get_graphviz_code(&self) -> String {
+        let mut graphviz_code = String::new();
+
+        graphviz_code.push_str(
+            r#"digraph g {
+splines="polyline"
+rankdir = "LR"
+
+fontname="Fira Code"
+node [fontname="Fira Code"]
+"#,
+        );
+        for (node_id, node) in self.nodes.iter() {
+            let node_name = node.node_name();
+            graphviz_code.push_str(
+                format!(
+                    r#"
+"node{node_id}" [
+    shape = none
+    label = <<table border="0" cellspacing="0">
+    <tr><td border="1" bgcolor="white">{node_name} #{node_id}</td></tr>
+            "#
+                )
+                .as_str(),
+            );
+
+            for output in node.get_output_names() {
+                graphviz_code.push_str(
+                    format!(r#"<tr><td border="1" port="{output}"> {output} ● </td></tr> \n"#)
+                        .as_str(),
+                );
+            }
+
+            for (input_id, input) in node.get_input_names().iter().enumerate() {
+                let input_value = node.get_input_by_index(input_id);
+
+                graphviz_code.push_str(
+                    format!(r#"<tr><td border="1" port="{input}"> ○ {input}: {input_value:.3} </td></tr> \n"#)
+                        .as_str(),
+                );
+            }
+
+            graphviz_code.push_str("</table>>\n];");
+        }
+
+        for connection in &self.connections {
+            let output_name =
+                &self.nodes[&connection.from_node].get_output_names()[connection.from_output];
+            let input_name =
+                &self.nodes[&connection.to_node].get_input_names()[connection.to_input];
+
+            let from_node = &connection.from_node;
+            let to_node = &connection.to_node;
+
+            graphviz_code.push_str(
+                format!(
+                    r#"
+                "node{from_node}":{output_name} -> "node{to_node}":{input_name} [];
+                "#
+                )
+                .as_str(),
+            );
+        }
+
+        graphviz_code.push_str("\n}");
+        graphviz_code
+    }
+    fn draw(&self) -> Vec<u8> {
+        let graphviz_code = self.get_graphviz_code();
+
+        let mut graphviz_process = Command::new("dot")
+            .arg("-T")
+            .arg("png")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("Unable to start graphviz");
+
+        let mut graphviz_stdin = graphviz_process
+            .stdin
+            .take()
+            .expect("Unable to connect to graphviz process stdin");
+        std::thread::spawn(move || {
+            graphviz_stdin
+                .write_all(graphviz_code.as_bytes())
+                .expect("Unable to write data to graphviz stdin");
+        });
+
+        let output = graphviz_process
+            .wait_with_output()
+            .expect("failed to wait on graphviz output");
+
+        let generated_png = output.stdout.to_vec().clone();
+        generated_png
+    }
+
     fn patch(
         &mut self,
         from_node_id: NodeId,
@@ -213,6 +328,13 @@ mod tests {
     fn play_basic_graph() {
         let mut g = DspGraph::new();
         g.play(100);
+    }
+
+    #[test]
+    fn test_draw_doesnt_panic() {
+        let g = DspGraph::new();
+        g.get_graphviz_code();
+        g.draw();
     }
 
     #[test]
