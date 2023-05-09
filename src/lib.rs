@@ -1,11 +1,11 @@
-use node_traits::DspConnectible;
+use node_traits::{DspConnectible, DspNode};
 use numpy::ndarray::{Array1, Dim};
 use numpy::{IntoPyArray, PyArray};
 use pyo3::prelude::*;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
 extern crate node_macro;
-use node_macro::AnswerFn;
+use node_macro::DspConnectibleDerive;
 
 type NodeId = usize;
 type InputId = usize;
@@ -19,44 +19,45 @@ struct DspConnection {
     to_input: InputId,
 }
 
-trait DspNode {
-    fn num_inputs(&self) -> usize;
-    fn num_outputs(&self) -> usize;
-
-    fn input_names(&self) -> &[&str];
-    fn output_names(&self) -> &[&str];
-
-    fn set_input(&self, id: InputId, value: f64);
-    fn get_output(&self, id: OutputId) -> f64;
+struct Speaker {
+    input_input: f64,
 }
 
-struct Speaker {}
+#[derive(DspConnectibleDerive)]
+struct SineOscillator {
+    input_frequency: f64,
+    input_modulation: f64,
+    output_output: f64,
 
-impl DspNode for Speaker {
-    fn num_inputs(&self) -> usize {
-        1
-    }
-
-    fn num_outputs(&self) -> usize {
-        0
-    }
-
-    fn input_names(&self) -> &[&str] {
-        &["input"][..]
-    }
-
-    fn output_names(&self) -> &[&str] {
-        &[][..]
-    }
-
-    fn set_input(&self, id: InputId, value: f64) {}
-
-    fn get_output(&self, id: OutputId) -> f64 {
-        0.0
-    }
+    state: usize,
 }
+
+// impl DspNode for Speaker {
+//     fn num_inputs(&self) -> usize {
+//         1
+//     }
+
+//     fn num_outputs(&self) -> usize {
+//         0
+//     }
+
+//     fn input_names(&self) -> &[&str] {
+//         &["input"][..]
+//     }
+
+//     fn output_names(&self) -> &[&str] {
+//         &[][..]
+//     }
+
+//     fn set_input(&self, id: InputId, value: f64) {}
+
+//     fn get_output(&self, id: OutputId) -> f64 {
+//         0.0
+//     }
+// }
 
 #[pyclass]
+#[derive(Default)]
 struct DspGraph {
     nodes: Vec<Box<dyn DspNode + Send>>,
     connections: Vec<DspConnection>,
@@ -93,38 +94,11 @@ impl DspGraph {
     }
 }
 
-impl Default for DspGraph {
-    fn default() -> Self {
-        Self {
-            nodes: vec![],
-            connections: vec![],
-        }
-    }
-}
-
 #[pymodule]
 fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
 
     Ok(())
-}
-
-struct SineOscillatorInputs {
-    frequency: f64,
-    modulation: f64,
-}
-
-struct SineOscillatorOutputs {
-    output: f64,
-}
-
-#[derive(AnswerFn)]
-struct SineOscillator {
-    state: usize,
-
-    input_frequency: f64,
-    input_modulation: f64,
-    output_output: f64,
 }
 
 #[cfg(test)]

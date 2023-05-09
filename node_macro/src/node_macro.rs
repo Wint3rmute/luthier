@@ -53,7 +53,7 @@ fn find_output_fields(fields: &Punctuated<Field, Comma>) -> Vec<String> {
     result
 }
 
-#[proc_macro_derive(AnswerFn)]
+#[proc_macro_derive(DspConnectibleDerive)]
 pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     let DeriveInput { ident, data, .. } = parse_macro_input!(input);
 
@@ -92,13 +92,13 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
 
     let output = quote! {
     impl DspConnectible for #ident {
-        fn get_input_names() -> Vec<String> {
+        fn get_input_names(&self) -> Vec<String> {
             vec![
                 #(#inputs.to_string(),)*
             ]
         }
 
-        fn get_output_names() -> Vec<String> {
+        fn get_output_names(&self) -> Vec<String> {
             vec![
                 #(#outputs.to_string(),)*
             ]
