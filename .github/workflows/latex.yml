@@ -5,7 +5,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: xu-cheng/latex-action@v2
         with:
           root_file: Dyplom.tex
@@ -16,7 +16,7 @@ jobs:
   laczek:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: xu-cheng/texlive-action/full@v1
         with:
           run: |
