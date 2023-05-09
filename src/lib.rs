@@ -109,7 +109,7 @@ impl Default for DspGraph {
 
 impl DspGraph {
     fn add_node(&mut self, node: Node) -> NodeId {
-        let node_index = self.get_next_node_index();
+        let node_index = self.get_next_node_index() - 1; // patola
         self.nodes.insert(node_index, node);
         node_index
     }

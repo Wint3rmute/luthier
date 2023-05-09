@@ -171,7 +171,7 @@ class DspGraph:
     def __init__(self) -> None:
         self.nodes: dict[NodeId, DspNode] = {}
         self.connections: list[DspConnection] = []
-        self.node_id_counter = count()
+        self.node_id_counter = count(0)
         self.speaker = self._add_node_no_check(Speaker())
 
     def iter_params(self) -> Iterator[tuple[int, int]]:
