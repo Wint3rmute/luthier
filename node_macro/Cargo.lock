@@ -2,6 +2,9 @@
 # It is not intended for manual editing.
 version = 3
 
+[lib]
+path = "src/node_macro.rs"
+
 [[package]]
 name = "node_macro"
 version = "0.1.0"

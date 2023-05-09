@@ -47,6 +47,7 @@ name = "luthier"
 version = "0.1.0"
 dependencies = [
  "node_macro",
+ "node_traits",
  "numpy",
  "pyo3",
 ]
@@ -87,9 +88,14 @@ dependencies = [
 name = "node_macro"
 version = "0.1.0"
 dependencies = [
+ "node_traits",
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "node_traits"
+version = "0.1.0"
 
 [[package]]
 name = "num-complex"
