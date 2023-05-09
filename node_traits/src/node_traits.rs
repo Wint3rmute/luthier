@@ -4,6 +4,7 @@ pub type OutputId = usize;
 pub type Node = Box<dyn DspNode + Send>;
 
 pub trait DspConnectible {
+    fn node_name(&self) -> &str;
     fn get_input_names(&self) -> Vec<String>;
     fn get_output_names(&self) -> Vec<String>;
     fn get_input_by_index(&self, index: InputId) -> f64;

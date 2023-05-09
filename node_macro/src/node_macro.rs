@@ -1,22 +1,10 @@
 extern crate proc_macro;
-use node_traits::DspConnectible;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{
     parse_macro_input, punctuated::Punctuated, token::Comma, DeriveInput, Field, FieldsNamed,
     FieldsUnnamed,
 };
-
-fn find_struct_by_name(name: &str, fields: &Punctuated<Field, Comma>) -> Option<Field> {
-    for field in fields.iter() {
-        if field.ident.clone().unwrap() == name {
-            let result = field.clone();
-            return Some(result);
-        }
-    }
-
-    None
-}
 
 fn find_input_fields(fields: &Punctuated<Field, Comma>) -> Vec<String> {
     let mut result = vec![];
@@ -60,13 +48,11 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     let (inputs, outputs) = match data {
         syn::Data::Struct(s) => match s.fields {
             syn::Fields::Named(FieldsNamed { named, .. }) => {
-                // let idents = named.iter() .map(|f| &f.ident);
-
                 let inputs = find_input_fields(&named);
                 let outputs = find_output_fields(&named);
                 (inputs, outputs)
             }
-            syn::Fields::Unnamed(FieldsUnnamed { unnamed, .. }) => {
+            syn::Fields::Unnamed(FieldsUnnamed { unnamed: _, .. }) => {
                 panic!("Unnamed fields not supported");
             }
             syn::Fields::Unit => panic!("Unnamed fields not supported"),
@@ -92,6 +78,10 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
 
     let output = quote! {
     impl DspConnectible for #ident {
+        fn node_name(&self) -> &str {
+            stringify!(#ident)
+        }
+
         fn get_input_names(&self) -> Vec<String> {
             vec![
                 #(#inputs.to_string(),)*

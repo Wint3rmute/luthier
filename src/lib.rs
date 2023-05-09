@@ -129,11 +129,6 @@ impl DspGraph {
         graph
     }
 
-    fn nodes(&self) {
-        println!("Co jest");
-        println!("{:?}", self.connections);
-    }
-
     fn patch(
         &mut self,
         from_node_id: NodeId,
@@ -220,18 +215,15 @@ mod tests {
         g.play(100);
     }
 
-    // #[test]
-    // fn it_works() {
-    //     let s = SineOscillator {
-    //         state: 0,
-    //         input_frequency: 0.0,
-    //         input_modulation: 0.0,
-    //         output_output: 0.0,
-    //     };
-    //     let names = SineOscillator::get_input_names();
-    //     println!("{:?}", names);
-    //     // assert_eq!(42, answer());
-    //     //
-    //     println!("{}", s.get_input_by_index(1));
-    // }
+    #[test]
+    fn test_node_name() {
+        let osc = SineOscillator {
+            input_frequency: 0.440,
+            input_modulation: 0.0,
+            output_output: 0.0,
+            phase: 0.0,
+        };
+
+        assert_eq!(osc.node_name(), "SineOscillator");
+    }
 }
