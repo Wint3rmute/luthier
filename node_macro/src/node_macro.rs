@@ -1,4 +1,5 @@
 extern crate proc_macro;
+use node_traits::DspConnectible;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{
@@ -48,6 +49,7 @@ fn find_output_fields(fields: &Punctuated<Field, Comma>) -> Vec<String> {
         }
     }
 
+    result.sort();
     result
 }
 
@@ -81,8 +83,15 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
         input_idents.push(format_ident!("{}", inputs[i]));
     }
 
+    let mut output_indexes = vec![];
+    let mut output_idents = vec![];
+    for i in 0..outputs.len() {
+        output_indexes.push(i);
+        output_idents.push(format_ident!("{}", outputs[i]));
+    }
+
     let output = quote! {
-    impl #ident {
+    impl DspConnectible for #ident {
         fn get_input_names() -> Vec<String> {
             vec![
                 #(#inputs.to_string(),)*
@@ -95,10 +104,23 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
             ]
         }
 
+        fn get_output_by_index(&self, index: usize) -> f64 {
+            match index {
+                #( #output_indexes => self.#output_idents , )*
+                _ => panic!("Output {} not found in {}", index, stringify!(#ident))
+            }
+        }
+
         fn get_input_by_index(&self, index: usize) -> f64 {
             match index {
                 #( #input_indexes => self.#input_idents , )*
-                // #( #input_indexes => 0.0, )*
+                _ => panic!("Input {} not found in {}", index, stringify!(#ident))
+            }
+        }
+
+        fn set_input_by_index(&mut self, index: usize, value: f64) {
+            match index {
+                #( #input_indexes => self.#input_idents = value, )*
                 _ => panic!("Input {} not found in {}", index, stringify!(#ident))
             }
         }

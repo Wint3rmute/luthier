@@ -1,3 +1,4 @@
+use node_traits::DspConnectible;
 use numpy::ndarray::{Array1, Dim};
 use numpy::{IntoPyArray, PyArray};
 use pyo3::prelude::*;
