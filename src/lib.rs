@@ -48,7 +48,7 @@ impl DspNode for BaseFrequency {
     fn tick(&mut self) {}
 }
 
-#[pyclass]
+#[pyclass(set_all, get_all)]
 #[derive(DspConnectibleDerive, Clone)]
 struct SineOscillator {
     input_frequency: f64,
@@ -122,6 +122,12 @@ impl DspGraph {
     fn get_node(&self, node_id: NodeId) -> &Node {
         self.nodes
             .get(&node_id)
+            .unwrap_or_else(|| panic!("Node with id {} not found", node_id))
+    }
+
+    fn get_node_mut(&mut self, node_id: NodeId) -> &mut Node {
+        self.nodes
+            .get_mut(&node_id)
             .unwrap_or_else(|| panic!("Node with id {} not found", node_id))
     }
 
@@ -255,6 +261,15 @@ node [fontname="Fira Code"]
 
         let generated_png = output.stdout.to_vec().clone();
         generated_png
+    }
+
+    fn set_input(&mut self, node_id: NodeId, input_name: &str, value: f64) {
+        let node = self.get_node_mut(node_id);
+        let node_name = node.node_name();
+        let input_index = node
+            .get_index_of_input(input_name)
+            .expect(format!("Input {input_name} not found in {node_name}").as_str());
+        node.set_input_by_index(input_index, value);
     }
 
     fn patch(
