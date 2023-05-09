@@ -121,6 +121,31 @@ impl DspGraph {
         println!("{:?}", self.connections);
     }
 
+    fn patch(
+        &mut self,
+        from_node_id: NodeId,
+        from_output_name: String,
+        to_node_id: NodeId,
+        to_input_name: String,
+    ) {
+        let from_node = self.get_node(from_node_id);
+        let to_node = self.get_node(to_node_id);
+
+        let from_output = from_node
+            .get_index_of_output(&from_output_name)
+            .unwrap_or_else(|| panic!("Output {} not found", from_output_name));
+        let to_input = to_node
+            .get_index_of_output(&to_input_name)
+            .unwrap_or_else(|| panic!("Input {} not found", to_input_name));
+
+        self.connections.push(DspConnection {
+            from_node: from_node_id,
+            from_output,
+            to_node: to_node_id,
+            to_input,
+        });
+    }
+
     fn tick(&mut self) -> f64 {
         for connection in self.connections.iter() {
             let output_node = &self.nodes[&connection.from_output];
