@@ -67,31 +67,7 @@ jobs:
 
       - name: Ruff
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry install
           poetry run ruff .
-
-  notebook:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Restore cache
-        uses: actions/cache/restore@v3
-        with:
-          path: |
-            .venv
-            target
-          key: cache
-      - name: Install dependencies
-        run: |
-          ./.github/workflows/setup.sh
-
-      - name: Run notebook
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry install
-          sudo apt install -y graphviz
-          poetry run ipython prototyping.ipynb
 
   dsp_py:
     runs-on: ubuntu-latest

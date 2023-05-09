@@ -7,9 +7,13 @@ edition = "2021"
 name = "luthier"
 crate-type = ["cdylib"]
 
+[workspace]
+members = ["node_macro"]
+
 [dependencies]
 pyo3 = { version = "0.18", features = ["extension-module"] }
 numpy = "0.18"
+node_macro = { path = "node_macro" }
 # eframe = "0.21.3"
 # flume = "0.10.14"
 # rodio = { version = "0.17.1", default-features = true }

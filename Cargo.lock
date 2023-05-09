@@ -46,6 +46,7 @@ dependencies = [
 name = "luthier"
 version = "0.1.0"
 dependencies = [
+ "node_macro",
  "numpy",
  "pyo3",
 ]
@@ -80,6 +81,14 @@ dependencies = [
  "num-integer",
  "num-traits",
  "rawpointer",
+]
+
+[[package]]
+name = "node_macro"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn",
 ]
 
 [[package]]
