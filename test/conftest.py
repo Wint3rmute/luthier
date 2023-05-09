@@ -1,8 +1,8 @@
-import os
+import subprocess
 
 import pytest
 
 
 @pytest.fixture
 def build_luthier() -> None:
-    os.system("maturin develop")
+    subprocess.check_output(["maturin", "develop"])

@@ -13,6 +13,8 @@ type NodeId = usize;
 type InputId = usize;
 type OutputId = usize;
 
+const SAMPLE_RATE: f64 = 22050.0;
+
 #[derive(Debug)]
 struct DspConnection {
     from_node: NodeId,
@@ -38,7 +40,20 @@ struct SineOscillator {
     input_modulation: f64,
     output_output: f64,
 
-    state: usize,
+    phase: f64,
+}
+
+impl DspNode for SineOscillator {
+    fn tick(&mut self) {
+        let frequency = (self.input_frequency * 1000.0).abs();
+        let phase_diff = (2.0 * std::f64::consts::PI * frequency) / SAMPLE_RATE;
+        self.output_output = (self.phase + self.input_modulation).sin();
+        self.phase += phase_diff;
+
+        while self.phase > std::f64::consts::PI * 2.0 {
+            self.phase -= std::f64::consts::PI * 2.0
+        }
+    }
 }
 
 // impl DspNode for Speaker {
@@ -107,13 +122,41 @@ impl DspGraph {
             .get(&node_id)
             .unwrap_or_else(|| panic!("Node with id {} not found", node_id))
     }
+
+    fn play(&mut self, num_samples: usize) -> Array1<f64> {
+        let mut result = Array1::zeros(num_samples);
+
+        for element in result.iter_mut() {
+            *element = self.tick();
+        }
+
+        result
+    }
 }
 
 #[pymethods]
 impl DspGraph {
     #[new]
     fn new() -> Self {
-        DspGraph::default()
+        let mut graph = DspGraph::default();
+
+        let osc = SineOscillator {
+            input_frequency: 0.440,
+            input_modulation: 0.0,
+            output_output: 0.0,
+            phase: 0.0,
+        };
+
+        let osc_id = graph.add_node(Box::new(osc));
+
+        graph.patch(
+            osc_id,
+            "output_output",
+            graph.speaker_node_id,
+            "input_input",
+        );
+
+        graph
     }
 
     fn nodes(&self) {
@@ -124,9 +167,9 @@ impl DspGraph {
     fn patch(
         &mut self,
         from_node_id: NodeId,
-        from_output_name: String,
+        from_output_name: &str,
         to_node_id: NodeId,
-        to_input_name: String,
+        to_input_name: &str,
     ) {
         let from_node = self.get_node(from_node_id);
         let to_node = self.get_node(to_node_id);
@@ -134,8 +177,9 @@ impl DspGraph {
         let from_output = from_node
             .get_index_of_output(&from_output_name)
             .unwrap_or_else(|| panic!("Output {} not found", from_output_name));
+
         let to_input = to_node
-            .get_index_of_output(&to_input_name)
+            .get_index_of_input(&to_input_name)
             .unwrap_or_else(|| panic!("Input {} not found", to_input_name));
 
         self.connections.push(DspConnection {
@@ -148,7 +192,7 @@ impl DspGraph {
 
     fn tick(&mut self) -> f64 {
         for connection in self.connections.iter() {
-            let output_node = &self.nodes[&connection.from_output];
+            let output_node = &self.nodes[&connection.from_node];
             let value_on_output = output_node.get_output_by_index(connection.from_output);
 
             let input_node = self
@@ -166,18 +210,13 @@ impl DspGraph {
         self.get_node(self.speaker_node_id).get_input_by_index(0)
     }
 
-    fn play<'py>(
+    #[pyo3(name = "play")]
+    fn play_py<'py>(
         &mut self,
         num_samples: usize,
         py: Python<'py>,
     ) -> &'py PyArray<f64, Dim<[usize; 1]>> {
-        let mut result = Array1::zeros(num_samples);
-
-        for element in result.iter_mut() {
-            *element = self.tick();
-        }
-
-        result.into_pyarray(py)
+        self.play(num_samples).into_pyarray(py)
     }
 }
 
@@ -210,6 +249,24 @@ mod tests {
     //     input_modulation: f64,
     //     output_output: f64,
     // }
+
+    #[test]
+    fn test_get_output() {
+        let osc = SineOscillator {
+            input_frequency: 0.440,
+            input_modulation: 0.0,
+            output_output: 0.0,
+            phase: 0.0,
+        };
+
+        osc.get_index_of_output("output_output");
+    }
+
+    #[test]
+    fn play_basic_graph() {
+        let mut g = DspGraph::new();
+        g.play(100);
+    }
 
     // #[test]
     // fn it_works() {
