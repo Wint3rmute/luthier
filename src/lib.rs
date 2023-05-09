@@ -5,6 +5,7 @@ use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
 use numpy::ndarray::{Array1, Dim};
 use numpy::{IntoPyArray, PyArray};
 use pyo3::prelude::*;
+use pyo3::types::PyBytes;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 use std::process::{Command, Stdio};
 
@@ -86,7 +87,7 @@ impl DspNode for SineOscillator {
 
 #[pyclass]
 struct DspGraph {
-    nodes: HashMap<NodeId, Box<dyn DspNode + Send>>,
+    nodes: HashMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
     speaker_node_id: NodeId,
@@ -140,6 +141,34 @@ impl DspGraph {
 
         result
     }
+
+    fn draw(&self) -> Vec<u8> {
+        let graphviz_code = self.get_graphviz_code();
+
+        let mut graphviz_process = Command::new("dot")
+            .arg("-T")
+            .arg("png")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("Unable to start graphviz");
+
+        let mut graphviz_stdin = graphviz_process
+            .stdin
+            .take()
+            .expect("Unable to connect to graphviz process stdin");
+        std::thread::spawn(move || {
+            graphviz_stdin
+                .write_all(graphviz_code.as_bytes())
+                .expect("Unable to write data to graphviz stdin");
+        });
+
+        let output = graphviz_process
+            .wait_with_output()
+            .expect("failed to wait on graphviz output");
+
+        output.stdout //.clone()
+    }
 }
 
 #[pymethods]
@@ -165,6 +194,10 @@ impl DspGraph {
         );
 
         graph
+    }
+
+    fn add_sine(&mut self, sine: SineOscillator) -> NodeId {
+        self.add_node(Box::new(sine))
     }
 
     fn get_graphviz_code(&self) -> String {
@@ -234,33 +267,10 @@ node [fontname="Fira Code"]
         graphviz_code.push_str("\n}");
         graphviz_code
     }
-    fn draw(&self) -> Vec<u8> {
-        let graphviz_code = self.get_graphviz_code();
 
-        let mut graphviz_process = Command::new("dot")
-            .arg("-T")
-            .arg("png")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .spawn()
-            .expect("Unable to start graphviz");
-
-        let mut graphviz_stdin = graphviz_process
-            .stdin
-            .take()
-            .expect("Unable to connect to graphviz process stdin");
-        std::thread::spawn(move || {
-            graphviz_stdin
-                .write_all(graphviz_code.as_bytes())
-                .expect("Unable to write data to graphviz stdin");
-        });
-
-        let output = graphviz_process
-            .wait_with_output()
-            .expect("failed to wait on graphviz output");
-
-        let generated_png = output.stdout.to_vec().clone();
-        generated_png
+    #[pyo3(name = "draw")]
+    fn draw_py<'py>(&mut self, py: Python<'py>) -> &'py PyBytes {
+        PyBytes::new(py, &self.draw())
     }
 
     fn set_input(&mut self, node_id: NodeId, input_name: &str, value: f64) {
