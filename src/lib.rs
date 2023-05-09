@@ -108,21 +108,20 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     Ok(())
 }
 
-
 struct SineOscillatorInputs {
     frequency: f64,
-    modulation: f64
+    modulation: f64,
 }
 
 struct SineOscillatorOutputs {
-    output: f64
+    output: f64,
 }
 
 #[derive(AnswerFn)]
 struct SineOscillator {
     state: usize,
     inputs: SineOscillatorInputs,
-    outputs: SineOscillatorOutputs
+    outputs: SineOscillatorOutputs,
 }
 
 #[cfg(test)]

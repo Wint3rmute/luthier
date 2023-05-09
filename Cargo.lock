@@ -86,6 +86,10 @@ dependencies = [
 [[package]]
 name = "node_macro"
 version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "num-complex"
