@@ -120,17 +120,46 @@ struct SineOscillatorOutputs {
 #[derive(AnswerFn)]
 struct SineOscillator {
     state: usize,
-    inputs: SineOscillatorInputs,
-    outputs: SineOscillatorOutputs,
+
+    input_frequency: f64,
+    input_modulation: f64,
+    output_output: f64,
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn it_works() {
-        SineOscillator::describe();
-        // assert_eq!(42, answer());
-    }
+    // struct SineOscillatorInputs {
+    //     frequency: f64,
+    //     modulation: f64,
+    // }
+
+    // struct SineOscillatorOutputs {
+    //     output: f64,
+    // }
+
+    // #[derive(AnswerFn)]
+    // struct SineOscillator {
+    //     state: usize,
+
+    //     input_frequency: f64,
+    //     input_modulation: f64,
+    //     output_output: f64,
+    // }
+
+    // #[test]
+    // fn it_works() {
+    //     let s = SineOscillator {
+    //         state: 0,
+    //         input_frequency: 0.0,
+    //         input_modulation: 0.0,
+    //         output_output: 0.0,
+    //     };
+    //     let names = SineOscillator::get_input_names();
+    //     println!("{:?}", names);
+    //     // assert_eq!(42, answer());
+    //     //
+    //     println!("{}", s.get_input_by_index(1));
+    // }
 }
