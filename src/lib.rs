@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use node_traits::{DspConnectible, DspNode};
 use numpy::ndarray::{Array1, Dim};
 use numpy::{IntoPyArray, PyArray};
@@ -19,10 +21,17 @@ struct DspConnection {
     to_input: InputId,
 }
 
+#[pyclass]
+#[derive(Default, DspConnectibleDerive)]
 struct Speaker {
     input_input: f64,
 }
 
+impl DspNode for Speaker {
+    fn tick(&mut self) {}
+}
+
+#[pyclass]
 #[derive(DspConnectibleDerive)]
 struct SineOscillator {
     input_frequency: f64,
@@ -56,11 +65,48 @@ struct SineOscillator {
 //     }
 // }
 
+type Node = Box<dyn DspNode + Send>;
+
 #[pyclass]
-#[derive(Default)]
 struct DspGraph {
-    nodes: Vec<Box<dyn DspNode + Send>>,
+    nodes: HashMap<NodeId, Box<dyn DspNode + Send>>,
     connections: Vec<DspConnection>,
+    current_node_index: NodeId,
+    speaker_node_id: NodeId,
+}
+
+impl Default for DspGraph {
+    fn default() -> Self {
+        let mut result = Self {
+            nodes: HashMap::new(),
+            connections: vec![],
+            current_node_index: 0,
+            speaker_node_id: 0,
+        };
+
+        result.speaker_node_id = result.add_node(Box::new(Speaker::default()));
+
+        result
+    }
+}
+
+impl DspGraph {
+    fn get_next_node_index(&mut self) -> usize {
+        self.current_node_index += 1;
+        self.current_node_index
+    }
+
+    fn add_node(&mut self, node: Node) -> NodeId {
+        let node_index = self.get_next_node_index();
+        self.nodes.insert(node_index, node);
+        node_index
+    }
+
+    fn get_node(&self, node_id: NodeId) -> &Node {
+        self.nodes
+            .get(&node_id)
+            .unwrap_or_else(|| panic!("Node with id {} not found", node_id))
+    }
 }
 
 #[pymethods]
@@ -75,8 +121,24 @@ impl DspGraph {
         println!("{:?}", self.connections);
     }
 
-    fn tick(&self) -> f64 {
-        0.0
+    fn tick(&mut self) -> f64 {
+        for connection in self.connections.iter() {
+            let output_node = &self.nodes[&connection.from_output];
+            let value_on_output = output_node.get_output_by_index(connection.from_output);
+
+            let input_node = self
+                .nodes
+                .get_mut(&connection.to_node)
+                .unwrap_or_else(|| panic!("Node with id {} not found", connection.to_node));
+
+            input_node.set_input_by_index(connection.to_input, value_on_output);
+        }
+
+        for (_node_id, node) in self.nodes.iter_mut() {
+            node.tick();
+        }
+
+        self.get_node(self.speaker_node_id).get_input_by_index(0)
     }
 
     fn play<'py>(
@@ -97,6 +159,7 @@ impl DspGraph {
 #[pymodule]
 fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
+    m.add_class::<SineOscillator>()?;
 
     Ok(())
 }
