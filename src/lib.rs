@@ -22,7 +22,7 @@ struct DspConnection {
 }
 
 #[pyclass]
-#[derive(Default, DspConnectibleDerive)]
+#[derive(Default, Clone, DspConnectibleDerive)]
 struct Speaker {
     input_input: f64,
 }
@@ -31,7 +31,7 @@ impl DspNode for Speaker {
     fn tick(&mut self) {}
 }
 
-#[derive(DspConnectibleDerive)]
+#[derive(DspConnectibleDerive, Clone)]
 struct BaseFrequency {
     output_output: f64,
 }
@@ -49,13 +49,26 @@ impl DspNode for BaseFrequency {
 }
 
 #[pyclass]
-#[derive(DspConnectibleDerive)]
+#[derive(DspConnectibleDerive, Clone)]
 struct SineOscillator {
     input_frequency: f64,
     input_modulation: f64,
     output_output: f64,
 
     phase: f64,
+}
+
+#[pymethods]
+impl SineOscillator {
+    #[new]
+    fn new() -> Self {
+        return SineOscillator {
+            input_frequency: 0.0,
+            input_modulation: 0.0,
+            output_output: 0.0,
+            phase: 0.0,
+        };
+    }
 }
 
 impl DspNode for SineOscillator {
@@ -95,15 +108,15 @@ impl Default for DspGraph {
 }
 
 impl DspGraph {
-    fn get_next_node_index(&mut self) -> usize {
-        self.current_node_index += 1;
-        self.current_node_index
-    }
-
     fn add_node(&mut self, node: Node) -> NodeId {
         let node_index = self.get_next_node_index();
         self.nodes.insert(node_index, node);
         node_index
+    }
+
+    fn get_next_node_index(&mut self) -> usize {
+        self.current_node_index += 1;
+        self.current_node_index
     }
 
     fn get_node(&self, node_id: NodeId) -> &Node {
@@ -347,5 +360,18 @@ mod tests {
         };
 
         assert_eq!(osc.node_name(), "SineOscillator");
+    }
+
+    #[test]
+    fn test_set_field_by_proc_macro_enum() {
+        let mut osc = SineOscillator {
+            input_frequency: 0.440,
+            input_modulation: 0.0,
+            output_output: 0.0,
+            phase: 0.0,
+        };
+
+        osc.set_input_by_index(SineOscillatorInputs::INPUT_FREQUENCY as usize, 1.0);
+        assert_eq!(osc.input_frequency, 1.0);
     }
 }

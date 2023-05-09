@@ -1,6 +1,7 @@
 pub type NodeId = usize;
 pub type InputId = usize;
 pub type OutputId = usize;
+
 pub type Node = Box<dyn DspNode + Send>;
 
 pub trait DspConnectible {

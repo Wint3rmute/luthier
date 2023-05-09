@@ -69,6 +69,17 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
         input_idents.push(format_ident!("{}", inputs[i]));
     }
 
+    let inputs_enum_ident = format_ident!("{}Inputs", ident);
+    let outputs_enum_ident = format_ident!("{}Outputs", ident);
+    let inputs_enum_values: Vec<syn::Ident> = inputs
+        .iter()
+        .map(|v| format_ident!("{}", v.to_uppercase()))
+        .collect();
+    let outputs_enum_values: Vec<syn::Ident> = outputs
+        .iter()
+        .map(|v| format_ident!("{}", v.to_uppercase()))
+        .collect();
+
     let mut output_indexes = vec![];
     let mut output_idents = vec![];
     for i in 0..outputs.len() {
@@ -76,7 +87,7 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
         output_idents.push(format_ident!("{}", outputs[i]));
     }
 
-    let output = quote! {
+    let mut output = quote! {
     impl DspConnectible for #ident {
         fn node_name(&self) -> &str {
             stringify!(#ident)
@@ -117,5 +128,26 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     }
     };
 
+    if inputs_enum_values.len() > 0 {
+        output.extend(quote! {
+
+        #[derive(Debug, Clone)]
+        #[repr(usize)]
+        enum #inputs_enum_ident {
+            #( #inputs_enum_values = #input_indexes ,)*
+        }
+        });
+    }
+
+    if outputs_enum_values.len() > 0 {
+        output.extend(quote! {
+
+        #[derive(Debug, Clone)]
+        #[repr(usize)]
+        enum #outputs_enum_ident {
+            #( #outputs_enum_values = #output_indexes ,)*
+        }
+        });
+    }
     output.into()
 }
