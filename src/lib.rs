@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use node_traits::{DspConnectible, DspNode};
+use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
 use numpy::ndarray::{Array1, Dim};
 use numpy::{IntoPyArray, PyArray};
 use pyo3::prelude::*;
@@ -8,10 +8,6 @@ use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
 extern crate node_macro;
 use node_macro::DspConnectibleDerive;
-
-type NodeId = usize;
-type InputId = usize;
-type OutputId = usize;
 
 const SAMPLE_RATE: f64 = 22050.0;
 
@@ -56,32 +52,6 @@ impl DspNode for SineOscillator {
     }
 }
 
-// impl DspNode for Speaker {
-//     fn num_inputs(&self) -> usize {
-//         1
-//     }
-
-//     fn num_outputs(&self) -> usize {
-//         0
-//     }
-
-//     fn input_names(&self) -> &[&str] {
-//         &["input"][..]
-//     }
-
-//     fn output_names(&self) -> &[&str] {
-//         &[][..]
-//     }
-
-//     fn set_input(&self, id: InputId, value: f64) {}
-
-//     fn get_output(&self, id: OutputId) -> f64 {
-//         0.0
-//     }
-// }
-
-type Node = Box<dyn DspNode + Send>;
-
 #[pyclass]
 struct DspGraph {
     nodes: HashMap<NodeId, Box<dyn DspNode + Send>>,
@@ -124,7 +94,7 @@ impl DspGraph {
     }
 
     fn play(&mut self, num_samples: usize) -> Array1<f64> {
-        let mut result = Array1::zeros(num_samples);
+        let mut result = Array1::ones(num_samples);
 
         for element in result.iter_mut() {
             *element = self.tick();
@@ -231,24 +201,6 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // struct SineOscillatorInputs {
-    //     frequency: f64,
-    //     modulation: f64,
-    // }
-
-    // struct SineOscillatorOutputs {
-    //     output: f64,
-    // }
-
-    // #[derive(AnswerFn)]
-    // struct SineOscillator {
-    //     state: usize,
-
-    //     input_frequency: f64,
-    //     input_modulation: f64,
-    //     output_output: f64,
-    // }
 
     #[test]
     fn test_get_output() {
