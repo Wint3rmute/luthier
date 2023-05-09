@@ -3,6 +3,9 @@ use numpy::{IntoPyArray, PyArray};
 use pyo3::prelude::*;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
+extern crate node_macro;
+use node_macro::make_answer;
+
 type NodeId = usize;
 type InputId = usize;
 type OutputId = usize;
