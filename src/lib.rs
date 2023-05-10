@@ -211,6 +211,8 @@ struct DspGraph {
     speaker_node_id: NodeId,
     #[pyo3(get)]
     base_frequency_node_id: NodeId,
+    #[pyo3(get)]
+    amp_adsr_node_id: NodeId,
 }
 
 impl Default for DspGraph {
@@ -222,10 +224,18 @@ impl Default for DspGraph {
 
             speaker_node_id: 0,
             base_frequency_node_id: 0,
+            amp_adsr_node_id: 0,
         };
 
         result.speaker_node_id = result.add_node(Box::new(Speaker::default()));
         result.base_frequency_node_id = result.add_node(Box::new(BaseFrequency::default()));
+        result.amp_adsr_node_id = result.add_node(Box::new(ADSR::new()));
+        result.patch(
+            result.amp_adsr_node_id,
+            "output_output",
+            result.speaker_node_id,
+            "input_input",
+        );
 
         result
     }
@@ -298,25 +308,7 @@ impl DspGraph {
 impl DspGraph {
     #[new]
     fn new() -> Self {
-        let mut graph = DspGraph::default();
-
-        let osc = SineOscillator {
-            input_frequency: 0.440,
-            input_modulation: 0.0,
-            output_output: 0.0,
-            phase: 0.0,
-        };
-
-        let osc_id = graph.add_node(Box::new(osc));
-
-        graph.patch(
-            osc_id,
-            "output_output",
-            graph.speaker_node_id,
-            "input_input",
-        );
-
-        graph
+        DspGraph::default()
     }
 
     fn add_sine(&mut self, sine: SineOscillator) -> NodeId {
