@@ -276,6 +276,10 @@ impl DspGraph {
         self.add_node(Box::new(sine))
     }
 
+    fn add_adsr(&mut self, adsr: ADSR) -> NodeId {
+        self.add_node(Box::new(adsr))
+    }
+
     fn get_graphviz_code(&self) -> String {
         let mut graphviz_code = String::new();
 
@@ -418,6 +422,7 @@ node [fontname="Fira Code"]
 fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
     m.add_class::<SineOscillator>()?;
+    m.add_class::<ADSR>()?;
 
     Ok(())
 }

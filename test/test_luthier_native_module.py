@@ -21,3 +21,12 @@ def test_graph_draw(build_luthier: Any) -> None:
     sine = luthier.SineOscillator()
     graph.add_sine(sine)
     assert isinstance(graph.draw(), bytes)
+
+def test_adsr(build_luthier: Any) -> None:
+    from luthier import luthier
+    graph = luthier.DspGraph()
+    adsr = luthier.ADSR()
+    adsr.input_attack = 1.0
+
+    graph.add_adsr(adsr)
+    graph.play(100)
