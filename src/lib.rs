@@ -22,7 +22,7 @@ struct DspConnection {
     to_input: InputId,
 }
 
-#[pyclass]
+#[pyclass(freelist = 64)]
 #[derive(Default, Clone, DspConnectibleDerive)]
 struct Speaker {
     input_input: f64,
@@ -49,7 +49,7 @@ impl DspNode for BaseFrequency {
     fn tick(&mut self) {}
 }
 
-#[pyclass(set_all, get_all)]
+#[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
 struct SineOscillator {
     input_frequency: f64,
@@ -93,7 +93,7 @@ enum AdsrPhase {
     RELEASE,
 }
 
-#[pyclass(set_all, get_all)]
+#[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
 struct ADSR {
     input_input: f64,
@@ -112,7 +112,7 @@ struct ADSR {
 impl ADSR {
     #[new]
     fn new() -> Self {
-        return Self {
+        Self {
             input_input: 0.0,
             input_attack: 0.1,
             input_sustain: 0.1,
@@ -122,7 +122,7 @@ impl ADSR {
             phase: AdsrPhase::ATTACK,
             state: 0.0,
             sustain_state: 0.0,
-        };
+        }
     }
 }
 
@@ -155,7 +155,7 @@ impl DspNode for ADSR {
 
 const HARMONICS: [f64; 9] = [0.2, 0.4, 0.5, 0.6, 1.0, 1.5, 2.0, 2.5, 3.0];
 
-#[pyclass(set_all, get_all)]
+#[pyclass(set_all, get_all, freelist = 64)]
 #[derive(Clone, Default, DspConnectibleDerive)]
 struct HarmonicMultiplier {
     input_input: f64,
@@ -179,7 +179,7 @@ impl DspNode for HarmonicMultiplier {
     }
 }
 
-#[pyclass(set_all, get_all)]
+#[pyclass(set_all, get_all, freelist = 64)]
 #[derive(Clone, Default, DspConnectibleDerive)]
 struct Multiplier {
     input_input: f64,
@@ -201,7 +201,7 @@ impl DspNode for Multiplier {
     }
 }
 
-#[pyclass]
+#[pyclass(freelist = 64)]
 struct DspGraph {
     nodes: HashMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
@@ -405,7 +405,8 @@ node [fontname="Fira Code"]
         let node_name = node.node_name();
         let input_index = node
             .get_index_of_input(input_name)
-            .expect(format!("Input {input_name} not found in {node_name}").as_str());
+            .unwrap_or_else(|| panic!("Input {input_name} not found in {node_name}"));
+        // .expect(format!("Input {input_name} not found in {node_name}")
         node.set_input_by_index(input_index, value);
     }
 
@@ -420,11 +421,11 @@ node [fontname="Fira Code"]
         let to_node = self.get_node(to_node_id);
 
         let from_output = from_node
-            .get_index_of_output(&from_output_name)
+            .get_index_of_output(from_output_name)
             .unwrap_or_else(|| panic!("Output {} not found", from_output_name));
 
         let to_input = to_node
-            .get_index_of_input(&to_input_name)
+            .get_index_of_input(to_input_name)
             .unwrap_or_else(|| panic!("Input {} not found", to_input_name));
 
         self.connections.push(DspConnection {
