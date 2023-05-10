@@ -110,4 +110,4 @@ jobs:
           ./.github/workflows/setup.sh
       - name: Run pytest
         run: |
-          poetry run pytest .
+          poetry run pytest -v .

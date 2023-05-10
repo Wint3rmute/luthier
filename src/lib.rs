@@ -1,9 +1,10 @@
-use std::collections::HashMap;
+use pyo3::exceptions::PyValueError;
+use std::collections::BTreeMap;
 use std::io::Write;
 
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
 use numpy::ndarray::{Array1, Dim};
-use numpy::{IntoPyArray, PyArray};
+use numpy::{IntoPyArray, PyArray, PyArrayDyn};
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
@@ -203,7 +204,7 @@ impl DspNode for Multiplier {
 
 #[pyclass(freelist = 64)]
 struct DspGraph {
-    nodes: HashMap<NodeId, Box<dyn DspNode>>,
+    nodes: BTreeMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
 
@@ -218,7 +219,7 @@ struct DspGraph {
 impl Default for DspGraph {
     fn default() -> Self {
         let mut result = Self {
-            nodes: HashMap::new(),
+            nodes: BTreeMap::new(),
             connections: vec![],
             current_node_index: 0,
 
@@ -304,11 +305,68 @@ impl DspGraph {
     }
 }
 
+impl DspGraph {
+    fn inputs_iterator(&self) -> impl Iterator<Item = (NodeId, InputId)> + '_ {
+        self.nodes.iter().flat_map(|(node_id, node)| {
+            node.get_input_names()
+                .iter()
+                .enumerate()
+                .filter_map(|(input_id, _input_name)| {
+                    if self.is_modulated(*node_id, input_id) {
+                        Some((*node_id, input_id))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>()
+        })
+    }
+}
+
 #[pymethods]
 impl DspGraph {
     #[new]
     fn new() -> Self {
         DspGraph::default()
+    }
+
+    fn num_inputs(&self) -> usize {
+        self.inputs_iterator().count()
+    }
+
+    fn set_inputs(&mut self, inputs: &PyArrayDyn<f64>) -> PyResult<()> {
+        let inputs = unsafe { inputs.as_array() };
+
+        let graph_inputs = self.num_inputs();
+        if !inputs.len() == graph_inputs {
+            return Err(PyValueError::new_err(format!("Input array's length must be the same as the number of inputs in the DspGraph: {graph_inputs}")));
+        }
+
+        let inputs_iterator_collected: Vec<(NodeId, InputId)> = self.inputs_iterator().collect();
+
+        for ((node_id, input_id), new_value) in inputs_iterator_collected.iter().zip(inputs) {
+            self.get_node_mut(*node_id)
+                .set_input_by_index(*input_id, *new_value);
+        }
+
+        Ok(())
+    }
+
+    fn get_inputs<'py>(&mut self, py: Python<'py>) -> &'py PyArray<f64, Dim<[usize; 1]>> {
+        self.inputs_iterator()
+            .map(|(node_id, input_id)| self.get_node(node_id).get_input_by_index(input_id))
+            .collect::<Array1<f64>>()
+            .into_pyarray(py)
+    }
+
+    fn is_modulated(&self, node_id: NodeId, input_id: InputId) -> bool {
+        for connection in self.connections.iter() {
+            if connection.to_node == node_id && connection.to_input == input_id {
+                return true;
+            }
+        }
+
+        false
     }
 
     fn add_sine(&mut self, sine: SineOscillator) -> NodeId {
