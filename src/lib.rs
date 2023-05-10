@@ -86,11 +86,84 @@ impl DspNode for SineOscillator {
 }
 
 #[pyclass]
+#[derive(PartialEq, Eq, Clone)]
+enum AdsrPhase {
+    ATTACK,
+    SUSTAIN,
+    RELEASE
+}
+
+#[pyclass(set_all, get_all)]
+#[derive(DspConnectibleDerive, Clone)]
+struct ADSR {
+    input_input: f64,
+    input_attack: f64,
+    input_sustain: f64,
+    input_release: f64,
+
+    output_output: f64,
+
+    phase: AdsrPhase,
+    state: f64,
+    sustain_state: f64
+}
+
+#[pymethods]
+impl ADSR {
+    #[new]
+    fn new() -> Self {
+        return Self {
+            input_input: 0.0,
+            input_attack: 0.1,
+            input_sustain: 0.1,
+            input_release: 0.1,
+            output_output: 0.0,
+
+            phase: AdsrPhase::ATTACK,
+            state: 0.0,
+            sustain_state: 0.0
+        }
+    }
+
+}
+
+impl DspNode for ADSR {
+    fn tick(&mut self) {
+        if self.phase == AdsrPhase::ATTACK {
+            let state_inc = 0.4 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
+            self.state += state_inc;
+            if self.state > 1.0 {
+                self.state = 1.0;
+                self.phase = AdsrPhase::SUSTAIN;
+            }
+    }
+        else if self.phase == AdsrPhase::SUSTAIN {
+            let state_inc = 0.4 / (self.input_sustain + 0.000001).abs() / SAMPLE_RATE;
+            self.sustain_state += state_inc;
+            if self.sustain_state >= 1.0 {
+                self.phase = AdsrPhase::RELEASE;
+            }
+                }
+
+        else if self.phase == AdsrPhase::RELEASE {
+            let state_dec = 0.4 / (self.input_release + 0.000001).abs() / SAMPLE_RATE;
+            self.state -= state_dec;
+            if self.state < 0.0 {
+                self.state = 0.0
+            }
+                }
+
+        self.output_output = self.input_input * self.state;
+    }
+}
+
+#[pyclass]
 struct DspGraph {
     nodes: HashMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
     speaker_node_id: NodeId,
+    base_frequency_node_id: NodeId
 }
 
 impl Default for DspGraph {
@@ -99,10 +172,13 @@ impl Default for DspGraph {
             nodes: HashMap::new(),
             connections: vec![],
             current_node_index: 0,
+
             speaker_node_id: 0,
+            base_frequency_node_id: 0
         };
 
         result.speaker_node_id = result.add_node(Box::new(Speaker::default()));
+        result.base_frequency_node_id = result.add_node(Box::new(BaseFrequency::default()));
 
         result
     }
