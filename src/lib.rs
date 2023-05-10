@@ -90,7 +90,7 @@ impl DspNode for SineOscillator {
 enum AdsrPhase {
     ATTACK,
     SUSTAIN,
-    RELEASE
+    RELEASE,
 }
 
 #[pyclass(set_all, get_all)]
@@ -105,7 +105,7 @@ struct ADSR {
 
     phase: AdsrPhase,
     state: f64,
-    sustain_state: f64
+    sustain_state: f64,
 }
 
 #[pymethods]
@@ -121,10 +121,9 @@ impl ADSR {
 
             phase: AdsrPhase::ATTACK,
             state: 0.0,
-            sustain_state: 0.0
-        }
+            sustain_state: 0.0,
+        };
     }
-
 }
 
 impl DspNode for ADSR {
@@ -136,22 +135,19 @@ impl DspNode for ADSR {
                 self.state = 1.0;
                 self.phase = AdsrPhase::SUSTAIN;
             }
-    }
-        else if self.phase == AdsrPhase::SUSTAIN {
+        } else if self.phase == AdsrPhase::SUSTAIN {
             let state_inc = 0.4 / (self.input_sustain + 0.000001).abs() / SAMPLE_RATE;
             self.sustain_state += state_inc;
             if self.sustain_state >= 1.0 {
                 self.phase = AdsrPhase::RELEASE;
             }
-                }
-
-        else if self.phase == AdsrPhase::RELEASE {
+        } else if self.phase == AdsrPhase::RELEASE {
             let state_dec = 0.4 / (self.input_release + 0.000001).abs() / SAMPLE_RATE;
             self.state -= state_dec;
             if self.state < 0.0 {
                 self.state = 0.0
             }
-                }
+        }
 
         self.output_output = self.input_input * self.state;
     }
@@ -163,7 +159,7 @@ struct DspGraph {
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
     speaker_node_id: NodeId,
-    base_frequency_node_id: NodeId
+    base_frequency_node_id: NodeId,
 }
 
 impl Default for DspGraph {
@@ -174,7 +170,7 @@ impl Default for DspGraph {
             current_node_index: 0,
 
             speaker_node_id: 0,
-            base_frequency_node_id: 0
+            base_frequency_node_id: 0,
         };
 
         result.speaker_node_id = result.add_node(Box::new(Speaker::default()));
