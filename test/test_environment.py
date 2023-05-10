@@ -1,4 +1,4 @@
-def test_import_libraries_with_problematic_installation_procedures():
+def test_import_libraries_with_problematic_installation_procedures() -> None:
     import frechet_audio_distance
     import torch
 
