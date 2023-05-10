@@ -16,7 +16,9 @@ fn find_input_fields(fields: &Punctuated<Field, Comma>) -> Vec<String> {
             .to_string()
             .starts_with("input_")
         {
-            result.push(field.ident.clone().unwrap().to_string())
+            result.push(
+                field.ident.clone().unwrap().to_string(), // .replacen("input_", "", 1),
+            )
         }
     }
 
@@ -33,7 +35,9 @@ fn find_output_fields(fields: &Punctuated<Field, Comma>) -> Vec<String> {
             .to_string()
             .starts_with("output_")
         {
-            result.push(field.ident.clone().unwrap().to_string())
+            result.push(
+                field.ident.clone().unwrap().to_string(), // .replacen("output_", "", 1),
+            )
         }
     }
 
