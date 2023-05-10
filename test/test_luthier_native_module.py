@@ -32,3 +32,13 @@ def test_adsr(build_luthier: Any) -> None:
 
     graph.add_adsr(adsr)
     graph.play(100)
+
+def test_multiplier(build_luthier: Any) -> None:
+    from luthier import luthier
+
+    graph = luthier.DspGraph()
+    multiplier = luthier.Multiplier()
+    multiplier.input_scale = 1.0
+    
+    graph.add_multiplier(multiplier)
+    graph.play(100)

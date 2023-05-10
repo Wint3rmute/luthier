@@ -153,6 +153,28 @@ impl DspNode for ADSR {
     }
 }
 
+#[pyclass(set_all, get_all)]
+#[derive(Clone, Default, DspConnectibleDerive)]
+struct Multiplier {
+    input_input: f64,
+    input_scale: f64,
+    output_output: f64,
+}
+
+#[pymethods]
+impl Multiplier {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for Multiplier {
+    fn tick(&mut self) {
+        self.output_output = self.input_input * self.input_scale;
+    }
+}
+
 #[pyclass]
 struct DspGraph {
     nodes: HashMap<NodeId, Box<dyn DspNode>>,
@@ -274,6 +296,10 @@ impl DspGraph {
 
     fn add_adsr(&mut self, adsr: ADSR) -> NodeId {
         self.add_node(Box::new(adsr))
+    }
+
+    fn add_multiplier(&mut self, multiplier: Multiplier) -> NodeId {
+        self.add_node(Box::new(multiplier))
     }
 
     fn get_graphviz_code(&self) -> String {
@@ -419,6 +445,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
     m.add_class::<SineOscillator>()?;
     m.add_class::<ADSR>()?;
+    m.add_class::<Multiplier>()?;
 
     Ok(())
 }
