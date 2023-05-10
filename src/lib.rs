@@ -153,6 +153,32 @@ impl DspNode for ADSR {
     }
 }
 
+const HARMONICS: [f64; 9] = [0.2, 0.4, 0.5, 0.6, 1.0, 1.5, 2.0, 2.5, 3.0];
+
+#[pyclass(set_all, get_all)]
+#[derive(Clone, Default, DspConnectibleDerive)]
+struct HarmonicMultiplier {
+    input_input: f64,
+    input_scale: f64,
+    output_output: f64,
+}
+
+#[pymethods]
+impl HarmonicMultiplier {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for HarmonicMultiplier {
+    fn tick(&mut self) {
+        self.output_output = self.input_input
+            * HARMONICS
+                [(((self.input_scale + 1.0) / 2.0) * (HARMONICS.len() as f64) - 1.0) as usize];
+    }
+}
+
 #[pyclass(set_all, get_all)]
 #[derive(Clone, Default, DspConnectibleDerive)]
 struct Multiplier {
@@ -180,7 +206,10 @@ struct DspGraph {
     nodes: HashMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
+
+    #[pyo3(get)]
     speaker_node_id: NodeId,
+    #[pyo3(get)]
     base_frequency_node_id: NodeId,
 }
 
@@ -299,6 +328,10 @@ impl DspGraph {
     }
 
     fn add_multiplier(&mut self, multiplier: Multiplier) -> NodeId {
+        self.add_node(Box::new(multiplier))
+    }
+
+    fn add_harmonic_multiplier(&mut self, multiplier: HarmonicMultiplier) -> NodeId {
         self.add_node(Box::new(multiplier))
     }
 
@@ -446,6 +479,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<SineOscillator>()?;
     m.add_class::<ADSR>()?;
     m.add_class::<Multiplier>()?;
+    m.add_class::<HarmonicMultiplier>()?;
 
     Ok(())
 }
