@@ -1,10 +1,13 @@
 use std::collections::HashMap;
+use std::io::Write;
 
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
 use numpy::ndarray::{Array1, Dim};
 use numpy::{IntoPyArray, PyArray};
 use pyo3::prelude::*;
+use pyo3::types::PyBytes;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
+use std::process::{Command, Stdio};
 
 extern crate node_macro;
 use node_macro::DspConnectibleDerive;
@@ -19,8 +22,8 @@ struct DspConnection {
     to_input: InputId,
 }
 
-#[pyclass]
-#[derive(Default, DspConnectibleDerive)]
+#[pyclass(freelist = 64)]
+#[derive(Default, Clone, DspConnectibleDerive)]
 struct Speaker {
     input_input: f64,
 }
@@ -29,14 +32,44 @@ impl DspNode for Speaker {
     fn tick(&mut self) {}
 }
 
-#[pyclass]
-#[derive(DspConnectibleDerive)]
+#[derive(DspConnectibleDerive, Clone)]
+struct BaseFrequency {
+    output_output: f64,
+}
+
+impl Default for BaseFrequency {
+    fn default() -> Self {
+        BaseFrequency {
+            output_output: 0.440,
+        }
+    }
+}
+
+impl DspNode for BaseFrequency {
+    fn tick(&mut self) {}
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone)]
 struct SineOscillator {
     input_frequency: f64,
     input_modulation: f64,
     output_output: f64,
 
     phase: f64,
+}
+
+#[pymethods]
+impl SineOscillator {
+    #[new]
+    fn new() -> Self {
+        return SineOscillator {
+            input_frequency: 0.0,
+            input_modulation: 0.0,
+            output_output: 0.0,
+            phase: 0.0,
+        };
+    }
 }
 
 impl DspNode for SineOscillator {
@@ -53,11 +86,133 @@ impl DspNode for SineOscillator {
 }
 
 #[pyclass]
+#[derive(PartialEq, Eq, Clone)]
+enum AdsrPhase {
+    ATTACK,
+    SUSTAIN,
+    RELEASE,
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone)]
+struct ADSR {
+    input_input: f64,
+    input_attack: f64,
+    input_sustain: f64,
+    input_release: f64,
+
+    output_output: f64,
+
+    phase: AdsrPhase,
+    state: f64,
+    sustain_state: f64,
+}
+
+#[pymethods]
+impl ADSR {
+    #[new]
+    fn new() -> Self {
+        Self {
+            input_input: 0.0,
+            input_attack: 0.1,
+            input_sustain: 0.1,
+            input_release: 0.1,
+            output_output: 0.0,
+
+            phase: AdsrPhase::ATTACK,
+            state: 0.0,
+            sustain_state: 0.0,
+        }
+    }
+}
+
+impl DspNode for ADSR {
+    fn tick(&mut self) {
+        if self.phase == AdsrPhase::ATTACK {
+            let state_inc = 0.4 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
+            self.state += state_inc;
+            if self.state > 1.0 {
+                self.state = 1.0;
+                self.phase = AdsrPhase::SUSTAIN;
+            }
+        } else if self.phase == AdsrPhase::SUSTAIN {
+            let state_inc = 0.4 / (self.input_sustain + 0.000001).abs() / SAMPLE_RATE;
+            self.sustain_state += state_inc;
+            if self.sustain_state >= 1.0 {
+                self.phase = AdsrPhase::RELEASE;
+            }
+        } else if self.phase == AdsrPhase::RELEASE {
+            let state_dec = 0.4 / (self.input_release + 0.000001).abs() / SAMPLE_RATE;
+            self.state -= state_dec;
+            if self.state < 0.0 {
+                self.state = 0.0
+            }
+        }
+
+        self.output_output = self.input_input * self.state;
+    }
+}
+
+const HARMONICS: [f64; 9] = [0.2, 0.4, 0.5, 0.6, 1.0, 1.5, 2.0, 2.5, 3.0];
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(Clone, Default, DspConnectibleDerive)]
+struct HarmonicMultiplier {
+    input_input: f64,
+    input_scale: f64,
+    output_output: f64,
+}
+
+#[pymethods]
+impl HarmonicMultiplier {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for HarmonicMultiplier {
+    fn tick(&mut self) {
+        self.output_output = self.input_input
+            * HARMONICS
+                [(((self.input_scale + 1.0) / 2.0) * (HARMONICS.len() as f64) - 1.0) as usize];
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(Clone, Default, DspConnectibleDerive)]
+struct Multiplier {
+    input_input: f64,
+    input_scale: f64,
+    output_output: f64,
+}
+
+#[pymethods]
+impl Multiplier {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for Multiplier {
+    fn tick(&mut self) {
+        self.output_output = self.input_input * self.input_scale;
+    }
+}
+
+#[pyclass(freelist = 64)]
 struct DspGraph {
-    nodes: HashMap<NodeId, Box<dyn DspNode + Send>>,
+    nodes: HashMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
+
+    #[pyo3(get)]
     speaker_node_id: NodeId,
+    #[pyo3(get)]
+    base_frequency_node_id: NodeId,
+    #[pyo3(get)]
+    amp_adsr_node_id: NodeId,
 }
 
 impl Default for DspGraph {
@@ -66,30 +221,47 @@ impl Default for DspGraph {
             nodes: HashMap::new(),
             connections: vec![],
             current_node_index: 0,
+
             speaker_node_id: 0,
+            base_frequency_node_id: 0,
+            amp_adsr_node_id: 0,
         };
 
         result.speaker_node_id = result.add_node(Box::new(Speaker::default()));
+        result.base_frequency_node_id = result.add_node(Box::new(BaseFrequency::default()));
+        result.amp_adsr_node_id = result.add_node(Box::new(ADSR::new()));
+        result.patch(
+            result.amp_adsr_node_id,
+            "output_output",
+            result.speaker_node_id,
+            "input_input",
+        );
 
         result
     }
 }
 
 impl DspGraph {
+    fn add_node(&mut self, node: Node) -> NodeId {
+        let node_index = self.get_next_node_index() - 1; // patola
+        self.nodes.insert(node_index, node);
+        node_index
+    }
+
     fn get_next_node_index(&mut self) -> usize {
         self.current_node_index += 1;
         self.current_node_index
     }
 
-    fn add_node(&mut self, node: Node) -> NodeId {
-        let node_index = self.get_next_node_index();
-        self.nodes.insert(node_index, node);
-        node_index
-    }
-
     fn get_node(&self, node_id: NodeId) -> &Node {
         self.nodes
             .get(&node_id)
+            .unwrap_or_else(|| panic!("Node with id {} not found", node_id))
+    }
+
+    fn get_node_mut(&mut self, node_id: NodeId) -> &mut Node {
+        self.nodes
+            .get_mut(&node_id)
             .unwrap_or_else(|| panic!("Node with id {} not found", node_id))
     }
 
@@ -102,36 +274,140 @@ impl DspGraph {
 
         result
     }
+
+    fn draw(&self) -> Vec<u8> {
+        let graphviz_code = self.get_graphviz_code();
+
+        let mut graphviz_process = Command::new("dot")
+            .arg("-T")
+            .arg("png")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .spawn()
+            .expect("Unable to start graphviz");
+
+        let mut graphviz_stdin = graphviz_process
+            .stdin
+            .take()
+            .expect("Unable to connect to graphviz process stdin");
+        std::thread::spawn(move || {
+            graphviz_stdin
+                .write_all(graphviz_code.as_bytes())
+                .expect("Unable to write data to graphviz stdin");
+        });
+
+        let output = graphviz_process
+            .wait_with_output()
+            .expect("failed to wait on graphviz output");
+
+        output.stdout //.clone()
+    }
 }
 
 #[pymethods]
 impl DspGraph {
     #[new]
     fn new() -> Self {
-        let mut graph = DspGraph::default();
-
-        let osc = SineOscillator {
-            input_frequency: 0.440,
-            input_modulation: 0.0,
-            output_output: 0.0,
-            phase: 0.0,
-        };
-
-        let osc_id = graph.add_node(Box::new(osc));
-
-        graph.patch(
-            osc_id,
-            "output_output",
-            graph.speaker_node_id,
-            "input_input",
-        );
-
-        graph
+        DspGraph::default()
     }
 
-    fn nodes(&self) {
-        println!("Co jest");
-        println!("{:?}", self.connections);
+    fn add_sine(&mut self, sine: SineOscillator) -> NodeId {
+        self.add_node(Box::new(sine))
+    }
+
+    fn add_adsr(&mut self, adsr: ADSR) -> NodeId {
+        self.add_node(Box::new(adsr))
+    }
+
+    fn add_multiplier(&mut self, multiplier: Multiplier) -> NodeId {
+        self.add_node(Box::new(multiplier))
+    }
+
+    fn add_harmonic_multiplier(&mut self, multiplier: HarmonicMultiplier) -> NodeId {
+        self.add_node(Box::new(multiplier))
+    }
+
+    fn get_graphviz_code(&self) -> String {
+        let mut graphviz_code = String::new();
+
+        graphviz_code.push_str(
+            r#"digraph g {
+splines="polyline"
+rankdir = "LR"
+
+fontname="Fira Code"
+node [fontname="Fira Code"]
+"#,
+        );
+        for (node_id, node) in self.nodes.iter() {
+            let node_name = node.node_name();
+            graphviz_code.push_str(
+                format!(
+                    r#"
+"node{node_id}" [
+    shape = none
+    label = <<table border="0" cellspacing="0">
+    <tr><td border="1" bgcolor="white">{node_name} #{node_id}</td></tr>
+            "#
+                )
+                .as_str(),
+            );
+
+            for output in node.get_output_names() {
+                graphviz_code.push_str(
+                    format!(r#"<tr><td border="1" port="{output}"> {output} ● </td></tr> \n"#)
+                        .as_str(),
+                );
+            }
+
+            for (input_id, input) in node.get_input_names().iter().enumerate() {
+                let input_value = node.get_input_by_index(input_id);
+
+                graphviz_code.push_str(
+                    format!(r#"<tr><td border="1" port="{input}"> ○ {input}: {input_value:.3} </td></tr> \n"#)
+                        .as_str(),
+                );
+            }
+
+            graphviz_code.push_str("</table>>\n];");
+        }
+
+        for connection in &self.connections {
+            let output_name =
+                &self.nodes[&connection.from_node].get_output_names()[connection.from_output];
+            let input_name =
+                &self.nodes[&connection.to_node].get_input_names()[connection.to_input];
+
+            let from_node = &connection.from_node;
+            let to_node = &connection.to_node;
+
+            graphviz_code.push_str(
+                format!(
+                    r#"
+                "node{from_node}":{output_name} -> "node{to_node}":{input_name} [];
+                "#
+                )
+                .as_str(),
+            );
+        }
+
+        graphviz_code.push_str("\n}");
+        graphviz_code
+    }
+
+    #[pyo3(name = "draw")]
+    fn draw_py<'py>(&mut self, py: Python<'py>) -> &'py PyBytes {
+        PyBytes::new(py, &self.draw())
+    }
+
+    fn set_input(&mut self, node_id: NodeId, input_name: &str, value: f64) {
+        let node = self.get_node_mut(node_id);
+        let node_name = node.node_name();
+        let input_index = node
+            .get_index_of_input(input_name)
+            .unwrap_or_else(|| panic!("Input {input_name} not found in {node_name}"));
+        // .expect(format!("Input {input_name} not found in {node_name}")
+        node.set_input_by_index(input_index, value);
     }
 
     fn patch(
@@ -145,11 +421,11 @@ impl DspGraph {
         let to_node = self.get_node(to_node_id);
 
         let from_output = from_node
-            .get_index_of_output(&from_output_name)
+            .get_index_of_output(from_output_name)
             .unwrap_or_else(|| panic!("Output {} not found", from_output_name));
 
         let to_input = to_node
-            .get_index_of_input(&to_input_name)
+            .get_index_of_input(to_input_name)
             .unwrap_or_else(|| panic!("Input {} not found", to_input_name));
 
         self.connections.push(DspConnection {
@@ -194,6 +470,9 @@ impl DspGraph {
 fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
     m.add_class::<SineOscillator>()?;
+    m.add_class::<ADSR>()?;
+    m.add_class::<Multiplier>()?;
+    m.add_class::<HarmonicMultiplier>()?;
 
     Ok(())
 }
@@ -220,18 +499,35 @@ mod tests {
         g.play(100);
     }
 
-    // #[test]
-    // fn it_works() {
-    //     let s = SineOscillator {
-    //         state: 0,
-    //         input_frequency: 0.0,
-    //         input_modulation: 0.0,
-    //         output_output: 0.0,
-    //     };
-    //     let names = SineOscillator::get_input_names();
-    //     println!("{:?}", names);
-    //     // assert_eq!(42, answer());
-    //     //
-    //     println!("{}", s.get_input_by_index(1));
-    // }
+    #[test]
+    fn test_draw_doesnt_panic() {
+        let g = DspGraph::new();
+        g.get_graphviz_code();
+        g.draw();
+    }
+
+    #[test]
+    fn test_node_name() {
+        let osc = SineOscillator {
+            input_frequency: 0.440,
+            input_modulation: 0.0,
+            output_output: 0.0,
+            phase: 0.0,
+        };
+
+        assert_eq!(osc.node_name(), "SineOscillator");
+    }
+
+    #[test]
+    fn test_set_field_by_proc_macro_enum() {
+        let mut osc = SineOscillator {
+            input_frequency: 0.440,
+            input_modulation: 0.0,
+            output_output: 0.0,
+            phase: 0.0,
+        };
+
+        osc.set_input_by_index(SineOscillatorInputs::INPUT_FREQUENCY as usize, 1.0);
+        assert_eq!(osc.input_frequency, 1.0);
+    }
 }

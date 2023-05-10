@@ -171,7 +171,7 @@ class DspGraph:
     def __init__(self) -> None:
         self.nodes: dict[NodeId, DspNode] = {}
         self.connections: list[DspConnection] = []
-        self.node_id_counter = count()
+        self.node_id_counter = count(0)
         self.speaker = self._add_node_no_check(Speaker())
 
     def iter_params(self) -> Iterator[tuple[int, int]]:
@@ -469,6 +469,7 @@ class SineOscillator(DspNode):
     class Inputs:
         frequency: float = 0
         modulation: float = 0
+        modulation_index: float = 0.01
 
     @dataclass
     class Outputs:
@@ -483,7 +484,9 @@ class SineOscillator(DspNode):
     def tick(self) -> None:
         frequency = abs(self.inputs.frequency * 1000)
         self.phase_diff = (2.0 * math.pi * frequency) / SAMPLE_RATE
-        self.outputs.output = math.sin(self.phase + self.inputs.modulation)
+        self.outputs.output = math.sin(
+            self.phase + self.inputs.modulation * self.inputs.modulation_index * 100.0
+        )
         self.phase += self.phase_diff
 
         while self.phase > math.pi * 2.0:

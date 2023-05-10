@@ -1,9 +1,11 @@
 pub type NodeId = usize;
 pub type InputId = usize;
 pub type OutputId = usize;
-pub type Node = Box<dyn DspNode + Send>;
+
+pub type Node = Box<dyn DspNode>;
 
 pub trait DspConnectible {
+    fn node_name(&self) -> &str;
     fn get_input_names(&self) -> Vec<String>;
     fn get_output_names(&self) -> Vec<String>;
     fn get_input_by_index(&self, index: InputId) -> f64;
@@ -29,7 +31,7 @@ pub trait DspConnectible {
     }
 }
 
-pub trait DspNode: DspConnectible {
+pub trait DspNode: DspConnectible + Send {
     fn tick(&mut self);
 }
 

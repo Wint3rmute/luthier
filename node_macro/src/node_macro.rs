@@ -1,22 +1,10 @@
 extern crate proc_macro;
-use node_traits::DspConnectible;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::{
     parse_macro_input, punctuated::Punctuated, token::Comma, DeriveInput, Field, FieldsNamed,
     FieldsUnnamed,
 };
-
-fn find_struct_by_name(name: &str, fields: &Punctuated<Field, Comma>) -> Option<Field> {
-    for field in fields.iter() {
-        if field.ident.clone().unwrap() == name {
-            let result = field.clone();
-            return Some(result);
-        }
-    }
-
-    None
-}
 
 fn find_input_fields(fields: &Punctuated<Field, Comma>) -> Vec<String> {
     let mut result = vec![];
@@ -28,7 +16,9 @@ fn find_input_fields(fields: &Punctuated<Field, Comma>) -> Vec<String> {
             .to_string()
             .starts_with("input_")
         {
-            result.push(field.ident.clone().unwrap().to_string())
+            result.push(
+                field.ident.clone().unwrap().to_string(), // .replacen("input_", "", 1),
+            )
         }
     }
 
@@ -45,7 +35,9 @@ fn find_output_fields(fields: &Punctuated<Field, Comma>) -> Vec<String> {
             .to_string()
             .starts_with("output_")
         {
-            result.push(field.ident.clone().unwrap().to_string())
+            result.push(
+                field.ident.clone().unwrap().to_string(), // .replacen("output_", "", 1),
+            )
         }
     }
 
@@ -60,13 +52,11 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     let (inputs, outputs) = match data {
         syn::Data::Struct(s) => match s.fields {
             syn::Fields::Named(FieldsNamed { named, .. }) => {
-                // let idents = named.iter() .map(|f| &f.ident);
-
                 let inputs = find_input_fields(&named);
                 let outputs = find_output_fields(&named);
                 (inputs, outputs)
             }
-            syn::Fields::Unnamed(FieldsUnnamed { unnamed, .. }) => {
+            syn::Fields::Unnamed(FieldsUnnamed { unnamed: _, .. }) => {
                 panic!("Unnamed fields not supported");
             }
             syn::Fields::Unit => panic!("Unnamed fields not supported"),
@@ -83,6 +73,17 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
         input_idents.push(format_ident!("{}", inputs[i]));
     }
 
+    let inputs_enum_ident = format_ident!("{}Inputs", ident);
+    let outputs_enum_ident = format_ident!("{}Outputs", ident);
+    let inputs_enum_values: Vec<syn::Ident> = inputs
+        .iter()
+        .map(|v| format_ident!("{}", v.to_uppercase()))
+        .collect();
+    let outputs_enum_values: Vec<syn::Ident> = outputs
+        .iter()
+        .map(|v| format_ident!("{}", v.to_uppercase()))
+        .collect();
+
     let mut output_indexes = vec![];
     let mut output_idents = vec![];
     for i in 0..outputs.len() {
@@ -90,8 +91,12 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
         output_idents.push(format_ident!("{}", outputs[i]));
     }
 
-    let output = quote! {
+    let mut output = quote! {
     impl DspConnectible for #ident {
+        fn node_name(&self) -> &str {
+            stringify!(#ident)
+        }
+
         fn get_input_names(&self) -> Vec<String> {
             vec![
                 #(#inputs.to_string(),)*
@@ -127,5 +132,26 @@ pub fn derive_answer_fn(input: TokenStream) -> TokenStream {
     }
     };
 
+    if inputs_enum_values.len() > 0 {
+        output.extend(quote! {
+
+        #[derive(Debug, Clone)]
+        #[repr(usize)]
+        enum #inputs_enum_ident {
+            #( #inputs_enum_values = #input_indexes ,)*
+        }
+        });
+    }
+
+    if outputs_enum_values.len() > 0 {
+        output.extend(quote! {
+
+        #[derive(Debug, Clone)]
+        #[repr(usize)]
+        enum #outputs_enum_ident {
+            #( #outputs_enum_values = #output_indexes ,)*
+        }
+        });
+    }
     output.into()
 }
