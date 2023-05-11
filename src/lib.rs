@@ -312,7 +312,7 @@ impl DspGraph {
                 .iter()
                 .enumerate()
                 .filter_map(|(input_id, _input_name)| {
-                    if self.is_modulated(*node_id, input_id) {
+                    if !self.is_modulated(*node_id, input_id) {
                         Some((*node_id, input_id))
                     } else {
                         None
