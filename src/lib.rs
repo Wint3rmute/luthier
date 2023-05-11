@@ -55,6 +55,7 @@ impl DspNode for BaseFrequency {
 struct SineOscillator {
     input_frequency: f64,
     input_modulation: f64,
+    input_modulation_index: f64,
     output_output: f64,
 
     phase: f64,
@@ -67,6 +68,7 @@ impl SineOscillator {
         return SineOscillator {
             input_frequency: 0.0,
             input_modulation: 0.0,
+            input_modulation_index: 0.1,
             output_output: 0.0,
             phase: 0.0,
         };
@@ -77,7 +79,8 @@ impl DspNode for SineOscillator {
     fn tick(&mut self) {
         let frequency = (self.input_frequency * 1000.0).abs();
         let phase_diff = (2.0 * std::f64::consts::PI * frequency) / SAMPLE_RATE;
-        self.output_output = (self.phase + self.input_modulation).sin();
+        self.output_output =
+            (self.phase + self.input_modulation * self.input_modulation_index * 10.0).sin();
         self.phase += phase_diff;
 
         while self.phase > std::f64::consts::PI * 2.0 {
@@ -154,7 +157,7 @@ impl DspNode for ADSR {
     }
 }
 
-const HARMONICS: [f64; 9] = [0.2, 0.4, 0.5, 0.6, 1.0, 1.5, 2.0, 2.5, 3.0];
+const HARMONICS: [f64; 12] = [0.1, 0.15, 0.2, 0.25, 0.4, 0.5, 0.6, 1.0, 1.5, 2.0, 2.5, 3.0];
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(Clone, Default, DspConnectibleDerive)]

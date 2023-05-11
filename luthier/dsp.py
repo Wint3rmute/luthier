@@ -107,7 +107,7 @@ class Sample:
             self.buffer = audio_buffer
         else:
             self.buffer = audio_buffer / numpy.linalg.norm(audio_buffer)
-            self.buffer /= max(self.buffer)
+            self.buffer /= max(abs(self.buffer))
         # self.buffer /= max(self.buffer)
 
     def __len__(self) -> int:
