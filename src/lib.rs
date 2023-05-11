@@ -1,9 +1,10 @@
-use std::collections::HashMap;
+use pyo3::exceptions::PyValueError;
+use std::collections::BTreeMap;
 use std::io::Write;
 
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
 use numpy::ndarray::{Array1, Dim};
-use numpy::{IntoPyArray, PyArray};
+use numpy::{IntoPyArray, PyArray, PyArrayDyn};
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
@@ -181,10 +182,44 @@ impl DspNode for HarmonicMultiplier {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(Clone, Default, DspConnectibleDerive)]
+struct Sum {
+    input_in_1: f64,
+    input_in_2: f64,
+    input_in_3: f64,
+    input_in_4: f64,
+    output_output: f64,
+}
+
+impl DspNode for Sum {
+    fn tick(&mut self) {
+        self.output_output = self.input_in_1 + self.input_in_2 + self.input_in_3 + self.input_in_4;
+    }
+}
+
+#[pymethods]
+impl Sum {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(Clone, DspConnectibleDerive)]
 struct Multiplier {
     input_input: f64,
     input_scale: f64,
     output_output: f64,
+}
+
+impl Default for Multiplier {
+    fn default() -> Self {
+        Self {
+            input_input: 0.0,
+            input_scale: 0.5,
+            output_output: 0.0,
+        }
+    }
 }
 
 #[pymethods]
@@ -203,7 +238,7 @@ impl DspNode for Multiplier {
 
 #[pyclass(freelist = 64)]
 struct DspGraph {
-    nodes: HashMap<NodeId, Box<dyn DspNode>>,
+    nodes: BTreeMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
 
@@ -218,7 +253,7 @@ struct DspGraph {
 impl Default for DspGraph {
     fn default() -> Self {
         let mut result = Self {
-            nodes: HashMap::new(),
+            nodes: BTreeMap::new(),
             connections: vec![],
             current_node_index: 0,
 
@@ -304,6 +339,24 @@ impl DspGraph {
     }
 }
 
+impl DspGraph {
+    fn inputs_iterator(&self) -> impl Iterator<Item = (NodeId, InputId)> + '_ {
+        self.nodes.iter().flat_map(|(node_id, node)| {
+            node.get_input_names()
+                .iter()
+                .enumerate()
+                .filter_map(|(input_id, _input_name)| {
+                    if !self.is_modulated(*node_id, input_id) {
+                        Some((*node_id, input_id))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>()
+        })
+    }
+}
+
 #[pymethods]
 impl DspGraph {
     #[new]
@@ -311,8 +364,51 @@ impl DspGraph {
         DspGraph::default()
     }
 
+    fn num_inputs(&self) -> usize {
+        self.inputs_iterator().count()
+    }
+
+    fn set_inputs(&mut self, inputs: &PyArrayDyn<f64>) -> PyResult<()> {
+        let inputs = unsafe { inputs.as_array() };
+
+        let graph_inputs = self.num_inputs();
+        if !inputs.len() == graph_inputs {
+            return Err(PyValueError::new_err(format!("Input array's length must be the same as the number of inputs in the DspGraph: {graph_inputs}")));
+        }
+
+        let inputs_iterator_collected: Vec<(NodeId, InputId)> = self.inputs_iterator().collect();
+
+        for ((node_id, input_id), new_value) in inputs_iterator_collected.iter().zip(inputs) {
+            self.get_node_mut(*node_id)
+                .set_input_by_index(*input_id, *new_value);
+        }
+
+        Ok(())
+    }
+
+    fn get_inputs<'py>(&mut self, py: Python<'py>) -> &'py PyArray<f64, Dim<[usize; 1]>> {
+        self.inputs_iterator()
+            .map(|(node_id, input_id)| self.get_node(node_id).get_input_by_index(input_id))
+            .collect::<Array1<f64>>()
+            .into_pyarray(py)
+    }
+
+    fn is_modulated(&self, node_id: NodeId, input_id: InputId) -> bool {
+        for connection in self.connections.iter() {
+            if connection.to_node == node_id && connection.to_input == input_id {
+                return true;
+            }
+        }
+
+        false
+    }
+
     fn add_sine(&mut self, sine: SineOscillator) -> NodeId {
         self.add_node(Box::new(sine))
+    }
+
+    fn add_sum(&mut self, sum: Sum) -> NodeId {
+        self.add_node(Box::new(sum))
     }
 
     fn add_adsr(&mut self, adsr: ADSR) -> NodeId {
@@ -329,6 +425,16 @@ impl DspGraph {
 
     fn get_graphviz_code(&self) -> String {
         let mut graphviz_code = String::new();
+        let gradient = colorous::RED_BLUE;
+
+        let node_to_color = std::collections::HashMap::from([
+            ("SineOscillator", "#FF5370"),
+            ("ADSR", "#BB80B3FCB6B"),
+            ("Sum", "#C792EA"),
+            ("Multiplier", "#FFCB6B"),
+            ("HarmonicMultiplier", "#F78C6C"),
+            ("BaseFrequency", "#82AAFF"),
+        ]);
 
         graphviz_code.push_str(
             r#"digraph g {
@@ -340,6 +446,10 @@ node [fontname="Fira Code"]
 "#,
         );
         for (node_id, node) in self.nodes.iter() {
+            let node_color = node_to_color
+                .get(node.node_name())
+                .unwrap_or_else(|| &"white");
+
             let node_name = node.node_name();
             graphviz_code.push_str(
                 format!(
@@ -347,7 +457,7 @@ node [fontname="Fira Code"]
 "node{node_id}" [
     shape = none
     label = <<table border="0" cellspacing="0">
-    <tr><td border="1" bgcolor="white">{node_name} #{node_id}</td></tr>
+    <tr><td border="1" bgcolor="{node_color}">{node_name} #{node_id}</td></tr>
             "#
                 )
                 .as_str(),
@@ -362,9 +472,11 @@ node [fontname="Fira Code"]
 
             for (input_id, input) in node.get_input_names().iter().enumerate() {
                 let input_value = node.get_input_by_index(input_id);
+                let color = gradient.eval_continuous((input_value + 1.0) / 2.0);
+                let color = format!("#{:x}", color);
 
                 graphviz_code.push_str(
-                    format!(r#"<tr><td border="1" port="{input}"> ○ {input}: {input_value:.3} </td></tr> \n"#)
+                    format!(r#"<tr><td border="1" bgcolor="{color}" port="{input}"> ○ {input}: {input_value:.3} </td></tr> \n"#)
                         .as_str(),
                 );
             }
@@ -469,6 +581,7 @@ node [fontname="Fira Code"]
 #[pymodule]
 fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
+    m.add_class::<Sum>()?;
     m.add_class::<SineOscillator>()?;
     m.add_class::<ADSR>()?;
     m.add_class::<Multiplier>()?;

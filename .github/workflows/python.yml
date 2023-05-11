@@ -10,6 +10,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: |
+            .cargo
             .venv
             target
           key: cache
@@ -27,6 +28,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: |
+            .cargo
             .venv
             target
           key: cache
@@ -39,6 +41,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: |
+            .cargo
             .venv
             target
           key: cache
@@ -58,6 +61,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: |
+            .cargo
             .venv
             target
           key: cache
@@ -77,6 +81,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: |
+            .cargo
             .venv
             target
           key: cache
@@ -96,6 +101,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: |
+            .cargo
             .venv
             target
           key: cache
@@ -104,4 +110,4 @@ jobs:
           ./.github/workflows/setup.sh
       - name: Run pytest
         run: |
-          poetry run pytest .
+          poetry run pytest -v .
