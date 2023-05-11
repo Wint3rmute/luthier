@@ -182,6 +182,30 @@ impl DspNode for HarmonicMultiplier {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(Clone, Default, DspConnectibleDerive)]
+struct Sum {
+    input_in_1: f64,
+    input_in_2: f64,
+    input_in_3: f64,
+    input_in_4: f64,
+    output_output: f64,
+}
+
+impl DspNode for Sum {
+    fn tick(&mut self) {
+        self.output_output = self.input_in_1 + self.input_in_2 + self.input_in_3 + self.input_in_4;
+    }
+}
+
+#[pymethods]
+impl Sum {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(Clone, Default, DspConnectibleDerive)]
 struct Multiplier {
     input_input: f64,
     input_scale: f64,
@@ -373,6 +397,10 @@ impl DspGraph {
         self.add_node(Box::new(sine))
     }
 
+    fn add_sum(&mut self, sum: Sum) -> NodeId {
+        self.add_node(Box::new(sum))
+    }
+
     fn add_adsr(&mut self, adsr: ADSR) -> NodeId {
         self.add_node(Box::new(adsr))
     }
@@ -527,6 +555,7 @@ node [fontname="Fira Code"]
 #[pymodule]
 fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
+    m.add_class::<Sum>()?;
     m.add_class::<SineOscillator>()?;
     m.add_class::<ADSR>()?;
     m.add_class::<Multiplier>()?;
