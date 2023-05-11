@@ -205,11 +205,21 @@ impl Sum {
 }
 
 #[pyclass(set_all, get_all, freelist = 64)]
-#[derive(Clone, Default, DspConnectibleDerive)]
+#[derive(Clone, DspConnectibleDerive)]
 struct Multiplier {
     input_input: f64,
     input_scale: f64,
     output_output: f64,
+}
+
+impl Default for Multiplier {
+    fn default() -> Self {
+        Self {
+            input_input: 0.0,
+            input_scale: 0.5,
+            output_output: 0.0,
+        }
+    }
 }
 
 #[pymethods]
@@ -416,6 +426,15 @@ impl DspGraph {
     fn get_graphviz_code(&self) -> String {
         let mut graphviz_code = String::new();
 
+        let node_to_color = std::collections::HashMap::from([
+            ("SineOscillator", "#FF5370"),
+            ("ADSR", "#BB80B3FCB6B"),
+            ("Sum", "#C792EA"),
+            ("Multiplier", "#FFCB6B"),
+            ("HarmonicMultiplier", "#F78C6C"),
+            ("BaseFrequency", "#82AAFF"),
+        ]);
+
         graphviz_code.push_str(
             r#"digraph g {
 splines="polyline"
@@ -426,6 +445,10 @@ node [fontname="Fira Code"]
 "#,
         );
         for (node_id, node) in self.nodes.iter() {
+            let node_color = node_to_color
+                .get(node.node_name())
+                .unwrap_or_else(|| &"white");
+
             let node_name = node.node_name();
             graphviz_code.push_str(
                 format!(
@@ -433,7 +456,7 @@ node [fontname="Fira Code"]
 "node{node_id}" [
     shape = none
     label = <<table border="0" cellspacing="0">
-    <tr><td border="1" bgcolor="white">{node_name} #{node_id}</td></tr>
+    <tr><td border="1" bgcolor="{node_color}">{node_name} #{node_id}</td></tr>
             "#
                 )
                 .as_str(),
