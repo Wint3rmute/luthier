@@ -68,7 +68,7 @@ impl LowPassFilter {
     #[new]
     fn new() -> Self {
         Self {
-            input_cutoff: 0.0,
+            input_cutoff: 0.5,
             input_resonance: 0.0,
             input_input: 0.0,
             output_output: 0.0,
@@ -80,8 +80,43 @@ impl LowPassFilter {
 impl DspNode for LowPassFilter {
     fn tick(&mut self) {
         self.filter.params.res = self.input_resonance;
-        self.filter.params.set_cutoff(self.input_cutoff);
+        self.filter.params.set_cutoff(self.input_cutoff.abs());
         self.output_output = self.filter.process(self.input_input);
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone, Default)]
+struct SquareOscillator {
+    input_frequency: f64,
+    input_pwm: f64,
+    output_output: f64,
+    phase: f64,
+}
+
+#[pymethods]
+impl SquareOscillator {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for SquareOscillator {
+    fn tick(&mut self) {
+        let frequency = (self.input_frequency * 1000.0).abs();
+        let phase_diff = (2.0 * std::f64::consts::PI * frequency) / SAMPLE_RATE;
+        self.output_output = if self.phase - self.input_pwm * 2.0 > std::f64::consts::PI {
+            1.0
+        } else {
+            -1.0
+        };
+
+        self.phase += phase_diff;
+
+        while self.phase > std::f64::consts::PI * 2.0 {
+            self.phase -= std::f64::consts::PI * 2.0
+        }
     }
 }
 
@@ -441,6 +476,10 @@ impl DspGraph {
         false
     }
 
+    fn add_square(&mut self, square: SquareOscillator) -> NodeId {
+        self.add_node(Box::new(square))
+    }
+
     fn add_sine(&mut self, sine: SineOscillator) -> NodeId {
         self.add_node(Box::new(sine))
     }
@@ -633,6 +672,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
     m.add_class::<Sum>()?;
     m.add_class::<SineOscillator>()?;
+    m.add_class::<SquareOscillator>()?;
     m.add_class::<ADSR>()?;
     m.add_class::<Multiplier>()?;
     m.add_class::<HarmonicMultiplier>()?;

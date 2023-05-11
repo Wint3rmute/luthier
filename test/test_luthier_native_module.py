@@ -101,3 +101,13 @@ def test_low_pass(build_luthier: Any) -> None:
     graph.add_lowpass(lowpass)
 
     graph.play(100)
+
+
+def test_square_osc(build_luthier: Any) -> None:
+    from luthier import luthier
+
+    graph = luthier.DspGraph()
+    square = luthier.SquareOscillator()
+    graph.add_square(square)
+
+    graph.play(100)
