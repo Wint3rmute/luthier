@@ -13,6 +13,7 @@ members = ["node_macro", "node_traits"]
 [dependencies]
 pyo3 = { version = "0.18", features = ["extension-module"] }
 numpy = "0.18"
+colorous = "1.0.10"
 node_macro = { path = "node_macro" }
 node_traits = { path = "node_traits" }
 # eframe = "0.21.3"

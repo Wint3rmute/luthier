@@ -21,6 +21,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "colorous"
+version = "1.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39efe0bc2ad58cbee0bea3109d15b5390fef75e810f28608a6e48ff3e3fbe24b"
+
+[[package]]
 name = "indoc"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -46,6 +52,7 @@ dependencies = [
 name = "luthier"
 version = "0.1.0"
 dependencies = [
+ "colorous",
  "node_macro",
  "node_traits",
  "numpy",
