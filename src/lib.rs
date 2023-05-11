@@ -463,21 +463,29 @@ node [fontname="Fira Code"]
                 .as_str(),
             );
 
-            for output in node.get_output_names() {
-                graphviz_code.push_str(
-                    format!(r#"<tr><td border="1" port="{output}"> {output} ● </td></tr> \n"#)
-                        .as_str(),
-                );
-            }
-
             for (input_id, input) in node.get_input_names().iter().enumerate() {
                 let input_value = node.get_input_by_index(input_id);
                 let color = gradient.eval_continuous((input_value + 1.0) / 2.0);
                 let color = format!("#{:x}", color);
 
+                let input_icon = if self.is_modulated(*node_id, input_id) {
+                    "●"
+                } else {
+                    "○"
+                };
+
                 graphviz_code.push_str(
-                    format!(r#"<tr><td border="1" bgcolor="{color}" port="{input}"> ○ {input}: {input_value:.3} </td></tr> \n"#)
+                    format!(r#"<tr><td border="1" bgcolor="{color}" port="{input}"> {input_icon} {input}: {input_value:.3} </td></tr> \n"#)
                         .as_str(),
+                );
+            }
+
+            for output in node.get_output_names() {
+                graphviz_code.push_str(
+                    format!(
+                        r#"<tr><td border="1" port="{output}"><b> {output} ● </b></td></tr> \n"#
+                    )
+                    .as_str(),
                 );
             }
 
