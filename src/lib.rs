@@ -609,6 +609,7 @@ mod tests {
     fn test_get_output() {
         let osc = SineOscillator {
             input_frequency: 0.440,
+            input_modulation_index: 0.1,
             input_modulation: 0.0,
             output_output: 0.0,
             phase: 0.0,
@@ -634,6 +635,7 @@ mod tests {
     fn test_node_name() {
         let osc = SineOscillator {
             input_frequency: 0.440,
+            input_modulation_index: 0.1,
             input_modulation: 0.0,
             output_output: 0.0,
             phase: 0.0,
@@ -646,6 +648,7 @@ mod tests {
     fn test_set_field_by_proc_macro_enum() {
         let mut osc = SineOscillator {
             input_frequency: 0.440,
+            input_modulation_index: 0.1,
             input_modulation: 0.0,
             output_output: 0.0,
             phase: 0.0,
