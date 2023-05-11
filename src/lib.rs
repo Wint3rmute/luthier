@@ -2,6 +2,9 @@ use pyo3::exceptions::PyValueError;
 use std::collections::BTreeMap;
 use std::io::Write;
 
+mod ladder_filter;
+use ladder_filter::LadderFilter;
+
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
 use numpy::ndarray::{Array1, Dim};
 use numpy::{IntoPyArray, PyArray, PyArrayDyn};
@@ -48,6 +51,38 @@ impl Default for BaseFrequency {
 
 impl DspNode for BaseFrequency {
     fn tick(&mut self) {}
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone)]
+struct LowPassFilter {
+    input_cutoff: f64,
+    input_resonance: f64,
+    input_input: f64,
+    output_output: f64,
+    filter: LadderFilter,
+}
+
+#[pymethods]
+impl LowPassFilter {
+    #[new]
+    fn new() -> Self {
+        Self {
+            input_cutoff: 0.0,
+            input_resonance: 0.0,
+            input_input: 0.0,
+            output_output: 0.0,
+            filter: LadderFilter::default(),
+        }
+    }
+}
+
+impl DspNode for LowPassFilter {
+    fn tick(&mut self) {
+        self.filter.params.res = self.input_resonance;
+        self.filter.params.set_cutoff(self.input_cutoff);
+        self.output_output = self.filter.process(self.input_input);
+    }
 }
 
 #[pyclass(set_all, get_all, freelist = 64)]
@@ -410,6 +445,10 @@ impl DspGraph {
         self.add_node(Box::new(sine))
     }
 
+    fn add_lowpass(&mut self, lowpass: LowPassFilter) -> NodeId {
+        self.add_node(Box::new(lowpass))
+    }
+
     fn add_sum(&mut self, sum: Sum) -> NodeId {
         self.add_node(Box::new(sum))
     }
@@ -597,6 +636,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<ADSR>()?;
     m.add_class::<Multiplier>()?;
     m.add_class::<HarmonicMultiplier>()?;
+    m.add_class::<LowPassFilter>()?;
 
     Ok(())
 }
