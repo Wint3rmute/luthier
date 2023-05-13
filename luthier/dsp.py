@@ -154,6 +154,7 @@ class Sample:
         self, ax: plt.Axes, num_samples: int = 400, title: str = "Waveform"
     ) -> None:
         ax.set_title(title)
+        ax.set_ylim(-1.1, 1.1)
         ax.plot(self.buffer[:num_samples])
 
     def show_player(self) -> None:
