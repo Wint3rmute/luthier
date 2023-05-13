@@ -20,3 +20,4 @@ node_traits = { path = "node_traits" }
 # flume = "0.10.14"
 # rodio = { version = "0.17.1", default-features = true }
 # rustfft = "6.1.0"
+rand = "0.8.5"

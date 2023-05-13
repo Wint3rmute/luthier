@@ -62,6 +62,13 @@ def test_sum(build_luthier: Any) -> None:
     assert output[5] == 3.0
 
 
+def test_smoke_randomize_inputs(build_luthier: Any) -> None:
+    from luthier import luthier
+
+    graph = luthier.DspGraph()
+    graph.randomize_inputs()
+
+
 def test_harmonic_multiplier(build_luthier: Any) -> None:
     from luthier import luthier
 
