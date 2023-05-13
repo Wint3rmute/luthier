@@ -170,7 +170,6 @@ enum AdsrPhase {
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
 struct ADSR {
-    input_input: f64,
     input_attack: f64,
     input_sustain: f64,
     input_release: f64,
@@ -187,7 +186,6 @@ impl ADSR {
     #[new]
     fn new() -> Self {
         Self {
-            input_input: 0.0,
             input_attack: 0.1,
             input_sustain: 0.1,
             input_release: 0.1,
@@ -223,7 +221,7 @@ impl DspNode for ADSR {
             }
         }
 
-        self.output_output = self.input_input * self.state;
+        self.output_output = self.state;
     }
 }
 
