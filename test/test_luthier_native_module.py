@@ -134,3 +134,12 @@ def test_mverb(build_luthier: Any) -> None:
     graph.patch(square_id, "output_output", reverb_id, "input_input")
 
     graph.play(100)
+
+
+def test_saw_oscillator(build_luthier: Any) -> None:
+    from luthier import luthier
+
+    graph = luthier.DspGraph()
+    saw = luthier.SawOscillator()
+
+    graph.add_saw(saw)

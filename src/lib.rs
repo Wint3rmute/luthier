@@ -145,6 +145,39 @@ impl DspNode for LowPassFilter {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone, Default)]
+pub struct SawOscillator {
+    input_frequency: f64,
+    input_detune: f64,
+    input_pwm: f64,
+    output_output: f64,
+    phase: f64,
+}
+
+#[pymethods]
+impl SawOscillator {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for SawOscillator {
+    fn tick(&mut self) {
+        let frequency =
+            (self.input_frequency * 1000.0).abs() + self.input_detune * self.input_frequency * 20.0;
+        let phase_diff = (2.0 * std::f64::consts::PI * frequency) / SAMPLE_RATE;
+        self.output_output = (self.phase / std::f64::consts::PI) - 1.0;
+
+        self.phase += phase_diff;
+
+        while self.phase > std::f64::consts::PI * 2.0 {
+            self.phase -= std::f64::consts::PI * 2.0
+        }
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone, Default)]
 pub struct SquareOscillator {
     input_frequency: f64,
     input_pwm: f64,
@@ -259,7 +292,7 @@ impl ADSR {
 impl DspNode for ADSR {
     fn tick(&mut self) {
         if self.phase == AdsrPhase::ATTACK {
-            let state_inc = 10.0 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
+            let state_inc = 0.4 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
             self.state += state_inc;
             if self.state > 1.0 {
                 self.state = 1.0;
@@ -272,7 +305,7 @@ impl DspNode for ADSR {
                 self.phase = AdsrPhase::RELEASE;
             }
         } else if self.phase == AdsrPhase::RELEASE {
-            let state_dec = 5.0 / (self.input_release + 0.000001).abs() / SAMPLE_RATE;
+            let state_dec = 0.4 / (self.input_release + 0.000001).abs() / SAMPLE_RATE;
             self.state -= state_dec;
             if self.state < 0.0 {
                 self.state = 0.0
@@ -563,6 +596,10 @@ impl DspGraph {
         self.add_node(Box::new(sine))
     }
 
+    fn add_saw(&mut self, saw: SawOscillator) -> NodeId {
+        self.add_node(Box::new(saw))
+    }
+
     fn add_lowpass(&mut self, lowpass: LowPassFilter) -> NodeId {
         self.add_node(Box::new(lowpass))
     }
@@ -768,6 +805,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<Sum>()?;
     m.add_class::<SineOscillator>()?;
     m.add_class::<SquareOscillator>()?;
+    m.add_class::<SawOscillator>()?;
     m.add_class::<ADSR>()?;
     m.add_class::<Multiplier>()?;
     m.add_class::<HarmonicMultiplier>()?;
@@ -782,11 +820,10 @@ mod tests {
 
     #[test]
     fn test_get_output() {
-        let osc = SineOscillator {
+        let osc = SawOscillator {
             input_frequency: 0.440,
-            input_modulation_index: 0.1,
-            input_modulation: 0.0,
             output_output: 0.0,
+            input_pwm: 0.0,
             phase: 0.0,
         };
 
