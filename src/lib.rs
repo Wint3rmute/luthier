@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 mod ladder_filter;
+mod mverb;
 use ladder_filter::LadderFilter;
 
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
