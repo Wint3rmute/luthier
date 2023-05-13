@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use std::io::Write;
 
 mod ladder_filter;
+mod mverb;
 use ladder_filter::LadderFilter;
 
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
@@ -51,6 +52,29 @@ impl Default for BaseFrequency {
 
 impl DspNode for BaseFrequency {
     fn tick(&mut self) {}
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone, Default)]
+struct Reverb {
+    input_input: f64,
+    output_output: f64,
+
+    mverb: mverb::MVerb,
+}
+
+#[pymethods]
+impl Reverb {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for Reverb {
+    fn tick(&mut self) {
+        self.output_output = self.mverb.process((self.input_input, self.input_input)).0;
+    }
 }
 
 #[pyclass(set_all, get_all, freelist = 64)]
@@ -484,6 +508,10 @@ impl DspGraph {
         self.add_node(Box::new(adsr))
     }
 
+    fn add_reverb(&mut self, reverb: Reverb) -> NodeId {
+        self.add_node(Box::new(reverb))
+    }
+
     fn add_multiplier(&mut self, multiplier: Multiplier) -> NodeId {
         self.add_node(Box::new(multiplier))
     }
@@ -658,6 +686,7 @@ node [fontname="Fira Code"]
 #[pymodule]
 fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
+    m.add_class::<Reverb>()?;
     m.add_class::<Sum>()?;
     m.add_class::<SineOscillator>()?;
     m.add_class::<SquareOscillator>()?;

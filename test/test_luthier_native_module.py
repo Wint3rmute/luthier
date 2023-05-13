@@ -111,3 +111,19 @@ def test_square_osc(build_luthier: Any) -> None:
     graph.add_square(square)
 
     graph.play(100)
+
+
+def test_mverb(build_luthier: Any) -> None:
+    from luthier import luthier
+
+    graph = luthier.DspGraph()
+    square = luthier.SquareOscillator()
+    square_id = graph.add_square(square)
+
+    reverb = luthier.Reverb()
+    reverb_id = graph.add_reverb(reverb)
+
+    graph.patch(reverb_id, "output_output", graph.speaker_node_id, "input_input")
+    graph.patch(square_id, "output_output", reverb_id, "input_input")
+
+    graph.play(100)
