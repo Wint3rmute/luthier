@@ -1,4 +1,5 @@
 use pyo3::exceptions::PyValueError;
+use rand::prelude::*;
 use std::collections::BTreeMap;
 use std::io::Write;
 
@@ -56,12 +57,32 @@ impl DspNode for BaseFrequency {
 }
 
 #[pyclass(set_all, get_all, freelist = 64)]
-#[derive(DspConnectibleDerive, Clone, Default)]
+#[derive(DspConnectibleDerive, Clone)]
 struct Reverb {
     input_input: f64,
+    input_size: f64,
+    input_decay: f64,
+    input_dry: f64,
+    input_wet: f64,
+
     output_output: f64,
 
     mverb: mverb::MVerb,
+}
+
+impl Default for Reverb {
+    fn default() -> Self {
+        Self {
+            input_input: 0.0,
+            input_size: 0.5,
+            input_decay: 0.5,
+            input_dry: 0.5,
+            input_wet: 0.5,
+
+            output_output: 0.0,
+            mverb: mverb::MVerb::default(),
+        }
+    }
 }
 
 #[pymethods]
@@ -75,8 +96,12 @@ impl Reverb {
 impl DspNode for Reverb {
     fn tick(&mut self) {
         // TODO: add dry/wet and reverb params as inputs
-        self.output_output =
-            self.mverb.process((self.input_input, self.input_input)).0 + self.input_input;
+        self.mverb.size = self.input_size;
+        self.mverb.decay = self.input_decay;
+
+        let wet = self.mverb.process((self.input_input, self.input_input)).0;
+        let dry = self.input_input;
+        self.output_output = dry * self.input_dry + wet * self.input_wet;
     }
 }
 
@@ -523,6 +548,17 @@ impl DspGraph {
         self.add_node(Box::new(multiplier))
     }
 
+    fn randomize_inputs<'py>(&mut self) {
+        let mut rng = rand::thread_rng();
+        let inputs_iterator_collected: Vec<(NodeId, InputId)> = self.inputs_iterator().collect();
+
+        for (node_id, input_id) in inputs_iterator_collected.iter() {
+            let new_value = rng.gen_range(-1.0..1.0);
+            self.get_node_mut(*node_id)
+                .set_input_by_index(*input_id, new_value);
+        }
+    }
+
     fn get_graphviz_code(&self) -> String {
         let mut graphviz_code = String::new();
         let gradient = colorous::RED_BLUE;
@@ -729,6 +765,12 @@ mod tests {
         let g = DspGraph::new();
         g.get_graphviz_code();
         g.draw();
+    }
+
+    #[test]
+    fn test_randomise_inputs_doesnt_panic() {
+        let mut g = DspGraph::new();
+        g.randomize_inputs();
     }
 
     #[test]
