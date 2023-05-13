@@ -1,10 +1,12 @@
 use pyo3::exceptions::PyValueError;
 use rand::prelude::*;
+use rodio::source::Source;
 use std::collections::BTreeMap;
 use std::io::Write;
+use std::time::Duration;
 
-mod ladder_filter;
-mod mverb;
+pub mod ladder_filter;
+pub mod mverb;
 use ladder_filter::LadderFilter;
 
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
@@ -41,24 +43,28 @@ impl DspNode for Speaker {
 
 #[derive(DspConnectibleDerive, Clone)]
 struct BaseFrequency {
+    input_base_frequency: f64,
     output_output: f64,
 }
 
 impl Default for BaseFrequency {
     fn default() -> Self {
         BaseFrequency {
+            input_base_frequency: 0.440,
             output_output: 0.440,
         }
     }
 }
 
 impl DspNode for BaseFrequency {
-    fn tick(&mut self) {}
+    fn tick(&mut self) {
+        self.output_output = self.input_base_frequency
+    }
 }
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
-struct Reverb {
+pub struct Reverb {
     input_input: f64,
     input_size: f64,
     input_decay: f64,
@@ -107,7 +113,7 @@ impl DspNode for Reverb {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
-struct LowPassFilter {
+pub struct LowPassFilter {
     input_cutoff: f64,
     input_resonance: f64,
     input_input: f64,
@@ -139,7 +145,7 @@ impl DspNode for LowPassFilter {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone, Default)]
-struct SquareOscillator {
+pub struct SquareOscillator {
     input_frequency: f64,
     input_pwm: f64,
     output_output: f64,
@@ -253,7 +259,7 @@ impl ADSR {
 impl DspNode for ADSR {
     fn tick(&mut self) {
         if self.phase == AdsrPhase::ATTACK {
-            let state_inc = 5.0 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
+            let state_inc = 10.0 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
             self.state += state_inc;
             if self.state > 1.0 {
                 self.state = 1.0;
@@ -266,7 +272,7 @@ impl DspNode for ADSR {
                 self.phase = AdsrPhase::RELEASE;
             }
         } else if self.phase == AdsrPhase::RELEASE {
-            let state_dec = 0.4 / (self.input_release + 0.000001).abs() / SAMPLE_RATE;
+            let state_dec = 5.0 / (self.input_release + 0.000001).abs() / SAMPLE_RATE;
             self.state -= state_dec;
             if self.state < 0.0 {
                 self.state = 0.0
@@ -360,15 +366,15 @@ impl DspNode for Multiplier {
 }
 
 #[pyclass(freelist = 64)]
-struct DspGraph {
+pub struct DspGraph {
     nodes: BTreeMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
 
     #[pyo3(get)]
-    speaker_node_id: NodeId,
+    pub speaker_node_id: NodeId,
     #[pyo3(get)]
-    base_frequency_node_id: NodeId,
+    pub base_frequency_node_id: NodeId,
 }
 
 impl Default for DspGraph {
@@ -389,8 +395,34 @@ impl Default for DspGraph {
     }
 }
 
+impl Iterator for DspGraph {
+    type Item = f32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        Some(self.tick() as f32)
+    }
+}
+
+impl Source for DspGraph {
+    fn current_frame_len(&self) -> Option<usize> {
+        None
+    }
+
+    fn channels(&self) -> u16 {
+        1
+    }
+
+    fn sample_rate(&self) -> u32 {
+        SAMPLE_RATE as u32
+    }
+
+    fn total_duration(&self) -> Option<Duration> {
+        None
+    }
+}
+
 impl DspGraph {
-    fn add_node(&mut self, node: Node) -> NodeId {
+    pub fn add_node(&mut self, node: Node) -> NodeId {
         let node_index = self.get_next_node_index() - 1; // patola
         self.nodes.insert(node_index, node);
         node_index
@@ -461,6 +493,7 @@ impl DspGraph {
                 .filter_map(|(input_id, input_name)| {
                     if !self.is_modulated(*node_id, input_id)
                         // Awful hack to avoid setting mixer input values :)
+                        && *input_name != "input_base_frequency"
                         && *input_name != "input_in_1"
                         && *input_name != "input_in_2"
                         && *input_name != "input_in_3"
@@ -479,7 +512,7 @@ impl DspGraph {
 #[pymethods]
 impl DspGraph {
     #[new]
-    fn new() -> Self {
+    pub fn new() -> Self {
         DspGraph::default()
     }
 
@@ -672,7 +705,7 @@ node [fontname="Fira Code"]
         node.set_input_by_index(input_index, value);
     }
 
-    fn patch(
+    pub fn patch(
         &mut self,
         from_node_id: NodeId,
         from_output_name: &str,
@@ -698,7 +731,7 @@ node [fontname="Fira Code"]
         });
     }
 
-    fn tick(&mut self) -> f64 {
+    pub fn tick(&mut self) -> f64 {
         for connection in self.connections.iter() {
             let output_node = &self.nodes[&connection.from_node];
             let value_on_output = output_node.get_output_by_index(connection.from_output);

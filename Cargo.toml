@@ -18,6 +18,6 @@ node_macro = { path = "node_macro" }
 node_traits = { path = "node_traits" }
 # eframe = "0.21.3"
 # flume = "0.10.14"
-# rodio = { version = "0.17.1", default-features = true }
+rodio = { version = "0.17.1", default-features = true }
 # rustfft = "6.1.0"
 rand = "0.8.5"
