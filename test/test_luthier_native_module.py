@@ -82,8 +82,8 @@ def test_num_inputs(build_luthier: Any) -> None:
     from luthier import luthier
 
     graph = luthier.DspGraph()
-    assert graph.num_inputs() == 4
-    assert len(graph.get_inputs()) == 4
+    assert graph.num_inputs() == 1
+    assert len(graph.get_inputs()) == 1
 
     inputs = graph.get_inputs()
     inputs[0] = 0.15

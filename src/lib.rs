@@ -317,8 +317,6 @@ struct DspGraph {
     speaker_node_id: NodeId,
     #[pyo3(get)]
     base_frequency_node_id: NodeId,
-    #[pyo3(get)]
-    amp_adsr_node_id: NodeId,
 }
 
 impl Default for DspGraph {
@@ -330,18 +328,10 @@ impl Default for DspGraph {
 
             speaker_node_id: 0,
             base_frequency_node_id: 0,
-            amp_adsr_node_id: 0,
         };
 
         result.speaker_node_id = result.add_node(Box::new(Speaker::default()));
         result.base_frequency_node_id = result.add_node(Box::new(BaseFrequency::default()));
-        result.amp_adsr_node_id = result.add_node(Box::new(ADSR::new()));
-        result.patch(
-            result.amp_adsr_node_id,
-            "output_output",
-            result.speaker_node_id,
-            "input_input",
-        );
 
         result
     }
