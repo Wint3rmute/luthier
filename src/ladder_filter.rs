@@ -35,6 +35,7 @@
 //! Quality can be improved a lot by oversampling a bit.
 //! Feedback is clipped independently of the input, so it doesn't disappear at high gains.
 
+use crate::SAMPLE_RATE;
 use pyo3::prelude::*;
 use std::f64::consts::PI;
 
@@ -99,8 +100,7 @@ impl Default for LadderParameters {
             poles: 3,
             pole_value: 1.,
             drive: 0.,
-            // sample_rate: 44100.,
-            sample_rate: 44100. * 2.0,
+            sample_rate: SAMPLE_RATE * 2.0,
             g: 0.07135868,
         }
     }

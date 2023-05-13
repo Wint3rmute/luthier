@@ -170,7 +170,6 @@ enum AdsrPhase {
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
 struct ADSR {
-    input_input: f64,
     input_attack: f64,
     input_sustain: f64,
     input_release: f64,
@@ -187,7 +186,6 @@ impl ADSR {
     #[new]
     fn new() -> Self {
         Self {
-            input_input: 0.0,
             input_attack: 0.1,
             input_sustain: 0.1,
             input_release: 0.1,
@@ -203,7 +201,7 @@ impl ADSR {
 impl DspNode for ADSR {
     fn tick(&mut self) {
         if self.phase == AdsrPhase::ATTACK {
-            let state_inc = 0.4 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
+            let state_inc = 5.0 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
             self.state += state_inc;
             if self.state > 1.0 {
                 self.state = 1.0;
@@ -223,7 +221,7 @@ impl DspNode for ADSR {
             }
         }
 
-        self.output_output = self.input_input * self.state;
+        self.output_output = self.state;
     }
 }
 
@@ -319,8 +317,6 @@ struct DspGraph {
     speaker_node_id: NodeId,
     #[pyo3(get)]
     base_frequency_node_id: NodeId,
-    #[pyo3(get)]
-    amp_adsr_node_id: NodeId,
 }
 
 impl Default for DspGraph {
@@ -332,18 +328,10 @@ impl Default for DspGraph {
 
             speaker_node_id: 0,
             base_frequency_node_id: 0,
-            amp_adsr_node_id: 0,
         };
 
         result.speaker_node_id = result.add_node(Box::new(Speaker::default()));
         result.base_frequency_node_id = result.add_node(Box::new(BaseFrequency::default()));
-        result.amp_adsr_node_id = result.add_node(Box::new(ADSR::new()));
-        result.patch(
-            result.amp_adsr_node_id,
-            "output_output",
-            result.speaker_node_id,
-            "input_input",
-        );
 
         result
     }
