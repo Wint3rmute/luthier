@@ -17,7 +17,8 @@ use std::process::{Command, Stdio};
 extern crate node_macro;
 use node_macro::DspConnectibleDerive;
 
-const SAMPLE_RATE: f64 = 22050.0;
+// const SAMPLE_RATE: f64 = 22050.0;
+const SAMPLE_RATE: f64 = 41000.0;
 
 #[derive(Debug)]
 struct DspConnection {
@@ -73,7 +74,9 @@ impl Reverb {
 
 impl DspNode for Reverb {
     fn tick(&mut self) {
-        self.output_output = self.mverb.process((self.input_input, self.input_input)).0;
+        // TODO: add dry/wet and reverb params as inputs
+        self.output_output =
+            self.mverb.process((self.input_input, self.input_input)).0 + self.input_input;
     }
 }
 

@@ -21,8 +21,7 @@ from audioflux.type import SpectralFilterBankScaleType
 from dtw import dtw
 from IPython.display import Audio, display
 
-# SAMPLE_RATE = 48000
-SAMPLE_RATE = 22050
+SAMPLE_RATE = 48000
 BASE_FREQUENCY = 0.440  # Maps to C4 #  440 * 0.01
 
 NodeId = int
@@ -103,11 +102,12 @@ class DspNode(ABC):
 
 class Sample:
     def __init__(self, audio_buffer: AudioBuffer) -> None:
-        if sum(abs(audio_buffer)) == 0:
-            self.buffer = audio_buffer
-        else:
-            self.buffer = audio_buffer / numpy.linalg.norm(audio_buffer)
-            self.buffer /= max(abs(self.buffer))
+        self.buffer = audio_buffer
+        # if sum(abs(audio_buffer)) == 0:
+        #     self.buffer = audio_buffer
+        # else:
+        #     self.buffer = audio_buffer / numpy.linalg.norm(audio_buffer)
+        #     self.buffer /= max(abs(self.buffer))
         # self.buffer /= max(self.buffer)
 
     def __len__(self) -> int:

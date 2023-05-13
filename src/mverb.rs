@@ -70,11 +70,11 @@ impl Default for MVerb {
 
             damping_frequency: 0.9,
             bandwidth_frequency: 0.9,
-            sample_rate: 44100.0,
-            decay: 1.0,
+            sample_rate: crate::SAMPLE_RATE,
+            decay: 0.5,
             // gain: 1.0,
-            mix: 1.0,
-            size: 1.0,
+            mix: 0.5,
+            size: 0.5,
             early_mix: 0.5,
             previous_left_tank: 0.0,
             previous_right_tank: 0.0,
@@ -764,7 +764,7 @@ pub struct LowPassFilter<const OVER_SAMPLE_COUNT: usize> {
 impl<const OVER_SAMPLE_COUNT: usize> Default for LowPassFilter<OVER_SAMPLE_COUNT> {
     fn default() -> Self {
         let mut result = Self {
-            sample_rate: 44100.0,
+            sample_rate: crate::SAMPLE_RATE,
             frequency: 1000.0,
             q: 0.0,
             f: 0.0,
