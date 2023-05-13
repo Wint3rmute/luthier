@@ -520,6 +520,10 @@ impl DspGraph {
         self.add_node(Box::new(adsr))
     }
 
+    fn add_reverb(&mut self, reverb: Reverb) -> NodeId {
+        self.add_node(Box::new(reverb))
+    }
+
     fn add_multiplier(&mut self, multiplier: Multiplier) -> NodeId {
         self.add_node(Box::new(multiplier))
     }
