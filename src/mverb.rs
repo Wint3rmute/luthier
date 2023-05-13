@@ -3,6 +3,8 @@
 //! Code inspired by a C++ implementation available at
 //! https://github.com/martineastwood/mverb
 
+use pyo3::prelude::*;
+
 pub enum MVerbParam {
     DampingFrequency,
     Density,
@@ -18,6 +20,8 @@ pub enum MVerbParam {
 
 const BUFFER_SIZE: usize = 96_000;
 
+#[pyclass(freelist = 64)]
+#[derive(Clone)]
 pub struct MVerb {
     all_pass: [AllPass<BUFFER_SIZE>; 4],
     all_pass_four_tap: [StaticAllPassFourTap<BUFFER_SIZE>; 4],
@@ -53,7 +57,7 @@ pub struct MVerb {
 
 impl Default for MVerb {
     fn default() -> Self {
-        let sample_rate = 44100.0;
+        let sample_rate = crate::SAMPLE_RATE;
 
         let mut result = Self {
             all_pass: Default::default(),
@@ -355,6 +359,7 @@ impl MVerb {
     }
 }
 
+#[derive(Clone)]
 pub struct AllPass<const MAX_LENGTH: usize> {
     buffer: Vec<f64>,
     index: usize,
@@ -410,6 +415,7 @@ impl<const MAX_LENGTH: usize> AllPass<MAX_LENGTH> {
     }
 }
 
+#[derive(Clone)]
 struct StaticAllPassFourTap<const MAX_LENGTH: usize> {
     buffer: Vec<f64>,
     index1: usize,
@@ -499,6 +505,7 @@ impl<const MAX_LENGTH: usize> StaticAllPassFourTap<MAX_LENGTH> {
     }
 }
 
+#[derive(Clone)]
 struct StaticDelayLine<const MAX_LENGTH: usize> {
     buffer: Vec<f64>,
     index: usize,
@@ -543,6 +550,7 @@ impl<const MAX_LENGTH: usize> StaticDelayLine<MAX_LENGTH> {
     }
 }
 
+#[derive(Clone)]
 struct StaticDelayLineFourTap<const MAX_LENGTH: usize> {
     buffer: Vec<f64>,
     index1: usize,
@@ -629,6 +637,7 @@ impl<const MAX_LENGTH: usize> StaticDelayLineFourTap<MAX_LENGTH> {
     }
 }
 
+#[derive(Clone)]
 struct StaticDelayLineEightTap<const MAX_LENGTH: usize> {
     buffer: Vec<f64>,
     index1: usize,
@@ -740,6 +749,7 @@ impl<const MAX_LENGTH: usize> StaticDelayLineEightTap<MAX_LENGTH> {
     }
 }
 
+#[derive(Clone)]
 pub struct LowPassFilter<const OVER_SAMPLE_COUNT: usize> {
     sample_rate: f64,
     frequency: f64,
