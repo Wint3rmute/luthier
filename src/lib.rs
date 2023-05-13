@@ -458,8 +458,14 @@ impl DspGraph {
             node.get_input_names()
                 .iter()
                 .enumerate()
-                .filter_map(|(input_id, _input_name)| {
-                    if !self.is_modulated(*node_id, input_id) {
+                .filter_map(|(input_id, input_name)| {
+                    if !self.is_modulated(*node_id, input_id)
+                        // Awful hack to avoid setting mixer input values :)
+                        && *input_name != "input_in_1"
+                        && *input_name != "input_in_2"
+                        && *input_name != "input_in_3"
+                        && *input_name != "input_in_4"
+                    {
                         Some((*node_id, input_id))
                     } else {
                         None
@@ -771,6 +777,15 @@ mod tests {
     fn test_randomise_inputs_doesnt_panic() {
         let mut g = DspGraph::new();
         g.randomize_inputs();
+    }
+
+    #[test]
+    fn test_mixer_inputs_dont_count_as_twekable_inputs() {
+        let mut g = DspGraph::new();
+        let inputs_before = g.num_inputs();
+
+        g.add_node(Box::new(Sum::new()));
+        assert_eq!(g.num_inputs(), inputs_before);
     }
 
     #[test]
