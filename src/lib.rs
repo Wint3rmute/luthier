@@ -1,10 +1,12 @@
 use pyo3::exceptions::PyValueError;
 use rand::prelude::*;
+use rodio::source::Source;
 use std::collections::BTreeMap;
 use std::io::Write;
+use std::time::Duration;
 
-mod ladder_filter;
-mod mverb;
+pub mod ladder_filter;
+pub mod mverb;
 use ladder_filter::LadderFilter;
 
 use node_traits::{DspConnectible, DspNode, InputId, Node, NodeId, OutputId};
@@ -360,7 +362,7 @@ impl DspNode for Multiplier {
 }
 
 #[pyclass(freelist = 64)]
-struct DspGraph {
+pub struct DspGraph {
     nodes: BTreeMap<NodeId, Box<dyn DspNode>>,
     connections: Vec<DspConnection>,
     current_node_index: NodeId,
@@ -386,6 +388,32 @@ impl Default for DspGraph {
         result.base_frequency_node_id = result.add_node(Box::new(BaseFrequency::default()));
 
         result
+    }
+}
+
+impl Iterator for DspGraph {
+    type Item = f32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        Some(self.tick() as f32)
+    }
+}
+
+impl Source for DspGraph {
+    fn current_frame_len(&self) -> Option<usize> {
+        None
+    }
+
+    fn channels(&self) -> u16 {
+        1
+    }
+
+    fn sample_rate(&self) -> u32 {
+        SAMPLE_RATE as u32
+    }
+
+    fn total_duration(&self) -> Option<Duration> {
+        None
     }
 }
 
@@ -479,7 +507,7 @@ impl DspGraph {
 #[pymethods]
 impl DspGraph {
     #[new]
-    fn new() -> Self {
+    pub fn new() -> Self {
         DspGraph::default()
     }
 
@@ -698,7 +726,7 @@ node [fontname="Fira Code"]
         });
     }
 
-    fn tick(&mut self) -> f64 {
+    pub fn tick(&mut self) -> f64 {
         for connection in self.connections.iter() {
             let output_node = &self.nodes[&connection.from_node];
             let value_on_output = output_node.get_output_by_index(connection.from_output);
