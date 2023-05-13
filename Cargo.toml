@@ -5,8 +5,7 @@ edition = "2021"
 
 [lib]
 name = "luthier"
-# crate-type = ["cdylib"]
-bench = false
+crate-type = ["cdylib"]
 
 [workspace]
 members = ["node_macro", "node_traits"]

@@ -43,24 +43,28 @@ impl DspNode for Speaker {
 
 #[derive(DspConnectibleDerive, Clone)]
 struct BaseFrequency {
+    input_base_frequency: f64,
     output_output: f64,
 }
 
 impl Default for BaseFrequency {
     fn default() -> Self {
         BaseFrequency {
+            input_base_frequency: 0.440,
             output_output: 0.440,
         }
     }
 }
 
 impl DspNode for BaseFrequency {
-    fn tick(&mut self) {}
+    fn tick(&mut self) {
+        self.output_output = self.input_base_frequency
+    }
 }
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
-struct Reverb {
+pub struct Reverb {
     input_input: f64,
     input_size: f64,
     input_decay: f64,
@@ -109,7 +113,7 @@ impl DspNode for Reverb {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
-struct LowPassFilter {
+pub struct LowPassFilter {
     input_cutoff: f64,
     input_resonance: f64,
     input_input: f64,
@@ -141,7 +145,7 @@ impl DspNode for LowPassFilter {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone, Default)]
-struct SquareOscillator {
+pub struct SquareOscillator {
     input_frequency: f64,
     input_pwm: f64,
     output_output: f64,
@@ -368,9 +372,9 @@ pub struct DspGraph {
     current_node_index: NodeId,
 
     #[pyo3(get)]
-    speaker_node_id: NodeId,
+    pub speaker_node_id: NodeId,
     #[pyo3(get)]
-    base_frequency_node_id: NodeId,
+    pub base_frequency_node_id: NodeId,
 }
 
 impl Default for DspGraph {
@@ -418,7 +422,7 @@ impl Source for DspGraph {
 }
 
 impl DspGraph {
-    fn add_node(&mut self, node: Node) -> NodeId {
+    pub fn add_node(&mut self, node: Node) -> NodeId {
         let node_index = self.get_next_node_index() - 1; // patola
         self.nodes.insert(node_index, node);
         node_index
@@ -489,6 +493,7 @@ impl DspGraph {
                 .filter_map(|(input_id, input_name)| {
                     if !self.is_modulated(*node_id, input_id)
                         // Awful hack to avoid setting mixer input values :)
+                        && *input_name != "input_base_frequency"
                         && *input_name != "input_in_1"
                         && *input_name != "input_in_2"
                         && *input_name != "input_in_3"
@@ -700,7 +705,7 @@ node [fontname="Fira Code"]
         node.set_input_by_index(input_index, value);
     }
 
-    fn patch(
+    pub fn patch(
         &mut self,
         from_node_id: NodeId,
         from_output_name: &str,
