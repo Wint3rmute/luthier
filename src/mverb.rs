@@ -75,7 +75,7 @@ impl Default for MVerb {
             // gain: 1.0,
             mix: 0.5,
             size: 0.5,
-            early_mix: 0.5,
+            early_mix: 1.0,
             previous_left_tank: 0.0,
             previous_right_tank: 0.0,
             pre_delay_time: 0.0 * (sample_rate / 1000.0),
