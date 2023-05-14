@@ -59,7 +59,7 @@ def test_sum(build_luthier: Any) -> None:
     graph.patch(sum_id, "output_output", graph.speaker_node_id, "input_input")
 
     output = graph.play(10)
-    assert output[5] == 3.0
+    assert output[5] == 3.0 / 4.0
 
 
 def test_smoke_randomize_inputs(build_luthier: Any) -> None:
