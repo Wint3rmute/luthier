@@ -21,7 +21,7 @@ extern crate node_macro;
 use node_macro::DspConnectibleDerive;
 
 // const SAMPLE_RATE: f64 = 22050.0;
-const SAMPLE_RATE: f64 = 41000.0;
+const SAMPLE_RATE: f64 = 48000.0;
 
 #[derive(Debug)]
 struct DspConnection {
@@ -358,7 +358,8 @@ struct Sum {
 
 impl DspNode for Sum {
     fn tick(&mut self) {
-        self.output_output = (self.input_in_1 + self.input_in_2 + self.input_in_3 + self.input_in_4) / 4.0;
+        self.output_output =
+            (self.input_in_1 + self.input_in_2 + self.input_in_3 + self.input_in_4) / 4.0;
     }
 }
 
