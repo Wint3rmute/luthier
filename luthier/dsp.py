@@ -21,7 +21,7 @@ from audioflux.type import SpectralFilterBankScaleType
 from dtw import dtw
 from IPython.display import Audio, display
 
-SAMPLE_RATE = 41000
+SAMPLE_RATE = 48000
 BASE_FREQUENCY = 0.440  # Maps to C4 #  440 * 0.01
 
 NodeId = int
