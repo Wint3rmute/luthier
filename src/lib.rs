@@ -165,13 +165,14 @@ impl DspNode for SawOscillator {
     fn tick(&mut self) {
         let frequency =
             (self.input_frequency * 1000.0).abs() + self.input_detune * self.input_frequency * 20.0;
-        let phase_diff = (2.0 * std::f64::consts::PI * frequency) / SAMPLE_RATE;
-        self.output_output = (self.phase / std::f64::consts::PI) - 1.0;
+        let phase_diff = frequency * 2.0 / SAMPLE_RATE;
+
+        self.output_output = self.phase;
 
         self.phase += phase_diff;
 
-        while self.phase > std::f64::consts::PI * 2.0 {
-            self.phase -= std::f64::consts::PI * 2.0
+        while self.phase > 1.0 {
+            self.phase = -1.0
         }
     }
 }
@@ -181,6 +182,7 @@ impl DspNode for SawOscillator {
 pub struct SquareOscillator {
     input_frequency: f64,
     input_pwm: f64,
+    input_detune: f64,
     output_output: f64,
     phase: f64,
 }
@@ -195,9 +197,11 @@ impl SquareOscillator {
 
 impl DspNode for SquareOscillator {
     fn tick(&mut self) {
-        let frequency = (self.input_frequency * 1000.0).abs();
-        let phase_diff = (2.0 * std::f64::consts::PI * frequency) / SAMPLE_RATE;
-        self.output_output = if self.phase - self.input_pwm * 2.0 > std::f64::consts::PI {
+        let frequency =
+            (self.input_frequency * 1000.0).abs() + self.input_detune * self.input_frequency * 20.0;
+        let phase_diff = frequency * 2.0 / SAMPLE_RATE;
+
+        self.output_output = if (self.phase - self.input_pwm) > 0.0 {
             1.0
         } else {
             -1.0
@@ -205,8 +209,8 @@ impl DspNode for SquareOscillator {
 
         self.phase += phase_diff;
 
-        while self.phase > std::f64::consts::PI * 2.0 {
-            self.phase -= std::f64::consts::PI * 2.0
+        while self.phase > 1.0 {
+            self.phase = -1.0;
         }
     }
 }

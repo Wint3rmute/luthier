@@ -21,7 +21,7 @@ from audioflux.type import SpectralFilterBankScaleType
 from dtw import dtw
 from IPython.display import Audio, display
 
-SAMPLE_RATE = 48000
+SAMPLE_RATE = 41000
 BASE_FREQUENCY = 0.440  # Maps to C4 #  440 * 0.01
 
 NodeId = int
@@ -166,6 +166,15 @@ class Sample:
             self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1)
         )
         return float(dist)
+
+    def plot_sound_overview(self, title: str = "Sound overview") -> None:
+        fig, (ax, ax2) = plt.subplots(2)
+        fig.suptitle(title)
+        self.plot_waveform(ax, 1500)
+        self.plot_spectrogram(ax2)
+        self.show_player()
+        plt.tight_layout()
+        plt.show()
 
 
 class DspGraph:
