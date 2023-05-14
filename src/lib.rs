@@ -822,6 +822,7 @@ mod tests {
     fn test_get_output() {
         let osc = SawOscillator {
             input_frequency: 0.440,
+            input_detune: 0.0,
             output_output: 0.0,
             input_pwm: 0.0,
             phase: 0.0,
