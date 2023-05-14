@@ -358,7 +358,7 @@ struct Sum {
 
 impl DspNode for Sum {
     fn tick(&mut self) {
-        self.output_output = self.input_in_1 + self.input_in_2 + self.input_in_3 + self.input_in_4;
+        self.output_output = (self.input_in_1 + self.input_in_2 + self.input_in_3 + self.input_in_4) / 4.0;
     }
 }
 
