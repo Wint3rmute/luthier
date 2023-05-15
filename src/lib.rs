@@ -145,6 +145,48 @@ impl DspNode for LowPassFilter {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone, Default)]
+pub struct TriangleOscillator {
+    input_frequency: f64,
+    input_detune: f64,
+    // input_pwm: f64,
+    output_output: f64,
+    phase: f64,
+    going_up: bool,
+}
+
+#[pymethods]
+impl TriangleOscillator {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for TriangleOscillator {
+    fn tick(&mut self) {
+        let frequency =
+            (self.input_frequency * 2000.0).abs() + self.input_detune * self.input_frequency * 20.0;
+        let phase_diff = frequency * 2.0 / SAMPLE_RATE;
+
+        self.output_output = self.phase;
+
+        if self.going_up {
+            self.phase += phase_diff;
+        } else {
+            self.phase -= phase_diff;
+        }
+
+        if self.phase > 1.0 {
+            self.going_up = false;
+        }
+        if self.phase < -1.0 {
+            self.going_up = true;
+        }
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone, Default)]
 pub struct SawOscillator {
     input_frequency: f64,
     input_detune: f64,
@@ -593,6 +635,10 @@ impl DspGraph {
         false
     }
 
+    fn add_triangle(&mut self, triangle: TriangleOscillator) -> NodeId {
+        self.add_node(Box::new(triangle))
+    }
+
     fn add_square(&mut self, square: SquareOscillator) -> NodeId {
         self.add_node(Box::new(square))
     }
@@ -810,6 +856,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<Sum>()?;
     m.add_class::<SineOscillator>()?;
     m.add_class::<SquareOscillator>()?;
+    m.add_class::<TriangleOscillator>()?;
     m.add_class::<SawOscillator>()?;
     m.add_class::<ADSR>()?;
     m.add_class::<Multiplier>()?;
