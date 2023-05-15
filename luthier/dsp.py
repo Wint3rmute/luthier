@@ -168,10 +168,11 @@ class Sample:
         return float(dist)
 
     def plot_sound_overview(self, title: str = "Sound overview") -> None:
-        fig, (ax, ax2) = plt.subplots(2)
+        fig, (ax, ax2, ax3) = plt.subplots(3)
         fig.suptitle(title)
         self.plot_waveform(ax, 1500)
         self.plot_spectrogram(ax2)
+        self.plot_mfcc(ax3)
         self.show_player()
         plt.tight_layout()
         plt.show()
