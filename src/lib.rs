@@ -287,7 +287,7 @@ impl DspNode for SineOscillator {
         let frequency = (self.input_frequency * 1000.0).abs();
         let phase_diff = (2.0 * std::f64::consts::PI * frequency) / SAMPLE_RATE;
         self.output_output =
-            (self.phase + self.input_modulation * self.input_modulation_index * 10.0).sin();
+            (self.phase + self.input_modulation * self.input_modulation_index * 100.0).sin();
         self.phase += phase_diff;
 
         while self.phase > std::f64::consts::PI * 2.0 {
