@@ -338,20 +338,23 @@ impl ADSR {
 impl DspNode for ADSR {
     fn tick(&mut self) {
         if self.phase == AdsrPhase::ATTACK {
-            let state_inc = 0.4 / (self.input_attack + 0.000001).abs() / SAMPLE_RATE;
+            let attack = (self.input_attack + 1.0).abs() / 2.0;
+            let state_inc = 0.4 / attack / SAMPLE_RATE;
             self.state += state_inc;
             if self.state > 1.0 {
                 self.state = 1.0;
                 self.phase = AdsrPhase::SUSTAIN;
             }
         } else if self.phase == AdsrPhase::SUSTAIN {
-            let state_inc = 0.4 / (self.input_sustain + 0.000001).abs() / SAMPLE_RATE;
+            let sustain = (self.input_sustain + 1.0).abs() / 2.0;
+            let state_inc = 0.4 / sustain / SAMPLE_RATE;
             self.sustain_state += state_inc;
             if self.sustain_state >= 1.0 {
                 self.phase = AdsrPhase::RELEASE;
             }
         } else if self.phase == AdsrPhase::RELEASE {
-            let state_dec = 0.4 / (self.input_release + 0.000001).abs() / SAMPLE_RATE;
+            let release = (self.input_release + 1.0).abs() / 2.0;
+            let state_dec = 0.4 / release / SAMPLE_RATE;
             self.state -= state_dec;
             if self.state < 0.0 {
                 self.state = 0.0
