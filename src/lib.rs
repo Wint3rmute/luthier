@@ -64,6 +64,36 @@ impl DspNode for BaseFrequency {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
+pub struct Delay {
+    input_input: f64,
+    input_length: f64,
+    input_feedback: f64,
+    input_dry: f64,
+    input_wet: f64,
+
+    output_output: f64,
+
+    buffer: [f64; SAMPLE_RATE as usize * 2],
+    buffer_index: usize,
+}
+
+impl DspNode for Delay {
+    fn tick(&mut self) {
+        self.output_output =
+            self.input_input * self.input_dry + self.buffer[self.buffer_index] * self.input_wet;
+
+        self.buffer[self.buffer_index] =
+            self.buffer[self.buffer_index] * self.input_feedback + self.input_input;
+
+        self.buffer_index += 1;
+        if self.buffer_index > ((self.input_length + 1.0) / 2.0 * SAMPLE_RATE) as usize {
+            self.buffer_index = 0;
+        }
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone)]
 pub struct Reverb {
     input_input: f64,
     input_size: f64,
