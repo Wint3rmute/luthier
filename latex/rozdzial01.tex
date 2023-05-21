@@ -50,13 +50,16 @@ Obecnie dostępne modele generujące pełne nagrania z muzyką nie umożliwiają
 szczegółowego edytowania parametrów wygenerowanego dźwięku, ponieważ operują bardzo wysokopoziomowo 
 -- syntezują muzykę na podstawie opisu słownego.
 
-Niniejsza praca realizuje zadanie,
-którego nie da się zaklasyfikować do żadnej z dwóch wyżej wymienionych (\ref{traditional_algos}) dziedzin.
+Podsumowując, wykorzystanie wygenerowanego przez komputer zapisu nutowego jest proste, ze względu na symboliczną naturę zapisu.
+Wykorzystanie wygenerowanego przez komputer \textbf{dźwięku} jest ograniczone ze względu na fakt, że do generowania złożonych sygnałów dźwiękowych wykorzystywane są techniki takie jak głębokie sieci neuronowe, w których utrudniona jest dokładna kontrola nad konkretnymi parametrami funkcjonowania sieci.
+
+Niniejsza praca sugeruje nową metodę podejścia do problemu generowania sygnałów dźwiękowych,
+którego nie da się zaklasyfikować do żadnej z dwóch wyżej wymienionych (\ref{traditional_algos}) głóœnych dziedzin komputerowej kompozycji muzycznej.
 Wynik pracy algorytmu implementowanego w ramach pracy magisterskiej jest \textbf{gotowym elektronicznym
-instrumentem muzycznym}, który może być wykorzystany w programie do komponowania muzyki.
+instrumentem muzycznym}, który może być wykorzystany w programie do komponowania muzyki. Algorytm nie generuje bezpośrednio sygnału dźwiękowego, lecz tworzy graf przetwarzania sygnałów, który jest zrozumiały dla użytkownika i \textbf{pozwala na precyzyjne dostosowanie parametrów syntezy}.
 Tego typu proces generowania grafów przetwarzania sygnałów dźwiękowych może być porównany z procesem projektowania instrumentu muzycznego.
 
-Proces dynamicznego modyfikowania grafu przetwarzania sygnału jest często wykorzystywany w muzyce
+Modyfikowanie grafu przetwarzania sygnału jest techniką często wykorzystywaną w muzyce
 elektronicznej, do tworzenia dźwięków o interesującej barwie bądź dynamice. Syntezatory dźwięku
 dostępne na rynku często wyposażone są w \textit{patch bay}, pozwalający na modyfikowanie
 grafu przepływu sygnałów wewnątrz syntezatora, bądź połączenie go z zewnętrznym sprzętem muzycznym
@@ -79,7 +82,7 @@ Celem pracy jest zbadanie, czy algorytmy optymalizacyjne są w stanie
 wytworzyć graf przetwarzania sygnałów audio, który wykona syntezę próbki
 dźwięku zadanej przez użytkownika.
 Problem poruszany w pracy można zakwalifikować do grupy zagadnień związanych
-z pojęciem \textit{computer-aided design} w dziedzienie inżynierii dźwięku. Docelowo
+z pojęciami \textit{computer-aided design} oraz \textit{generative artificial intelligence}, zastosowanymi w dziedzienie inżynierii dźwięku. Docelowo
 zaimplementowany algorytm będzie automatyzował pracę inżyniera dźwięku,
 tworząc i konfigurując grafy przetwarzania sygnałów dźwiękowych, dostępne w
 programach typu \textit{digital audio workstation}~\ref{fig:ableton_patch}. Badania obejmują dwa zagadnienia:
