@@ -5,8 +5,10 @@
 \label{sec:skroty}
 \noindent\vspace{-\topsep-\partopsep-\parsep} % Jeśli zaczyna się od otoczenia description, to otoczenie to ląduje lekko niżej niż wylądowałby zwykły tekst, dlatego wstawiano przesunięcie w pionie
 \begin{description}[labelwidth=*]
-  \item [DAW] (ang.\ \emph{Digital Audio Workstation}) %-- jednostka arytmetyczno--logiczna
-  \item [NN] (ang.\ \emph{Neural Network}) %-- jednostka arytmetyczno--logiczna
-  \item [FFT] (ang.\ \emph{Fast Fourier Transform}) %-- jednostka arytmetyczno--logiczna
-  \item [STFT] (ang.\ \emph{Short-time Fourier Transform}) %-- jednostka arytmetyczno--logiczna
+  \item [DAW] (ang.\ \emph{Digital Audio Workstation}) -- oprogramowanie dostępne na komputery osobiste, służące do komponowania utworów muzycznych.
+  % \item [FFT] (ang.\ \emph{Fast Fourier Transform}) -- wariant transformaty Fouriera, pozwalający na
+  \item [STFT] (ang.\ \emph{Short-time Fourier Transform}) -- wariant transformaty Fouriera, wykonujący transformatę na ruchomym okno przesuwające się wzdłuż analizowanego sygnału. \textbf{STFT} pozwala na zwiększenie dokładności transformaty dla sygnałów o dużej zmienności w czasie. W kontekście syntezy audio, \textbf{SFTP} zwiększa dokładność z jaką rejestrowane są transjenty, czyli dynamiczne zmiany charakterystyki barwy dźwięku w czasie.
+  \item [CV] (ang.\ \emph{Control Voltage}) -- Sygnał sterujący parametrami syntezy dźwięku, standardowo wykorzystywanych w syntezatorach modułowych (przykładowo w standardzie \textit{EuroRack}). Sygnał \textbf{CV} wykorzystuje się do przekazywania sygnałów kontrolnych między modułami.
+  \item [VCO] (ang.\ \emph{Voltage Controlled Oscillator}) -- komponent elektroniczny generujący sygnał dźwiekowy. Parametry generowanego sygnału sterowane są za pomocą napięcia kontrolnego (\textit{CV}).
+  \item [VCF] (ang.\ \emph{Voltage Controlled Filter}) -- komponent elektroniczny wykonujący filtrację dźwięku w domenie częstotliwości. Parametry filtru sterowane są za pomocą napięcia kontrolnego (\textit{CV}).
 \end{description}
