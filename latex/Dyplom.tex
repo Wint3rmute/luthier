@@ -122,6 +122,7 @@
 %% Pakiet do wstawiania fragmentów kodu
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{listings} 
+\usepackage{minted} 
 \usepackage{xpatch}
 \makeatletter
 \xpatchcmd\l@lstlisting{1.5em}{0em}{}{}
@@ -197,11 +198,14 @@
 \definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
 \definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
  
-\lstdefinelanguage{JavaScript}{ 
-	keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
-	keywordstyle=\color{blue}\bfseries,
-	ndkeywords={class, export, boolean, throw, implements, import, this},
-	ndkeywordstyle=\color{darkgray}\bfseries,
+% \definecolor{keyword_color}{RGB}{0, 191, 255}
+\usepackage[dvipsnames]{xcolor}
+
+\lstdefinelanguage{Rust}{ 
+	keywords={type, true, false, catch, fn, return, None, catch, match, var, if, in, for, else, impl, break},
+	keywordstyle=\color{Blue}\bfseries,
+	ndkeywords={let, while},
+	ndkeywordstyle=\color{Plum}\bfseries,
 	identifierstyle=\color{black},
 	sensitive=false,
 	comment=[l]{//},
@@ -211,8 +215,8 @@
 	morestring=[b]',
 	morestring=[b]"
 }
-\lstdefinestyle{JavaScriptStyle}{
-	language=JavaScript,
+\lstdefinestyle{RustStyle}{
+	language=Rust,
 	commentstyle=\color{javagreen}, % niestety, jeśli w linii komentarza pojawią się słowa kluczowe, to zostaną pokolorowane
 	backgroundcolor=,%\color{lightgray}, % można ustwić kolor tła, ale jest to niezalecane
 	extendedchars=true,
