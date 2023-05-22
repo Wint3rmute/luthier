@@ -57,7 +57,7 @@ przetwarzanie sygnału audio oraz połączeń między węzłami. Przykładowe el
 \end{enumerate}
 
 \noindent
-Odpowiednikiem implementowanego środowiska w świecie rzeczywistym są syntezatory modułowe (przykładowo \ref{fig:eurorack_setup}),
+Odpowiednikiem implementowanego środowiska w świecie rzeczywistym są syntezatory modułowe (przykładowo~\ref{fig:eurorack_setup}),
 które pozwalają na dowolne łączenie modułów wykonujących operacje DSP.
 Barwę dźwięku w syntezatorze modyfikuje się na dwa sposoby:
 \begin{enumerate}
@@ -66,7 +66,7 @@ Barwę dźwięku w syntezatorze modyfikuje się na dwa sposoby:
 \end{enumerate}
 
 \noindent
-Dla przykładowego układu DSP, przedstawionego na rysunku \ref{fig:example_simple_analog_synth},
+Dla przykładowego układu DSP, przedstawionego na rysunku~\ref{fig:example_simple_analog_synth},
 skonfigurowane są między innymi parametry:
 
 \begin{enumerate}
@@ -124,7 +124,7 @@ Przykładowo, przedstawiony na rysunku~\ref{fig:example_sine_node} węzeł posia
   \item sygnały wejściowe:
   \begin{itemize}
     \item \texttt{input\_frequency} - częstotliwość generowanej sinusoidy,
-    \item \texttt{input\_modulation} - wartość modulacji fazy, według równania \ref{eq:fm_sine},
+    \item \texttt{input\_modulation} - wartość modulacji fazy, według równania~\ref{eq:fm_sine},
     \item \texttt{input\_modulation\_index}.
   \end{itemize}
   \item Sygnały wyjściowe:
@@ -135,7 +135,7 @@ Przykładowo, przedstawiony na rysunku~\ref{fig:example_sine_node} węzeł posia
 
 \noindent
 Węzeł generuje sygnał sinusoidalny o fazie modulowanej poprzez parametr \texttt{input\_modulation} z siłą modulacji ustawianą przez
-parametr \texttt{input\_modulation\_index}, opisane za pomocą równania \ref{eq:fm_sine} oraz listingu \ref{lst:sine_fm}.
+parametr \texttt{input\_modulation\_index}, opisane za pomocą równania~\ref{eq:fm_sine} oraz listingu~\ref{lst:sine_fm}.
 
 \begin{equation} \label{eq:fm_sine}
   f(t, f, m, m_i) = sin(t * f + m * m_i)
@@ -166,7 +166,7 @@ przez węzły operacjami.
 
 Każdy węzeł DSP w środowisku eksperymentowym posiada zbiór parametrów wejściowych. Poza możliwością
 ustawienia danego parametru wejściowego na konkretną wartość, możliwa jest też modulacja parametru
-wejściowego. Na rysunku \ref{fig:fm_mod_example} przedstawiony jest przykładowy układ węzłów i modulacji,
+wejściowego. Na rysunku~\ref{fig:fm_mod_example} przedstawiony jest przykładowy układ węzłów i modulacji,
 które pozwalają na uzyskanie syntezy FM.
 
 \begin{figure}[H]
@@ -183,7 +183,7 @@ które pozwalają na uzyskanie syntezy FM.
     \centering
     \includegraphics[width=1.0\linewidth]{rys02/spectro_fm.png}
     \caption{
-      Spektrogram oraz wykres sygnału wygenerowanego za pomocą układ z rysunku \ref{fig:fm_mod_example}.
+      Spektrogram oraz wykres sygnału wygenerowanego za pomocą układ z rysunku~\ref{fig:fm_mod_example}.
       Widoczne dodatkowe składowe harmoniczne wpływające na barwę dźwięku.
     }
     \label{fig:fm_mod_spectra}
@@ -193,7 +193,7 @@ które pozwalają na uzyskanie syntezy FM.
     \centering
     \includegraphics[width=1.0\linewidth]{rys02/spectro_no_fm.png}
     \caption{
-      Spektrogram oraz wykres sygnału wygenerowanego przez układ z rysunku \ref{fig:fm_mod_example}
+      Spektrogram oraz wykres sygnału wygenerowanego przez układ z rysunku~\ref{fig:fm_mod_example}
       \textbf{po usunięciu} połączenia modulującego fazę oscylatora \texttt{\#2}.
       Widoczna tylko jedna składowa harmoniczna: częstotliwość podstawowa.
     }
@@ -239,7 +239,7 @@ na wykonywanie operacji zdefiniowanych w wymaganiach za pośrednictwem języka \
 
 W ramach pracy zaimplementowane zostało środowisko pozwalające na dynamiczne budowanie grafów DSP oraz
 na generowanie sygnałów dźwiękowych za pomocą wytworzonych grafów,
-według wymagań opisanych w sekcji \ref{section:requirements}. Środowisko zaimplementowano w języku \texttt{Rust},
+według wymagań opisanych w sekcji~\ref{section:requirements}. Środowisko zaimplementowano w języku \texttt{Rust},
 dzięki czemu proces syntezy sygnałów jest szybszy niż w przypadku implementacji w języku interpretowanym.
 Zaimplementowana biblioteka udostępnia interfejs zgodny ze standardem
 \textit{Python Extension Module}~\cite{python_extension_module}.
@@ -247,7 +247,7 @@ Zaimplementowana biblioteka udostępnia interfejs zgodny ze standardem
 \subsection{Przykłady użycia}
 
 Zaimplementowane środowisko pozwala na tworzenie grafów przetwarzania sygnałów za pomocą poleceń w języku \texttt{Python}.
-Listing \ref{lst:simple_sine} przedstawia proces tworzenia prostego grafu generującego sygnał sinusoidalny.
+Listing~\ref{lst:simple_sine} przedstawia proces tworzenia prostego grafu generującego sygnał sinusoidalny.
 
 \begin{lstlisting}[language=python, caption=Utworzenie prostego grafu generującego sygnał sinusoidalny., label={lst:simple_sine}]
 g = DspGraph()
@@ -270,13 +270,14 @@ display(Image(g.draw()))
     \centering
     \includegraphics[width=1.0\linewidth]{rys02/simple_graph_creation_example.png}
     \caption{
-      Wynik wykonania kodu przedstawionego w listingu~\ref{lst:simple_sine} w środowisku \textit{Jupyter Notebook}.
+      Wynik wykonania kodu przedstawionego w listingu~\ref{lst:simple_sine} w środowisku \textit{Jupyter Notebook},
+      wizualizacja utworzonego grafu.
     }
     \label{fig:example_graph_creation_jupyter}
 \end{figure}
 
 
-Jak pokazano na listingu \ref{lst:numpy_rust}, środowisko eksperymentalne zaimplementowane w ramach pracy w języku \texttt{Rust}
+Jak pokazano na listingu~\ref{lst:numpy_rust}, środowisko eksperymentalne zaimplementowane w ramach pracy w języku \texttt{Rust}
 zwraca obiekty typu \texttt{ndarray}, wykorzystywane w większości pakietów obliczeniowych wykorzystywanych w języku \texttt{Python}.
 Umożliwia to wykorzystanie gotowych bibliotek dostępnych w języku \texttt{Python},
 aby przeanalizować sygnał lub zoptymalizować parametry syntezy \cite{2020SciPy-NMeth} \cite{librosa}.
@@ -285,7 +286,7 @@ aby przeanalizować sygnał lub zoptymalizować parametry syntezy \cite{2020SciP
 \begin{lstlisting}[language=python, caption=Typ danych zwracanych przez środowisko eksperymentalne., label={lst:numpy_rust}]
 >>> generated_signal = g.play(num_samples=100)
 >>> type(generated_signal)
-<class 'numpy.ndarray'>
+<class `numpy.ndarray'>
 \end{lstlisting}
 
 % \cite{computational_music_synthesis}
