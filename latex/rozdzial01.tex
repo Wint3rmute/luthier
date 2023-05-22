@@ -2,17 +2,18 @@
 \section{Wprowadzenie}
 
 
-Rozpowszechnione algorytmy sztucznej inteligencji wspomagające pracę inżynierów dźwięku można podzielić na dwie główne dziedziny \cite{analysis_generative} \label{traditional_algos}:
+Rozpowszechnione algorytmy sztucznej inteligencji wspomagające pracę inżynierów dźwięku można podzielić na trzy główne kategorie \cite{analysis_generative} \label{traditional_algos}:
 
 \begin{enumerate}
-    \item algorytmy generujące symboliczny zapis muzyki (nuty lub dane MIDI) (\ref{fig:lamus_notes}),
+    \item algorytmy generujące symboliczny zapis muzyki (nuty lub dane MIDI) (\ref{fig:lamus_notes}), \cite{zhang2023language},
     \item algorytmy generujące gotowy plik audio (\ref{fig:riffusion_spectro}).
+    \item algorytmy symulujące brzemienie instrumentów muzycznych za pomocą sieci neuronowych \cite{engel2017neural}.
 \end{enumerate}
 
-Pierwsza grupa algorytmów znana jest już od lat 80, gdyż zagadnienie generowania zapisu symbolicznego jest mniej wymagające niż wytworzenie pełnego pliku audio.
-Powszechnie wykorzystywana jest w nich teoria muzyki, pozwalająca określić matematyczne relacje w rytmach, melodiach i progresjach akordów.
+Pierwsza grupa algorytmów znana jest już od lat 80, gdyż zagadnienie generowania zapisu symbolicznego wymaga mniej mocy obliczeniowej niż wytworzenie pełnego pliku audio.
+Powszechnie wykorzystywana jest w nich teoria muzyki, pozwalająca określić matematyczne relacje występujące w rytmach, melodiach i progresjach akordów.
 Wiedza dotyczącą teorii muzyki pozwala na wyznaczenie możliwej przestrzeni stanów, w której generowana jest kompozycja,
-natomiast modele matematyczne takie jak łańcuchy \textit{Markowa} służą za mechanizmy decyzyjne, które ,,nawigują'' w przestrzeni stanów.
+natomiast modele matematyczne takie jak łańcuchy Markowa służą za mechanizmy decyzyjne, które ,,nawigują'' w przestrzeni stanów.
 
 \begin{figure}[H]
     \centering
@@ -86,11 +87,22 @@ z pojęciami \textit{computer-aided design} oraz \textit{generative artificial i
 zaimplementowany algorytm będzie automatyzował pracę inżyniera dźwięku,
 tworząc i konfigurując grafy przetwarzania sygnałów dźwiękowych, dostępne w
 programach typu \textit{digital audio workstation}~\ref{fig:ableton_patch}. Badania obejmują dwa zagadnienia:
+\textbf{
 \begin{enumerate} \label{research_types}
-    \item metody generowania grafu przetwarzania sygnałów oraz późniejszej modyfikacji grafu,
-    \item dobór funkcji celu, na podstawie której algorytm optymalizujący będzie przeszukiwał
-możliwą przestrzeń grafów przetwarzania sygnałów.
+    \item metody generowania grafu przetwarzania sygnałów oraz późniejszej modyfikacji grafu -- jego struktury oraz parametrów,
+    \item dobór funkcji celu, na podstawie której algorytm optymalizujący będzie modyfikował graf przetwarzania sygnałów.
 \end{enumerate}
+}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{rys01/ableton_patch.jpg}
+    \caption{
+      Zbiór parametrów konfigurujących przykładowy syntezator dźwięku w programie \textit{Ableton}}
+    \label{fig:ableton_patch}
+\end{figure}
+
+\subsection{Generowanie grafu przetwarzania sygnałów}
 
 Pierwsze zagadnienie sprowadza się do przetestowania szeregu algorytmów pozwalających na wygenerowanie
 grafu przetwarzania sygnałów DSP oraz ich modyfikację. Przykładem modyfikacji grafu
@@ -119,11 +131,11 @@ $f_i(x)$ -- operacja wykonywana na sygnale przez i-ty węzeł.
 $C = [ \{ o_{(j, k)}, i_{(l, m)} \}, \ldots ] $ -- zbiór połączeń między węzłami, opisujący, które 
 $k$-te wyjście $j$-go węzła podłączone jest do którego $m$-go wejścia $l$-go węzła.
 
-Nie wszystkie wejścia w grafie muszą wyć podłączone do któregoś z wyjść.
+Nie wszystkie wejścia w grafie muszą być podłączone do któregoś z wyjść.
 Wejście, które nie zostało nigdzie podłączone przyjmuje jako wartość parametr 
 liczbowy optymalizowany później w funkcji celu~\ref{eq:target_function}.
 W przypadku schematu~\ref{fig:minilogue_diagram} takimi ,,wolnymi'' wejściami są przykładowo
-sygnał określający wysokość dźwięku oraz parametry określające parametry
+sygnał określający częstotliwość odciącia filtru sygnału lub parametry określające parametry
 generatora obwiedni~(\textit{EG}).
 
 
@@ -171,6 +183,7 @@ schematu przetwarzania sygnałów~(\ref{fig:minilogue_diagram}) można wyróźni
 \end{enumerate}
 \end{multicols}
 
+\subsection{Funkcja celu oceniająca podobieństwo barwy dźwieku}
 
 Drugie zagadnienie obejmuje przetestowanie szeregu algorytmów, które można wykorzystać jako funkcję celu,
 która będzie optymalizowana poprzez ,,dostrajanie'' grafu przetwarzania sygnałów dźwiękowych.
@@ -183,19 +196,19 @@ może zostać przedstawiona w następujący sposób:
   \label{eq:target_function}
 \end{equation}
 
+\noindent
+Gdzie $q$ oznacza liczbę rzeczywistą, która jest tym mniejsza, im bardziej zbliżone do siebie są barwy dźwięku sygnałów $x$ i $\bar{x}$,
+przy założeniu że oba sygnały przedstawiają dźwięk o tej samej częstotliwości podstawowej.
+
+\subsection{Problem optymalizacyjny}
+
 Następnie, dla danego układu $N$ węzłów przetwarzania oraz dla macierzy połączeń $C$, 
 należy rozwiązać następujący problem optymalizacji, należy rozwiązać problem
 maksymalizacji funkcji opisanej równaniem~\ref{eq:target_function} dla
 parametrów wszystkich wejść $i_j$ oraz $o_j$, które nie są połączone bezpośrednio
 pomiędzy węzłami.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{rys01/ableton_patch.jpg}
-    \caption{
-      Zbiór parametrów konfigurujących przykładowy syntezator dźwięku w programie \textit{Ableton}}
-    \label{fig:ableton_patch}
-\end{figure}
+
 
 
 \section{Zakres pracy, plan badań}
@@ -241,4 +254,32 @@ do przetestowania w ramach projektów zawarte są:
   \item techniki wykorzystywane do generowania ,,cyfrowych podpisów'' sygnałów dźwiękowych (\textit{sound fingerprinting}) \cite{computer_vision_music_identification},
   \item algorytmy wykrywające spadek jakości dźwięku z perspektywy psychoakustycznej \cite{peaq} \cite{frechet_audio_distance}.
 \end{enumerate}
+
+\section{Struktura i zawartość pracy}
+
+Praca podzielona jest na następujące części:
+
+\subsection*{Środowisko eksperymentalne - graf przetwarzania sygnałów (\ref{dsp_graph_chapter}) }
+
+Opisuje zaimplementowane w ramach pracy środowisko eksperymentalne, pozwalające na wytwarzanie
+grafów przetwarzania sygnałów o dowolnej strukturze. Przedstawia zaimplementowane algorytmy syntezy i przetwarzania sygnałów dźwiękowych.
+
+\subsection*{Analiza możliwych funkcji celu (\ref{target_function_chapter}) }
+
+Porównuje funkcje z dziedziny przetwarzania sygnałów, które pozwalają określić jak podobna jest barwa dźwięku dwóch sygnałów dźwiękowych.
+
+\subsection*{Optymalizacja struktury grafu DSP oraz jego parametrów (\ref{optimization_problem_chapter}) }
+
+Opisuje proces badawczy, w którym narzędzia wytworzone w rozdziałach \ref{dsp_graph_chapter} oraz \ref{target_function_chapter}
+zostały wykorzystane do automatycznego wytworzenia grafu DSP, który naśladuje barwę zadanej próbki dźwięku.
+
+\subsection*{Analiza wyników, dyskusja nad skutecznością działania algorytmu oraz możliwe drogi dalszego rozwoju (\ref{results_analysis_chapter})}
+
+Rozdział podsumowuje uzyskane wyniki badań, podejmuje dyskusję nad ogólną skutecznością i przydatnością zaimplementowanego rozwiązania oraz
+kreśli potencjalne drogi dalszego rozwoju prac badawczych w podobnej tematyce.
+
+% \begin{itemize}
+%   \item Opis środowiska eksperymentalnego (\ref{dsp_graph_chapter})
+%   \item 
+% \end{itemize}
 
