@@ -19,16 +19,6 @@ interfejsuje się z językiem \texttt{Python}, co umożliwia wykorzystanie gotow
     \label{fig:eurorack_setup}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\linewidth]{rys02/luthier_simple_analog.png}
-    \caption{
-      Przykładowy układ węzłów DSP w zaimplementowanym środowisku eksperymentowym.
-      Układ wykonuje syntezę subtraktywną z modulowaną wartością częstotliwości granicznej filtru niskoprzepustowego
-      oraz dodaje efekt pogłosu (\textit{reverb})~\cite{reverb}.
-    }
-    \label{fig:example_simple_analog_synth}
-\end{figure}
 
 
 \section{Podstawy syntezy dźwięku w syntezatorach modułowych}
@@ -65,6 +55,17 @@ Barwę dźwięku w syntezatorze modyfikuje się na dwa sposoby:
   \item Modulacja wartości danego parametru w węźle DSP za pomocą wartości wyjściowej innego węzła.
 \end{enumerate}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{rys02/luthier_simple_analog.png}
+    \caption{
+      Przykładowy układ węzłów DSP w zaimplementowanym środowisku eksperymentowym.
+      Układ wykonuje syntezę subtraktywną z modulowaną wartością częstotliwości granicznej filtru niskoprzepustowego
+      oraz dodaje efekt pogłosu (\textit{reverb})~\cite{reverb}.
+    }
+    \label{fig:example_simple_analog_synth}
+\end{figure}
+
 \noindent
 Dla przykładowego układu DSP, przedstawionego na rysunku~\ref{fig:example_simple_analog_synth},
 skonfigurowane są między innymi parametry:
@@ -77,8 +78,8 @@ skonfigurowane są między innymi parametry:
 \end{enumerate}
 
 \noindent
-Z kolei wartość parametru \texttt{input\_cutoff} w węźle \texttt{LowPassFilter \#6} modulowana
-jest przez sygnał wychodzący w węźle \texttt{ADSR \#7}, co pozwala na dynamiczne zmiany
+Z kolei wartość parametru \texttt{input\_cutoff} w węźle \texttt{LowPassFilter \#6} \textbf{jest modulowana}
+przez sygnał wychodzący w węźle \texttt{ADSR \#7}, co pozwala na dynamiczne zmiany
 częstotliwości odcięcia filtru w czasie, wzbogacając barwę generowanego dźwięku.
 
 \section{Wymagania} \label{section:requirements}
@@ -111,8 +112,8 @@ Pojedynczy węzeł DSP może zostać opisany za pomocą trzech cech:
     \centering
     \includegraphics[width=0.45\linewidth]{rys02/mutable_instruments_elements.png}
     \caption{
-      Moduł syntezy \textit{Mutable Instruments Elements} umożliwiający modulację
-      parametrów syntezy typu \textit{physical modeling} \cite{lisp_synthesis}.
+      Moduł syntezy \textit{Mutable Instruments Elements}, umożliwiający ręczne ustawianie \textbf{oraz} modulację
+      parametrów. Moduł wykonuję syntezę typu \textit{physical modeling} \cite{lisp_synthesis}.
     }
     \label{fig:example_eurorack_module}
 \end{figure}
@@ -135,10 +136,11 @@ Przykładowo, przedstawiony na rysunku~\ref{fig:example_sine_node} węzeł posia
 
 \noindent
 Węzeł generuje sygnał sinusoidalny o fazie modulowanej poprzez parametr \texttt{input\_modulation} z siłą modulacji ustawianą przez
-parametr \texttt{input\_modulation\_index}, opisane za pomocą równania~\ref{eq:fm_sine} oraz listingu~\ref{lst:sine_fm}.
+parametr \texttt{input\_modulation\_index}, opisane za pomocą równania~\ref{eq:fm_sine}
+(jest to uproszczenie równania syntezy FM przedstawionego w \cite{spectral_audio_processing}) oraz listingu~\ref{lst:sine_fm}:
 
 \begin{equation} \label{eq:fm_sine}
-  f(t, f, m, m_i) = sin(t * f + m * m_i)
+  f(t) = sin(t * f + m * m_i)
 \end{equation}
 
 \begin{lstlisting}[language=Rust, caption=Implementacja węzła SineOscillator.,label={lst:sine_fm}]
@@ -246,6 +248,8 @@ Zaimplementowana biblioteka udostępnia interfejs zgodny ze standardem
 
 \subsection{Przykłady użycia}
 
+\subsubsection{Utworzenie grafu}
+
 Zaimplementowane środowisko pozwala na tworzenie grafów przetwarzania sygnałów za pomocą poleceń w języku \texttt{Python}.
 Listing~\ref{lst:simple_sine} przedstawia proces tworzenia prostego grafu generującego sygnał sinusoidalny.
 
@@ -276,18 +280,28 @@ display(Image(g.draw()))
     \label{fig:example_graph_creation_jupyter}
 \end{figure}
 
+\subsubsection{Uruchomienie procesu syntezy dźwięku}
 
 Jak pokazano na listingu~\ref{lst:numpy_rust}, środowisko eksperymentalne zaimplementowane w ramach pracy w języku \texttt{Rust}
 zwraca obiekty typu \texttt{ndarray}, wykorzystywane w większości pakietów obliczeniowych wykorzystywanych w języku \texttt{Python}.
 Umożliwia to wykorzystanie gotowych bibliotek dostępnych w języku \texttt{Python},
 aby przeanalizować sygnał lub zoptymalizować parametry syntezy \cite{2020SciPy-NMeth} \cite{librosa}.
 
-
 \begin{lstlisting}[language=python, caption=Typ danych zwracanych przez środowisko eksperymentalne., label={lst:numpy_rust}]
 >>> generated_signal = g.play(num_samples=100)
 >>> type(generated_signal)
 <class `numpy.ndarray'>
 \end{lstlisting}
+
+\subsection{Detale techniczne}
+
+\subsubsection{Połączenia między węzłami w grafie}
+
+Ponieważ zdefiniowane wymagania (\ref{section:requirements}) zawierają dynamiczne modyfikowanie grafu przetwarzania sygnałów,
+nie jest możliwe spredefiniowanie mechanizmu wymiany danych między połączonymi węzłami. TODO: gadka o tym że to trudne bo
+circular patching i kolejki!
+
+
 
 % \cite{computational_music_synthesis}
 
