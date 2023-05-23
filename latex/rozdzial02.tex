@@ -296,6 +296,12 @@ aby przeanalizować sygnał lub zoptymalizować parametry syntezy \cite{2020SciP
 \subsubsection{Połączenia między węzłami w grafie}
 
 Ponieważ zdefiniowane wymagania (\ref{section:requirements}) zawierają dynamiczne modyfikowanie grafu przetwarzania sygnałów,
-nie jest możliwe spredefiniowanie mechanizmu wymiany danych między połączonymi węzłami. TODO: gadka o tym że to trudne bo
-circular patching i kolejki!
+nie jest możliwe spredefiniowanie mechanizmu wymiany danych między połączonymi węzłami.
+Podczas implementacji rozważane były następujące architektury:
+
+\begin{enumerate}
+  \item Przejście przez graf przed uruchomieniem syntezy i określenie kolejności wywołania węzłów,
+  \item Wykorzystanie struktury danych kolejki w każdym połączeniu,
+  \item Bezpośrednie przepisywanie wartości wyjść z węzłów do modulowanych przez nie wejść po każdej iteracji przetwarzania.
+\end{enumerate}
 
