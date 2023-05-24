@@ -162,10 +162,21 @@ class Sample:
         display(Audio(data=self.buffer, rate=SAMPLE_RATE))  # type: ignore
 
     def mfcc_distance(self, other: "Sample") -> float:
+        if len(self) != len(other):
+            raise ValueError(
+                f"Samples have different lengths, self: {len(self)}, other {len(other)}"
+            )
+
         dist, cost, acc_cost, path = dtw(
             self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1)
         )
         return float(dist)
+
+    def spectrogram_distance(self, other: "Sample") -> float:
+        _, self_spectro = self.spectrogram
+        _, other_spectro = other.spectrogram
+
+        return sum(sum(abs(self_spectro) - abs(other_spectro)))
 
     def plot_sound_overview(self, title: str = "Sound overview") -> None:
         fig, (ax, ax2, ax3) = plt.subplots(3)
