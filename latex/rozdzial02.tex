@@ -80,7 +80,7 @@ Z kolei wartość parametru \texttt{input\_cutoff} w węźle \texttt{LowPassFil
 przez sygnał wychodzący w węźle \texttt{ADSR \#7}, co pozwala na dynamiczne zmiany
 częstotliwości odcięcia filtru w czasie, wzbogacając barwę generowanego dźwięku.
 
-\section{Wymagania} \label{section:requirements}
+\section{Wymagania} \label{sec:requirements}
 
 W ramach pracy zostały zdefiniowane wymagania dotyczące implementowanego później środowiska eksperymentowego,
 opisane w niniejszym rozdziale.
@@ -162,7 +162,7 @@ impl DspNode for SineOscillator {
 przetwarzają sygnał. Węzły posiadają sloty wejściowe, z których czytają wartości parametrów sterujących wykonywanymi 
 przez węzły operacjami.
 
-\subsection{Połączenia między węzłami -- modulacja parametrów węzłów}
+\subsection{Połączenia między węzłami -- modulacja parametrów węzłów} \label{sec:modulation_requirements}
 
 Każdy węzeł DSP w środowisku eksperymentowym posiada zbiór parametrów wejściowych. Poza możliwością
 ustawienia danego parametru wejściowego na konkretną wartość, możliwa jest też modulacja parametru
@@ -295,13 +295,37 @@ aby przeanalizować sygnał lub zoptymalizować parametry syntezy \cite{2020SciP
 
 \subsubsection{Połączenia między węzłami w grafie}
 
-Ponieważ zdefiniowane wymagania (\ref{section:requirements}) zawierają dynamiczne modyfikowanie grafu przetwarzania sygnałów,
+Ponieważ zdefiniowane wymagania (\ref{sec:requirements}) zawierają dynamiczne modyfikowanie grafu przetwarzania sygnałów,
 nie jest możliwe spredefiniowanie mechanizmu wymiany danych między połączonymi węzłami.
 Podczas implementacji rozważane były następujące architektury:
 
 \begin{enumerate}
   \item Przejście przez graf przed uruchomieniem syntezy i określenie kolejności wywołania węzłów,
   \item Wykorzystanie struktury danych kolejki w każdym połączeniu,
-  \item Bezpośrednie przepisywanie wartości wyjść z węzłów do modulowanych przez nie wejść po każdej iteracji przetwarzania.
+  \item Bezpośrednie przepisywanie wartości wyjść z węzłów do modulowanych przez nie wejść po każdej iteracji przetwarzania. \label{test}
 \end{enumerate}
+
+Ostatecznie wybrane zostało podejście 3, ze względu na konieczność spełnienia wymagania
+\ref{sec:modulation_requirements}, konkretnie możliwości modulowania wejścia danego węzła
+przez wyjście tego samego węzła, co uniemożliwia wykorzystanie podejścia 1. Jednocześnie
+podejście 3 jest łatwiejsze do implementacji niż podejście 2.
+
+\subsubsection{Zastosowanie \textit{procedural macros} do automatycznej generacji akcesorów struktur węzłów}
+
+% Przesyłanie wartości modulacji między węzłami grafu wymaga zdefiniowania struktur mapujących
+% poszczególne pola struktur danych na ich indeksy, dzięki czemu możliwe jes
+Podczas implementacji grafu DSP zostały wykorzystane makra proceduralne~\cite{proc_macro},
+które umożliwiają automatyczne zaimplementowanie metod odczytujących $i$-te wejście
+lub wyjście danego węzła. Alternatywnym podejściem byłoby wykorzystanie struktur takich
+jak słowniki lub mapy, które umożliwiają na inspekcję kluczy w strukturze danych podczas
+działania programu i dostęp do nich za pomocą indeksu, jednakże takie podejście zmniejsza
+wydajność programu i nie wykorzystuje wykorzystywanie systemu typów wbudowanego w język,
+co potencjalnie może być źródłem błędów podczas utrzymywania dużego zbioru węzłów i algorytmów,
+które wykonują. Wykorzystanie makr proceduralnych pozwala na ograniczenie powtarzalnych
+implementacji podobnych akcesorów i zachowanie zalet silnego systemu typów języka
+\texttt{Rust}. % ponieważ na poziomie implementacji
+
+\subsubsection{Implementacja natywnego modułu dla języka \texttt{Python}}
+
+W implementacji grafu przetwarzania sygnałów
 
