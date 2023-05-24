@@ -239,7 +239,7 @@ na wykonywanie operacji zdefiniowanych w wymaganiach za pośrednictwem języka \
 
 W ramach pracy zaimplementowane zostało środowisko pozwalające na dynamiczne budowanie grafów DSP oraz
 na generowanie sygnałów dźwiękowych za pomocą wytworzonych grafów,
-według wymagań opisanych w sekcji~\ref{section:requirements}. Środowisko zaimplementowano w języku \texttt{Rust},
+według wymagań opisanych w sekcji~\ref{sec:requirements}. Środowisko zaimplementowano w języku \texttt{Rust},
 dzięki czemu proces syntezy sygnałów jest szybszy niż w przypadku implementacji w języku interpretowanym.
 Zaimplementowana biblioteka udostępnia interfejs zgodny ze standardem
 \textit{Python Extension Module}~\cite{python_extension_module}.
@@ -295,7 +295,7 @@ aby przeanalizować sygnał lub zoptymalizować parametry syntezy \cite{2020SciP
 
 \subsubsection{Połączenia między węzłami w grafie}
 
-Ponieważ wymagania zdefiniowane w rozdziale \ref{sec:requirements} zawierają dynamiczne modyfikowanie grafu przetwarzania sygnałów,
+Ponieważ wymagania zdefiniowane w rozdziale~\ref{sec:requirements} zawierają dynamiczne modyfikowanie grafu przetwarzania sygnałów,
 nie jest możliwe spredefiniowanie mechanizmu wymiany danych między połączonymi węzłami.
 Podczas implementacji rozważane były następujące architektury:
 
@@ -305,11 +305,11 @@ Podczas implementacji rozważane były następujące architektury:
   \item Bezpośrednie przepisywanie wartości wyjść z węzłów do modulowanych przez nie wejść po każdej iteracji przetwarzania. \label{test}
 \end{enumerate}
 
-Ostatecznie wybrane zostało podejście 3, ze względu na konieczność spełnienia wymagania
-\ref{sec:modulation_requirements}, konkretnie możliwości modulowania wejścia danego węzła
+Ostatecznie wybrane zostało podejście 3, ze względu na konieczność spełnienia wymagania~\ref{sec:modulation_requirements},
+konkretnie możliwości modulowania wejścia danego węzła
 przez wyjście tego samego węzła, co uniemożliwia wykorzystanie podejścia 1. Jednocześnie
 podejście 3 jest łatwiejsze do implementacji niż podejście 2. Implementację mechanizmu
-przesyłu danych między węzłami ułatwiło wykorzystanie makr proceduralnych, opisane w sekcji \ref{sec:proc_macro}.
+przesyłu danych między węzłami ułatwiło wykorzystanie makr proceduralnych, opisane w sekcji~\ref{sec:proc_macro}.
 
 \subsubsection{Zastosowanie \textit{procedural macros} do automatycznej generacji akcesorów struktur węzłów} \label{sec:proc_macro}
 
