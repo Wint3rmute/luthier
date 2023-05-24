@@ -176,7 +176,7 @@ class Sample:
         _, self_spectro = self.spectrogram
         _, other_spectro = other.spectrogram
 
-        return abs(sum(sum(abs(self_spectro) - abs(other_spectro))))
+        return float(abs(sum(sum(abs(self_spectro) - abs(other_spectro)))))
 
     def plot_sound_overview(self, title: str = "Sound overview") -> None:
         fig, (ax, ax2, ax3) = plt.subplots(3)
