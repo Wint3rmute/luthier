@@ -295,7 +295,7 @@ aby przeanalizować sygnał lub zoptymalizować parametry syntezy \cite{2020SciP
 
 \subsubsection{Połączenia między węzłami w grafie}
 
-Ponieważ zdefiniowane wymagania (\ref{sec:requirements}) zawierają dynamiczne modyfikowanie grafu przetwarzania sygnałów,
+Ponieważ wymagania zdefiniowane w rozdziale \ref{sec:requirements} zawierają dynamiczne modyfikowanie grafu przetwarzania sygnałów,
 nie jest możliwe spredefiniowanie mechanizmu wymiany danych między połączonymi węzłami.
 Podczas implementacji rozważane były następujące architektury:
 
@@ -308,9 +308,10 @@ Podczas implementacji rozważane były następujące architektury:
 Ostatecznie wybrane zostało podejście 3, ze względu na konieczność spełnienia wymagania
 \ref{sec:modulation_requirements}, konkretnie możliwości modulowania wejścia danego węzła
 przez wyjście tego samego węzła, co uniemożliwia wykorzystanie podejścia 1. Jednocześnie
-podejście 3 jest łatwiejsze do implementacji niż podejście 2.
+podejście 3 jest łatwiejsze do implementacji niż podejście 2. Implementację mechanizmu
+przesyłu danych między węzłami ułatwiło wykorzystanie makr proceduralnych, opisane w sekcji \ref{sec:proc_macro}.
 
-\subsubsection{Zastosowanie \textit{procedural macros} do automatycznej generacji akcesorów struktur węzłów}
+\subsubsection{Zastosowanie \textit{procedural macros} do automatycznej generacji akcesorów struktur węzłów} \label{sec:proc_macro}
 
 % Przesyłanie wartości modulacji między węzłami grafu wymaga zdefiniowania struktur mapujących
 % poszczególne pola struktur danych na ich indeksy, dzięki czemu możliwe jes
@@ -327,5 +328,8 @@ implementacji podobnych akcesorów i zachowanie zalet silnego systemu typów ję
 
 \subsubsection{Implementacja natywnego modułu dla języka \texttt{Python}}
 
-W implementacji grafu przetwarzania sygnałów
+Aby umożliwić wykorzystanie grafu przetwarzania sygnałów z poziomu języka
+Python, wykorzystano narzędzie \textit{Maturin}~\cite{maturin}, służące
+do implementowania rozszerzeń zgodnych ze standardem \textit{Python Extension Module}~\cite{python_extension_module}
+w języku \texttt{Rust}.
 
