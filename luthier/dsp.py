@@ -167,11 +167,11 @@ class Sample:
                 f"Samples have different lengths, self: {len(self)}, other {len(other)}"
             )
 
-    def mfcc_distance_with_dtw(self, other: "Sample") -> float:
+    def mfcc_distance_with_dtw(self, other: "Sample", w=1000) -> float:
         self._fail_on_different_sample_lengths(other)
 
         dist, cost, acc_cost, path = dtw(
-            self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1), w=10
+            self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1), w=w
         )
         return float(dist)
 
