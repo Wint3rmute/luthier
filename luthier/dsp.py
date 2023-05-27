@@ -161,7 +161,7 @@ class Sample:
         """Display playble audio widget in Jupyter"""
         display(Audio(data=self.buffer, rate=SAMPLE_RATE))  # type: ignore
 
-    def _fail_on_different_sample_lengths(self, other: "Sample"):
+    def _fail_on_different_sample_lengths(self, other: "Sample") -> None:
         if len(self) != len(other):
             raise ValueError(
                 f"Samples have different lengths, self: {len(self)}, other {len(other)}"
@@ -177,7 +177,7 @@ class Sample:
 
     def mfcc_distance(self, other: "Sample") -> float:
         self._fail_on_different_sample_lengths(other)
-        return float(abs(sum(sum(abs(self.mfcc) - abs(other.mfcc)))))
+        return float(sum(abs(sum(abs(self.mfcc) - abs(other.mfcc)))))
 
     def mfcc_distance_with_rms(self, other: "Sample") -> float:
         self._fail_on_different_sample_lengths(other)
