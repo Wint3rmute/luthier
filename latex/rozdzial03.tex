@@ -28,12 +28,12 @@ taki sam dźwięk zademonstrowano na rysunku~\ref{fig:waveform_not_equal_to_perc
 Ponieważ porównywanie barwy dźwięku instrumentów muzycznych nie należy do popularnych
 tematów badań, podczas przeglądu literatury wykorzystano również badania dotyczące
 rozpoznawania głosu, wykorzystujące współczynniki MFCC oraz
-\textit{dynamic time warping} \cite{mfcc_dtw}.
+\textit{dynamic time warping}~(DTW)~\cite{mfcc_dtw}.
 
-\subsection{Systematyzacja metod z literatury}
+\subsection{Systematyzacja metod z literatury} \label{sec:timbre_comparison_systematisation}
 
-Metody zaczerpięte z literatury wykorzystują różne podejścia do funkcji celu.
-Podejścia te można usystematyzować za pomocą dwóch cech:
+Metody zaczerpięte z literatury wykorzystują różne podejścia do porównywania barwy dźwięku
+pomiędzy sygnałami. Podejścia te można usystematyzować za pomocą dwóch cech:
 
 \begin{enumerate}
   \item Rodzaj wykonanej transformacji do dziedziny częstotliwości:
@@ -44,7 +44,7 @@ Podejścia te można usystematyzować za pomocą dwóch cech:
   \item Dalsze przetwarzanie przetransformowanego sygnału w celu ułatwienia optymalizacji:
     \begin{itemize}
       \item dostosowywanie wagi konkretnych próbek na podstawie metryki określającej siłę sygnału
-        (na przykład \textit{root-mean-square})
+        (na przykład \textit{root-mean-square}, RMS)
         \cite{parallel_evolutionary_optimization_synth_parameters},
         aby wzmocnić istotność głośniejszych fragmentów dźwięku,
       \item wykorzystanie \textit{dynamic time warping}, aby funkcja celu przyzwalała na
@@ -52,4 +52,42 @@ Podejścia te można usystematyzować za pomocą dwóch cech:
     \end{itemize}
 \end{enumerate}
 
+\subsection{Wybór funkcji celu do przetestowania}
 
+Na podstawie analizy metod z literatury opisanej w rozdziale,
+\ref{sec:timbre_comparison_systematisation} zostały wybrane wszystkie warianty
+funkcji celu wykorzystywane w przeanalizowanej literaturze:
+
+\begin{enumerate}
+  \item Różnica w spektrum Fouriera,
+  \item Różnica w spektrum Fouriera liczona za pomocą DTW,
+  \item Różnica w spektrum Fouriera ważonym za pomocą RMS.
+  \item Różnica w MFCC,
+  \item Różnica w MFCC liczona za pomocą DTW,
+  \item Różnica w MFCC ważonym za pomocą RMS.
+\end{enumerate}
+
+\section{Proces testowania funkcji celu}
+
+Funkcje celu zostały przetestowane poprzez wykonwanie
+zbioru przekrojów przez uproszczony problem syntezy typu FM.
+Testy obejmowały wygenerowanie wartości funkcji celu podczas
+modyfikowania pojedynczego parametru w grafie przetwarzania sygnałów
+przedstawionym na rysunku \ref{fig:fm_graph_for_benchmarks}.
+Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
+
+\begin{itemize}
+  \item \texttt{HarmonicMultiplier/input\_scale}:  składowe harmoniczne sygnału,
+  \item \texttt{SineOscillator/input\_modulation\_index}: siła składowych harmonicznych,
+  \item \texttt{ADSR\_input\_attack}: dynamika dźwięku.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys03/fm_graph_for_benchmarks.png}
+    \caption{
+      Prosty graf syntezy FM, zawierający jeden oscylator służący za sygnał nośny
+      i jeden oscylator służący za sygnał modulujący.
+    }
+    \label{fig:fm_graph_for_benchmarks}
+\end{figure}
