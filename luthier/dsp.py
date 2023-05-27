@@ -171,7 +171,20 @@ class Sample:
         self._fail_on_different_sample_lengths(other)
 
         dist, cost, acc_cost, path = dtw(
-            self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1)
+            self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1), w=10
+        )
+        return float(dist)
+
+    def mfcc_distance_with_dtw_and_rms(self, other: "Sample") -> float:
+        self._fail_on_different_sample_lengths(other)
+
+        S, phase = librosa.magphase(librosa.stft(self.buffer))
+        rms = librosa.feature.rms(S=S)
+
+        mfcc_with_rms = numpy.concatenate((self.mfcc.T, rms.T), axis=1).T
+
+        dist, cost, acc_cost, path = dtw(
+                mfcc_with_rms.T, other.mfcc.T, dist=lambda x, y: x[-1] * numpy.linalg.norm(x[:-1] - y, ord=1)
         )
         return float(dist)
 
