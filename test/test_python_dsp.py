@@ -20,3 +20,8 @@ def test_mfcc_distance_fails_on_different_sample_sizes() -> None:
 def test_spectrogram_distance() -> None:
     s = Sample(np.zeros(4096 * 10))
     assert s.spectrogram_distance(s) == 0
+
+
+def test_mfcc_dist_with_rms() -> None:
+    s = Sample(np.zeros(4096 * 10))
+    assert s.mfcc_distance_with_rms(s) == 0

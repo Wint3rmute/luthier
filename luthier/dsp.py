@@ -161,11 +161,14 @@ class Sample:
         """Display playble audio widget in Jupyter"""
         display(Audio(data=self.buffer, rate=SAMPLE_RATE))  # type: ignore
 
-    def mfcc_distance_with_dtw(self, other: "Sample") -> float:
+    def _fail_on_different_sample_lengths(self, other: "Sample"):
         if len(self) != len(other):
             raise ValueError(
                 f"Samples have different lengths, self: {len(self)}, other {len(other)}"
             )
+
+    def mfcc_distance_with_dtw(self, other: "Sample") -> float:
+        self._fail_on_different_sample_lengths(other)
 
         dist, cost, acc_cost, path = dtw(
             self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1)
@@ -173,9 +176,19 @@ class Sample:
         return float(dist)
 
     def mfcc_distance(self, other: "Sample") -> float:
+        self._fail_on_different_sample_lengths(other)
         return float(abs(sum(sum(abs(self.mfcc) - abs(other.mfcc)))))
 
+    def mfcc_distance_with_rms(self, other: "Sample") -> float:
+        self._fail_on_different_sample_lengths(other)
+        mfcc_distance_by_sample = sum(abs(self.mfcc) - abs(other.mfcc))
+        mfcc_distance_by_sample_by_rms = mfcc_distance_by_sample * (librosa.feature.rms(y=self.buffer) + 0.01)
+        sum_mfcc_distance = sum(sum(mfcc_distance_by_sample_by_rms))
+
+        return float(sum_mfcc_distance)
+
     def spectrogram_distance(self, other: "Sample") -> float:
+        self._fail_on_different_sample_lengths(other)
         _, self_spectro = self.spectrogram
         _, other_spectro = other.spectrogram
 
