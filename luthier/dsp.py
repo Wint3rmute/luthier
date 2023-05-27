@@ -167,14 +167,17 @@ class Sample:
                 f"Samples have different lengths, self: {len(self)}, other {len(other)}"
             )
 
-    def mfcc_distance_with_dtw(self, other: "Sample", w=1000) -> float:
+    def mfcc_distance_with_dtw(self, other: "Sample", w: int = 1000) -> float:
         self._fail_on_different_sample_lengths(other)
 
         if w < 2:
             w = 2
 
         dist, cost, acc_cost, path = dtw(
-            self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1), w=w
+            self.mfcc.T,
+            other.mfcc.T,
+            dist=lambda x, y: numpy.linalg.norm(x - y, ord=1),
+            w=w,
         )
         return float(dist)
 
@@ -187,13 +190,17 @@ class Sample:
         mfcc_with_rms = numpy.concatenate((self.mfcc.T, rms.T), axis=1).T
 
         dist, cost, acc_cost, path = dtw(
-                mfcc_with_rms.T, other.mfcc.T, dist=lambda x, y: x[-1] * numpy.linalg.norm(x[:-1] - y, ord=1)
+            mfcc_with_rms.T,
+            other.mfcc.T,
+            dist=lambda x, y: x[-1] * numpy.linalg.norm(x[:-1] - y, ord=1),
         )
         return float(dist)
 
     def mfcc_distance(self, other: "Sample") -> float:
         self._fail_on_different_sample_lengths(other)
-        return float(sum(abs(sum(abs(self.mfcc) - abs(other.mfcc)))))
+        # TODO: investigate whether this is definitely implemented right
+        # as the optimisation doesnt work with this as target function
+        return float(sum(abs(sum(abs(self.mfcc) - abs(other.mfcc)))))  # type: ignore
 
     def mfcc_distance_with_rms(self, other: "Sample") -> float:
         self._fail_on_different_sample_lengths(other)

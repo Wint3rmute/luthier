@@ -26,9 +26,11 @@ def test_mfcc_dist_with_rms() -> None:
     s = Sample(np.zeros(4096 * 10))
     assert s.mfcc_distance_with_rms(s) == 0
 
+
 def test_mfcc_dist_with_rms_and_dtw() -> None:
     s = Sample(np.zeros(4096 * 10))
     assert s.mfcc_distance_with_dtw_and_rms(s) == 0
+
 
 def test_various_dtw_window_lengths() -> None:
     s = Sample(np.zeros(4096 * 10))
