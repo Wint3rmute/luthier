@@ -161,7 +161,7 @@ class Sample:
         """Display playble audio widget in Jupyter"""
         display(Audio(data=self.buffer, rate=SAMPLE_RATE))  # type: ignore
 
-    def mfcc_distance(self, other: "Sample") -> float:
+    def mfcc_distance_with_dtw(self, other: "Sample") -> float:
         if len(self) != len(other):
             raise ValueError(
                 f"Samples have different lengths, self: {len(self)}, other {len(other)}"
@@ -171,6 +171,9 @@ class Sample:
             self.mfcc.T, other.mfcc.T, dist=lambda x, y: numpy.linalg.norm(x - y, ord=1)
         )
         return float(dist)
+
+    def mfcc_distance(self, other: "Sample") -> float:
+        return float(abs(sum(sum(abs(self.mfcc) - abs(other.mfcc)))))
 
     def spectrogram_distance(self, other: "Sample") -> float:
         _, self_spectro = self.spectrogram
