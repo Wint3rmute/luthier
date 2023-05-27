@@ -181,8 +181,10 @@ class Sample:
 
     def mfcc_distance_with_rms(self, other: "Sample") -> float:
         self._fail_on_different_sample_lengths(other)
-        mfcc_distance_by_sample = sum(abs(self.mfcc) - abs(other.mfcc))
-        mfcc_distance_by_sample_by_rms = mfcc_distance_by_sample * (librosa.feature.rms(y=self.buffer) + 0.01)
+        mfcc_distance_by_sample = abs(sum(abs(self.mfcc) - abs(other.mfcc)))
+        S, phase = librosa.magphase(librosa.stft(self.buffer))
+        rms = librosa.feature.rms(S=S)
+        mfcc_distance_by_sample_by_rms = mfcc_distance_by_sample * rms
         sum_mfcc_distance = sum(sum(mfcc_distance_by_sample_by_rms))
 
         return float(sum_mfcc_distance)
