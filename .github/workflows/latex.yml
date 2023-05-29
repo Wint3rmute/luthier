@@ -13,7 +13,7 @@ jobs:
           args: -interaction=nonstopmode
           working_directory: latex
 
-  laczek:
+  chktex:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
