@@ -1,1 +1,76 @@
 \chapter{Definicja problemu}\label{chap:problem_definition}
+
+\begin{multicols}{2}
+\noindent
+\textbf{Oscylator} (\textit{VCO}):
+\begin{enumerate}
+  \item Wejścia:
+    \begin{itemize}
+      \item częstotliwość,
+      \item kształt fali.
+    \end{itemize}
+  \item Wyjścia:
+    \begin{itemize}
+      \item wygenerowany sygnał.
+    \end{itemize}
+\end{enumerate}
+
+\noindent
+\textbf{Filtr} (\textit{VCF}):
+\begin{enumerate}
+  \item Wejścia:
+    \begin{itemize}
+      \item częstotliwość odcięcia,
+      \item rezonans.
+    \end{itemize}
+  \item Wyjścia:
+    \begin{itemize}
+      \item przefiltrowany sygnał.
+    \end{itemize}
+\end{enumerate}
+\end{multicols}
+
+Graf przetwarzania sygnałów można opisać jako zbiór połączonych węzłów generujących
+i przetwarzających sygnał dźwiękowy. Każdy węzeł można opisać poprzez:
+
+\begin{enumerate}
+  \item zbiór wejść,
+  \item zbiór wyjść,
+  \item operację matematyczną, wykonywaną na sygnale.
+\end{enumerate}
+
+Pełny graf przetwarzania można opisać za pomocą zbioru węzłów oraz
+macierzy połączeń między węzłami:
+
+$N$ - liczba węzłów,
+
+$i_{j} = [ p_1, p_2, \ldots, p_n ]$ -- Zbiór wejść (\textit{inputs}) j-go węzła,
+
+$o_{j} = [ p_1, p_2, \ldots, p_n ]$ -- Zbiór wyjść (\textit{outputs}) j-go węzła,
+
+$f_i(x)$ -- operacja wykonywana na sygnale przez i-ty węzeł. % chtex 8
+
+$C = [ \{ o_{(j, k)}, i_{(l, m)} \}, \ldots ] $: zbiór połączeń między węzłami, opisujący, które 
+$k$-te wyjście $j$-go węzła podłączone jest do którego $m$-go wejścia $l$-go węzła.
+
+Nie wszystkie wejścia w grafie muszą być podłączone do któregoś z wyjść.
+Wejście, które nie zostało nigdzie podłączone przyjmuje jako wartość parametr 
+liczbowy optymalizowany później w funkcji celu~\ref{eq:target_function}.
+W przypadku schematu~\ref{fig:minilogue_diagram} takimi~,,wolnymi'' wejściami są przykładowo
+sygnał określający częstotliwość odciącia filtru sygnału lub parametry określające parametry
+generatora obwiedni~(\textit{EG}).
+
+
+\subsection{Funkcja celu}
+
+Funkcja celu, oceniająca, jak sygnał wygenerowany ($\bar{x}$) przez algorytm jest bliski sygnałowi docelowemu ($x$)
+może zostać przedstawiona w następujący sposób:
+
+\begin{equation}
+  F(x, \bar{x}) = q
+  \label{eq:target_function}
+\end{equation}
+
+\noindent
+Gdzie $q$ oznacza liczbę rzeczywistą, która jest tym mniejsza, im bardziej zbliżone do siebie są barwy dźwięku sygnałów $x$ i $\bar{x}$,
+przy założeniu że oba sygnały przedstawiają dźwięk o tej samej częstotliwości podstawowej.
