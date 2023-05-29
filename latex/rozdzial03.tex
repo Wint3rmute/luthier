@@ -90,3 +90,27 @@ Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
     }
     \label{fig:fm_graph_for_benchmarks}
 \end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys03/target_function_testing.png}
+    \caption{
+      Zmiany w wartościach testowanych funkcji celu podczas przesuwania różnych parametrów syntezy dźwięku. 
+      Kształt pierwszego wykresu wynika z zastosowania kwantyzacji dostępnych częstotliwości modulacji,
+      aby wykluczyć nieharmoniczne stosunki częstotliwości modulacji i nośnej. Tego rodzaju praktyka
+      jest wykorzystywana w syntezatorach FM \cite{digitone_manual}, ponieważ ułatwia dostosowywanie parametrów syntezy.
+    }
+    \label{fig:target_function_testing}
+\end{figure}
+
+Wyniki testów zaprezentowane na wykresie \ref{fig:target_function_testing} pozwalają na wyeliminowanie
+bezpośredniej różnicy między spektrogramami jako funkcji celu, ponieważ w przypadku zmian częstotliwości
+modulacji posiada ona minima lokalne w niewłaściwych pozycjach parametru. W przypadku wpływu 
+zmian w dynamice dźwięku na wartości funkcji celu, zastosowanie DTW znacząco zmienia kształt funkcji celu,
+zależnie od wybranego rozmiaru okna DTW. Duży rozmiar okna powoduje zmniejszenie kary za niedokładne
+odwzorowanie dynamiki dźwięku.
+
+% \begin{enumerate}
+%   \item Zastosowanie DTW może pogorszyć 
+% \end{enumerate}
+
