@@ -13,10 +13,13 @@ Powszechnie wykorzystywana jest w nich teoria muzyki, pozwalająca określić ma
 Wiedza dotyczącą teorii muzyki pozwala na wyznaczenie możliwej przestrzeni stanów, w której generowana jest kompozycja,
 natomiast modele matematyczne takie jak łańcuchy Markowa służą za mechanizmy decyzyjne, które~,,nawigują'' w przestrzeni stanów.
 
-\begin{figure}[H]\label{fig:lamus_notes}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.4\linewidth]{rys01/lamus_notes.jpg}
-    \caption{Zapis nutowy utworu \textit{Opus One}, wygenerowany przez komputer \textit{Lamus}.}
+    \caption{
+      Zapis nutowy utworu \textit{Opus One},
+      wygenerowany przez komputer \textit{Lamus}.
+    }\label{fig:lamus_notes}
 \end{figure}
 
 Druga grupa algorytmów, generująca pliki audio, rozwija się na bazie nowych możliwości,
@@ -29,10 +32,13 @@ uczą się na spektrogramach, które następnie są w stanie wygenerować (\ref{
 Po wygenerowaniu spektrogramu przez model,
 jest on konwertowany do pliku audio za pomocą odwrotnej transformaty Fouriera.
 
-\begin{figure}[H]\label{fig:riffusion_spectro}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.4\linewidth]{rys01/riffusion_spectro.jpg}
-    \caption{Przykładowy spektrogram wygenerowany przez algorytm \textit{Stable Riffusion} dla danych wejściowych \texttt{funk bassline with a jazzy saxophone solo}.}
+    \caption{
+      Przykładowy spektrogram wygenerowany przez algorytm \textit{Stable Riffusion}
+      dla danych wejściowych \texttt{funk bassline with a jazzy saxophone solo}.
+    }\label{fig:riffusion_spectro}
 \end{figure}
 
 % TODO: check later
@@ -51,7 +57,7 @@ Podsumowując, wykorzystanie wygenerowanego przez komputer zapisu nutowego jest 
 Wykorzystanie wygenerowanego przez komputer \textbf{dźwięku} jest ograniczone ze względu na fakt, że do generowania złożonych sygnałów dźwiękowych wykorzystywane są techniki takie jak głębokie sieci neuronowe, w których utrudniona jest dokładna kontrola nad konkretnymi parametrami funkcjonowania sieci.
 
 Niniejsza praca sugeruje nową metodę podejścia do problemu generowania sygnałów dźwiękowych,
-którego nie da się zaklasyfikować do żadnej z dwóch wyżej wymienionych (\ref{traditional_algos}) głóœnych dziedzin komputerowej kompozycji muzycznej.
+którego nie da się zaklasyfikować do żadnej z dwóch wyżej wymienionych~(\ref{traditional_algos}) głównych dziedzin komputerowej kompozycji muzycznej.
 Wynik pracy algorytmu implementowanego w ramach pracy magisterskiej jest \textbf{gotowym elektronicznym
 instrumentem muzycznym}, który może być wykorzystany w programie do komponowania muzyki. Algorytm nie generuje bezpośrednio sygnału dźwiękowego, lecz tworzy graf przetwarzania sygnałów, który jest zrozumiały dla użytkownika i \textbf{pozwala na precyzyjne dostosowanie parametrów syntezy}.
 Tego typu proces generowania grafów przetwarzania sygnałów dźwiękowych może być porównany z procesem projektowania instrumentu muzycznego.
@@ -62,12 +68,14 @@ dostępne na rynku często wyposażone są w \textit{patch bay}, pozwalający na
 grafu przepływu sygnałów wewnątrz syntezatora, bądź połączenie go z zewnętrznym sprzętem muzycznym
 bądź elektronicznym (\ref{fig:mother32}).
 
-\begin{figure}[H]\label{fig:mother32}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{rys01/mother32.jpg}
-    \caption{Syntezator \textit{Mother 32} firmy \textit{Moog}, po prawej stronie widoczny
-    jest \textit{patch bay} z podłączonymi przewodami, które zmieniają konfigurację
-    połączeń między układami generującymi i przetwarzającymi sygnał dźwiękowy.}
+    \caption{
+      Syntezator \textit{Mother 32} firmy \textit{Moog}, po prawej stronie widoczny
+      jest \textit{patch bay} z podłączonymi przewodami, które zmieniają konfigurację
+      połączeń między układami generującymi i przetwarzającymi sygnał dźwiękowy.
+    }\label{fig:mother32}
 \end{figure}
 
 
@@ -81,7 +89,7 @@ Problem poruszany w pracy można zakwalifikować do grupy zagadnień związanych
 z pojęciami \textit{computer-aided design} oraz \textit{generative artificial intelligence}, zastosowanymi w dziedzienie inżynierii dźwięku. Docelowo
 zaimplementowany algorytm będzie automatyzował pracę inżyniera dźwięku,
 tworząc i konfigurując grafy przetwarzania sygnałów dźwiękowych, dostępne w
-programach typu \textit{digital audio workstation}~\ref{fig:ableton_patch}. Badania obejmują dwa zagadnienia:
+programach typu \textit{digital audio workstation}~(\ref{fig:ableton_patch}). Badania obejmują dwa zagadnienia:
 \textbf{
 \begin{enumerate}\label{research_types}
     \item metody generowania grafu przetwarzania sygnałów oraz późniejszej modyfikacji grafu -- jego struktury oraz parametrów,
@@ -89,11 +97,12 @@ programach typu \textit{digital audio workstation}~\ref{fig:ableton_patch}. Bada
 \end{enumerate}
 }
 
-\begin{figure}[H]\label{fig:ableton_patch}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{rys01/ableton_patch.jpg}
     \caption{
-      Zbiór parametrów konfigurujących przykładowy syntezator dźwięku w programie \textit{Ableton}}
+      Zbiór parametrów konfigurujących przykładowy syntezator dźwięku w programie \textit{Ableton}
+    }\label{fig:ableton_patch}
 \end{figure}
 
 \subsection{Generowanie grafu przetwarzania sygnałów}
@@ -133,13 +142,13 @@ sygnał określający częstotliwość odciącia filtru sygnału lub parametry o
 generatora obwiedni~(\textit{EG}).
 
 
-\begin{figure}[H]\label{fig:minilogue_diagram}
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{rys01/minilogue_voice_block_diagram.png}
     \caption{
       Diagram blokowy pojedynczego głosu w syntezatorze 
       \textit{Minilogue xd} firmy \textit{Korg}~\cite{minilogue_diagram}.
-    }
+    }\label{fig:minilogue_diagram}
 \end{figure}
 
 Dla powszechnie wykorzystywanego w analogowych syntezatorach subtraktywnych 
