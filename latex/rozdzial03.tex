@@ -1,25 +1,23 @@
-\chapter{Funkcja celu -- porównanie barwy dźwięku} \label{target_function_chapter}
+\chapter{Funkcja celu -- porównanie barwy dźwięku}~\label{target_function_chapter}
 
 Aby stopniowo dostosować graf przetwarzania sygnałów zaimplementowany 
 w rozdziale~\ref{dsp_graph_chapter} do imitowania zadanej próbki dźwięku,
 należy wykorzystać funkcję celu, która maleje wraz ze wzrostem podobieństwa
 barwy dźwięku między próbki zadaną i sygnałem generowanym przez graf. 
 
-\begin{figure}[H]
+\begin{figure}[H]\label{fig:waveform_not_equal_to_perception}
     \centering
     \includegraphics[width=0.5\linewidth]{rys03/d_dsp_example_graph.png}
     \caption{
       Przykład trzech próbek dźwięku, które dla słuchacza brzmią identycznie, mimo
-      znacznych różnic w kształcie fali. Źródło obrazka: \cite{engel2020ddsp}.
+      znacznych różnic w kształcie fali. Źródło obrazka:~\cite{engel2020ddsp}.
     }
-    \label{fig:waveform_not_equal_to_perception}
 \end{figure}
 
-\section{Porównanie barwy dźwięku w literaturze} \label{sec:timbre_comparison_literature_overview}
+\section{Porównanie barwy dźwięku w literaturze}\label{sec:timbre_comparison_literature_overview}
 
 Żadna z prac przeanalizowanych podczas przeglądu literatury
-(\cite{engel2020ddsp}, \cite{ieee_synth_programming}, \cite{ddx7}, \cite{riffusion},
-\cite{evolutionary_puredata}, \cite{parallel_evolutionary_optimization_synth_parameters}, \cite{mfcc_dtw})
+(\cite{engel2020ddsp},~\cite{ieee_synth_programming},~\cite{ddx7},~\cite{riffusion},~\cite{evolutionary_puredata},~\cite{parallel_evolutionary_optimization_synth_parameters},~\cite{mfcc_dtw})
 nie wykorzystuje metod porównywania sygnału osadzonych jedynie w dziedzinie czasu, ponieważ
 nie są one skuteczne do porównywania dźwięków pod względem odczuć psychoakustycznych.
 Przykład różnych kształtów fali, które z perspektywy słuchacza brzmią jak
@@ -30,7 +28,7 @@ tematów badań, podczas przeglądu literatury wykorzystano również badania do
 rozpoznawania głosu, wykorzystujące współczynniki MFCC oraz
 \textit{dynamic time warping}~(DTW)~\cite{mfcc_dtw}.
 
-\subsection{Systematyzacja metod z literatury} \label{sec:timbre_comparison_systematisation}
+\subsection{Systematyzacja metod z literatury}~\label{sec:timbre_comparison_systematisation}
 
 Metody zaczerpięte z literatury wykorzystują różne podejścia do porównywania barwy dźwięku
 pomiędzy sygnałami. Podejścia te można usystematyzować za pomocą dwóch cech:
@@ -38,17 +36,16 @@ pomiędzy sygnałami. Podejścia te można usystematyzować za pomocą dwóch ce
 \begin{enumerate}
   \item Rodzaj wykonanej transformacji do dziedziny częstotliwości:
   \begin{itemize}
-    \item transformata Fouriera (w różnych konfiguracjach) \cite{riffusion} \cite{ddx7},
-    \item MFCC \cite{ieee_synth_programming} \cite{evolutionary_puredata} \cite{mfcc_dtw}.
+    \item transformata Fouriera (w różnych konfiguracjach)~\cite{riffusion}~\cite{ddx7},
+    \item MFCC~\cite{ieee_synth_programming}~\cite{evolutionary_puredata}~\cite{mfcc_dtw}.
   \end{itemize}
   \item Dalsze przetwarzanie przetransformowanego sygnału w celu ułatwienia optymalizacji:
     \begin{itemize}
       \item dostosowywanie wagi konkretnych próbek na podstawie metryki określającej siłę sygnału
-        (na przykład \textit{root-mean-square}, RMS)
-        \cite{parallel_evolutionary_optimization_synth_parameters},
+        (na przykład \textit{root-mean-square}, RMS)~\cite{parallel_evolutionary_optimization_synth_parameters},
         aby wzmocnić istotność głośniejszych fragmentów dźwięku,
       \item wykorzystanie \textit{dynamic time warping}, aby funkcja celu przyzwalała na
-        niedokładności w odwzorowaniu dokładnej dynamiki zmian w charakterystyce spektralnej \cite{mfcc_dtw}.
+        niedokładności w odwzorowaniu dokładnej dynamiki zmian w charakterystyce spektralnej~\cite{mfcc_dtw}.
     \end{itemize}
 \end{enumerate}
 
@@ -60,16 +57,16 @@ funkcji celu wykorzystywane w przeanalizowanej literaturze:
 \begin{enumerate}
   \item Różnica w spektrum Fouriera,
   \item Różnica w spektrum Fouriera liczona za pomocą DTW,
-  \item Różnica w spektrum Fouriera ważonym za pomocą RMS.
+  \item Różnica w spektrum Fouriera ważonym za pomocą RMS\@.
   \item Różnica w MFCC,
-  \item Różnica w MFCC liczona za pomocą DTW,
-  \item Różnica w MFCC ważonym za pomocą RMS.
+  \item Różnica w MFCC liczona za pomocą DTW\@,
+  \item Różnica w MFCC ważonym za pomocą RMS\@.
 \end{enumerate}
 
 \section{Proces testowania funkcji celu}
 
 Funkcje celu zostały przetestowane poprzez wykonwanie
-zbioru przekrojów przez uproszczony problem syntezy typu FM.
+zbioru przekrojów przez uproszczony problem syntezy typu FM\@.
 Testy obejmowały wygenerowanie wartości funkcji celu podczas
 modyfikowania pojedynczego parametru w grafie przetwarzania sygnałów
 przedstawionym na rysunku~\ref{fig:fm_graph_for_benchmarks}.
@@ -81,17 +78,16 @@ Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
   \item \texttt{ADSR/input\_attack}: dynamika dźwięku.
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[H]\label{fig:fm_graph_for_benchmarks}
     \centering
     \includegraphics[width=1.0\linewidth]{rys03/fm_graph_for_benchmarks.png}
     \caption{
       Prosty graf syntezy FM, zawierający jeden oscylator służący za sygnał nośny
       i jeden oscylator służący za sygnał modulujący.
     }
-    \label{fig:fm_graph_for_benchmarks}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[H]\label{fig:target_function_testing}
     \centering
     \includegraphics[width=1.0\linewidth]{rys03/target_function_testing.png}
     \caption{
@@ -100,7 +96,6 @@ Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
       aby wykluczyć nieharmoniczne stosunki częstotliwości modulacji i nośnej. Tego rodzaju praktyka
       jest wykorzystywana w syntezatorach FM~\cite{digitone_manual}, ponieważ ułatwia dostosowywanie parametrów syntezy.
     }
-    \label{fig:target_function_testing}
 \end{figure}
 
 Wyniki testów zaprezentowane na wykresie~\ref{fig:target_function_testing} pozwalają na wyeliminowanie
