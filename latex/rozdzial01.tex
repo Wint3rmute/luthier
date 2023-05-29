@@ -64,16 +64,16 @@ Tego typu proces generowania grafów przetwarzania sygnałów dźwiękowych moż
 
 Modyfikowanie grafu przetwarzania sygnału jest techniką często wykorzystywaną w muzyce
 elektronicznej, do tworzenia dźwięków o interesującej barwie bądź dynamice. Syntezatory dźwięku
-dostępne na rynku często wyposażone są w \textit{patch bay}, pozwalający na modyfikowanie
+dostępne na rynku często wyposażone są w \textit{patch bay}~(\ref{fig:mother32}), pozwalający na modyfikowanie
 grafu przepływu sygnałów wewnątrz syntezatora, bądź połączenie go z zewnętrznym sprzętem muzycznym
-bądź elektronicznym (\ref{fig:mother32}).
+bądź elektronicznym.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\linewidth]{rys01/mother32.jpg}
     \caption{
       Syntezator \textit{Mother 32} firmy \textit{Moog}, po prawej stronie widoczny
-      jest \textit{patch bay} z podłączonymi przewodami, które zmieniają konfigurację
+      jest \textit{patch bay} z podłączonymi przewodami, które nadpisują konfigurację
       połączeń między układami generującymi i przetwarzającymi sygnał dźwiękowy.
     }\label{fig:mother32}
 \end{figure}
@@ -107,40 +107,13 @@ programach typu \textit{digital audio workstation}~(\ref{fig:ableton_patch}). Ba
 
 \subsection{Generowanie grafu przetwarzania sygnałów}
 
-Pierwsze zagadnienie sprowadza się do przetestowania szeregu algorytmów pozwalających na wygenerowanie
-grafu przetwarzania sygnałów DSP oraz ich modyfikację. Przykładem modyfikacji grafu
-może być wprowadzanie w nim losowych zmian lub krzyżowanie dwóch grafów DSP w przypadku
-wykorzystania algorytmu genetycznego.
-Graf przetwarzania sygnałów można opisać jako zbiór połączonych węzłów generujących
-i przetwarzających sygnał dźwiękowy. Każdy węzeł można opisać poprzez:
-
-\begin{enumerate}
-  \item zbiór wejść,
-  \item zbiór wyjść,
-  \item operację matematyczną, wykonywaną na sygnale.
-\end{enumerate}
-
-Pełny graf przetwarzania można opisać za pomocą zbioru węzłów oraz
-macierzy połączeń między węzłami:
-
-$N$ - liczba węzłów,
-
-$i_{j} = [ p_1, p_2, \ldots, p_n ]$ -- Zbiór wejść (\textit{inputs}) j-go węzła,
-
-$o_{j} = [ p_1, p_2, \ldots, p_n ]$ -- Zbiór wyjść (\textit{outputs}) j-go węzła,
-
-$f_i(x)$ -- operacja wykonywana na sygnale przez i-ty węzeł. % chtex 8
-
-$C = [ \{ o_{(j, k)}, i_{(l, m)} \}, \ldots ] $: zbiór połączeń między węzłami, opisujący, które 
-$k$-te wyjście $j$-go węzła podłączone jest do którego $m$-go wejścia $l$-go węzła.
-
-Nie wszystkie wejścia w grafie muszą być podłączone do któregoś z wyjść.
-Wejście, które nie zostało nigdzie podłączone przyjmuje jako wartość parametr 
-liczbowy optymalizowany później w funkcji celu~\ref{eq:target_function}.
-W przypadku schematu~\ref{fig:minilogue_diagram} takimi~,,wolnymi'' wejściami są przykładowo
-sygnał określający częstotliwość odciącia filtru sygnału lub parametry określające parametry
-generatora obwiedni~(\textit{EG}).
-
+Proces syntezy dźwięku może być przedstawiony jako graf przetwarzania sygnałów, w którym
+każdy węzeł wykonuje na sygnale określoną operację.
+Przykładowy graf przetwarzania sygnału dla syntezatora analogowego subtraktywnego
+przedstawiony jest na schemacie~\ref{fig:minilogue_diagram}.
+Pierwsze zagadnienie sprowadza się do opracowania algorytmu pozwalającego na wygenerowanie
+grafu przetwarzania sygnałów DSP oraz jego późniejszą modyfikację. Przykładem modyfikacji grafu
+może być wprowadzanie w nim losowych zmian lub krzyżowanie dwóch różnych grafów DSP\@.
 
 \begin{figure}[H]
     \centering
@@ -151,56 +124,16 @@ generatora obwiedni~(\textit{EG}).
     }\label{fig:minilogue_diagram}
 \end{figure}
 
-Dla powszechnie wykorzystywanego w analogowych syntezatorach subtraktywnych 
-schematu przetwarzania sygnałów~(\ref{fig:minilogue_diagram}) można wyróźnić przykładowe węzły: \\
-
-\begin{multicols}{2}
-
-\noindent
-\textbf{Oscylator} (\textit{VCO}):
-\begin{enumerate}
-  \item Wejścia:
-    \begin{itemize}
-      \item częstotliwość,
-      \item kształt fali.
-    \end{itemize}
-  \item Wyjścia:
-    \begin{itemize}
-      \item wygenerowany sygnał.
-    \end{itemize}
-\end{enumerate}
-
-\noindent
-\textbf{Filtr} (\textit{VCF}):
-\begin{enumerate}
-  \item Wejścia:
-    \begin{itemize}
-      \item częstotliwość odcięcia,
-      \item rezonans.
-    \end{itemize}
-  \item Wyjścia:
-    \begin{itemize}
-      \item przefiltrowany sygnał.
-    \end{itemize}
-\end{enumerate}
-\end{multicols}
-
 \subsection{Funkcja celu oceniająca podobieństwo barwy dźwieku}
 
-Drugie zagadnienie obejmuje przetestowanie szeregu algorytmów, które można wykorzystać jako funkcję celu,
-która będzie optymalizowana poprzez~,,dostrajanie'' grafu przetwarzania sygnałów dźwiękowych.
+Drugie zagadnienie obejmuje przetestowanie szeregu algorytmów, które można
+wykorzystać do zbudowania funkcji celu, która będzie optymalizowana
+poprzez~,,dostrajanie'' parametrów i struktury grafu przetwarzania sygnałów dźwiękowych.
+% todo: więcej o funkcji celu
 
-Funkcja celu, oceniająca, jak sygnał wygenerowany ($\bar{x}$) przez algorytm jest bliski sygnałowi docelowemu ($x$)
-może zostać przedstawiona w następujący sposób:
-
-\begin{equation}
-  F(x, \bar{x}) = q
-  \label{eq:target_function}
-\end{equation}
-
-\noindent
-Gdzie $q$ oznacza liczbę rzeczywistą, która jest tym mniejsza, im bardziej zbliżone do siebie są barwy dźwięku sygnałów $x$ i $\bar{x}$,
-przy założeniu że oba sygnały przedstawiają dźwięk o tej samej częstotliwości podstawowej.
+Praca proponuje wykorzystanie [
+  \textbf{Tutaj propozycja jak już się przekręcą wszystkie symulacje}
+] jako funkcji celu.
 
 \subsection{Problem optymalizacyjny}
 
