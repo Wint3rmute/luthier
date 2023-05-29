@@ -12,12 +12,3 @@ jobs:
           compiler: pdflatex
           args: -interaction=nonstopmode
           working_directory: latex
-
-  laczek:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: xu-cheng/texlive-action/full@v1
-        with:
-          run: |
-            ./lacheck_all.sh
