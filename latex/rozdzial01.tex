@@ -1,6 +1,6 @@
 \chapter{Wstęp}
 
-Rozpowszechnione algorytmy sztucznej inteligencji wspomagające pracę inżynierów dźwięku można podzielić na trzy główne kategorie \cite{analysis_generative} \label{traditional_algos}:
+Rozpowszechnione algorytmy sztucznej inteligencji wspomagające pracę inżynierów dźwięku można podzielić na trzy główne kategorie~\cite{analysis_generative}~\label{traditional_algos}:
 
 \begin{enumerate}
     \item algorytmy generujące symboliczny zapis muzyki (nuty lub dane MIDI) (\ref{fig:lamus_notes}), \cite{zhang2023language},
@@ -124,27 +124,26 @@ $i_{j} = [ p_1, p_2, \ldots, p_n ]$ -- Zbiór wejść (\textit{inputs}) j-go wę
 
 $o_{j} = [ p_1, p_2, \ldots, p_n ]$ -- Zbiór wyjść (\textit{outputs}) j-go węzła,
 
-$f_i(x)$ -- operacja wykonywana na sygnale przez i-ty węzeł.
+$f_i(x)$ -- operacja wykonywana na sygnale przez i-ty węzeł. % chtex 8
 
-$C = [ \{ o_{(j, k)}, i_{(l, m)} \}, \ldots ] $ -- zbiór połączeń między węzłami, opisujący, które 
+$C = [ \{ o_{(j, k)}, i_{(l, m)} \}, \ldots ] $: zbiór połączeń między węzłami, opisujący, które 
 $k$-te wyjście $j$-go węzła podłączone jest do którego $m$-go wejścia $l$-go węzła.
 
 Nie wszystkie wejścia w grafie muszą być podłączone do któregoś z wyjść.
 Wejście, które nie zostało nigdzie podłączone przyjmuje jako wartość parametr 
 liczbowy optymalizowany później w funkcji celu~\ref{eq:target_function}.
-W przypadku schematu~\ref{fig:minilogue_diagram} takimi ,,wolnymi'' wejściami są przykładowo
+W przypadku schematu~\ref{fig:minilogue_diagram} takimi~,,wolnymi'' wejściami są przykładowo
 sygnał określający częstotliwość odciącia filtru sygnału lub parametry określające parametry
 generatora obwiedni~(\textit{EG}).
 
 
-\begin{figure}[H]
+\begin{figure}[H]\label{fig:minilogue_diagram}
     \centering
     \includegraphics[width=0.8\linewidth]{rys01/minilogue_voice_block_diagram.png}
     \caption{
       Diagram blokowy pojedynczego głosu w syntezatorze 
-      \textit{Minilogue xd} firmy \textit{Korg} \cite{minilogue_diagram}.
+      \textit{Minilogue xd} firmy \textit{Korg}~\cite{minilogue_diagram}.
     }
-    \label{fig:minilogue_diagram}
 \end{figure}
 
 Dla powszechnie wykorzystywanego w analogowych syntezatorach subtraktywnych 
@@ -184,7 +183,7 @@ schematu przetwarzania sygnałów~(\ref{fig:minilogue_diagram}) można wyróźni
 \subsection{Funkcja celu oceniająca podobieństwo barwy dźwieku}
 
 Drugie zagadnienie obejmuje przetestowanie szeregu algorytmów, które można wykorzystać jako funkcję celu,
-która będzie optymalizowana poprzez ,,dostrajanie'' grafu przetwarzania sygnałów dźwiękowych.
+która będzie optymalizowana poprzez~,,dostrajanie'' grafu przetwarzania sygnałów dźwiękowych.
 
 Funkcja celu, oceniająca, jak sygnał wygenerowany ($\bar{x}$) przez algorytm jest bliski sygnałowi docelowemu ($x$)
 może zostać przedstawiona w następujący sposób:
@@ -220,7 +219,7 @@ Graf musi być grafem skierowanym, który nie zawiera pętli o dodatnim sprzęż
 Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika. 
 Automatyczna ewolucja może dążyć w kierunku wykorzystania nadmiarowej liczby
 bloków przetwarzania sygnału, jeśli funkcja celu nie będzie zawierała kary za zbyt złożone grafy.
-Podobne prace \cite{evolutionary_puredata} wykorzystują podejście oparte o 
+Podobne prace~\cite{evolutionary_puredata} wykorzystują podejście oparte o 
 \textit{mixed-typed carthesian genetic programming}, które będzie punktem startowym dla pracy.
 Finalnie, badania dążą do wyznaczenia algorytmu o następujący właściwościach:
 
@@ -233,13 +232,13 @@ Finalnie, badania dążą do wyznaczenia algorytmu o następujący właściwośc
 Elementami grafu przetwarzania sygnałów są używane powszechnie w syntezie dźwięku algorytmy:
 
 \begin{enumerate}
-  \item modulacja FM \cite{spectral_audio_processing} \cite{computational_music_synthesis},
-  \item synteza subtraktywna \cite{computational_music_synthesis} \cite{digital_filters},
-  \item algorytmy \textit{physical modeling} \cite{lisp_synthesis} \cite{computational_music_synthesis},
-  \item symulacja efektu pogłosu/echa \cite{reverb} \cite{freeverb}.
+  \item modulacja FM~\cite{spectral_audio_processing}~\cite{computational_music_synthesis},
+  \item synteza subtraktywna~\cite{computational_music_synthesis}~\cite{digital_filters},
+  \item algorytmy \textit{physical modeling}~\cite{lisp_synthesis}~\cite{computational_music_synthesis},
+  \item symulacja efektu pogłosu/echa~\cite{reverb}~\cite{freeverb}.
 \end{enumerate}
 
-\subsection{Dobór funkcji błędu -- różnica między wygenerowanym a docelowym sygnałem dźwiękowym}
+\subsection{Dobór funkcji błędu: różnica między wygenerowanym a docelowym sygnałem dźwiękowym}
 
 Funkcja celu poszukiwana w ramach projektu musi określać, jak dobrze sygnał wygenerowany przez
 graf przetwarzania sygnałów pokrywa się z sygnałem docelowym. Porówanie sygnałów musi skupiać się
@@ -248,16 +247,16 @@ na cechach sygnału, które są najbardziej słyszalne dla ludzkiego ucha. Jedno
 do przetestowania w ramach projektów zawarte są:
 
 \begin{enumerate}
-  \item algorytmy porównywania sygnałów oparte o transformatę Fouriera~\cite{sliding_fourier} \cite{mfcc},
-  \item techniki wykorzystywane do generowania ,,cyfrowych podpisów'' sygnałów dźwiękowych (\textit{sound fingerprinting}) \cite{computer_vision_music_identification},
-  \item algorytmy wykrywające spadek jakości dźwięku z perspektywy psychoakustycznej \cite{peaq} \cite{frechet_audio_distance}.
+  \item algorytmy porównywania sygnałów oparte o transformatę Fouriera~\cite{sliding_fourier}~\cite{mfcc},
+  \item techniki wykorzystywane do generowania~,,cyfrowych podpisów'' sygnałów dźwiękowych (\textit{sound fingerprinting})~\cite{computer_vision_music_identification},
+  \item algorytmy wykrywające spadek jakości dźwięku z perspektywy psychoakustycznej~\cite{peaq}~\cite{frechet_audio_distance}.
 \end{enumerate}
 
 \section{Struktura i zawartość pracy}
 
 Praca podzielona jest na następujące części:
 
-\subsection*{Środowisko eksperymentalne - graf przetwarzania sygnałów (\ref{dsp_graph_chapter}) }
+\subsection*{Środowisko eksperymentalne: graf przetwarzania sygnałów (\ref{dsp_graph_chapter}) }
 
 Opisuje zaimplementowane w ramach pracy środowisko eksperymentalne, pozwalające na wytwarzanie
 grafów przetwarzania sygnałów o dowolnej strukturze. Przedstawia zaimplementowane algorytmy syntezy i przetwarzania sygnałów dźwiękowych.
@@ -276,6 +275,6 @@ zostały wykorzystane do automatycznego wytworzenia grafu DSP, który naśladuje
 
 Rozdział podsumowuje uzyskane wyniki badań, podejmuje dyskusję nad ogólną skutecznością i przydatnością zaimplementowanego rozwiązania oraz
 kreśli potencjalne drogi dalszego rozwoju prac badawczych w podobnej tematyce. W czasie, gdy niniejsza praca była tworzona, zostały opublikowane badania
-dotyczące podobnego problemu \cite{ieee_synth_programming}, rozdział podejmuje dyskusję o różnicach w podejściu do problemu oraz potencjalnych
+dotyczące podobnego problemu~\cite{ieee_synth_programming}, rozdział podejmuje dyskusję o różnicach w podejściu do problemu oraz potencjalnych
 zalet i wad każdego z podejść.
 
