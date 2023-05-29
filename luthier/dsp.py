@@ -181,6 +181,8 @@ class Sample:
         )
         return float(dist)
 
+
+
     def mfcc_distance_with_dtw_and_rms(self, other: "Sample") -> float:
         self._fail_on_different_sample_lengths(other)
 
@@ -218,6 +220,23 @@ class Sample:
         _, other_spectro = other.spectrogram
 
         return float(abs(sum(sum(abs(self_spectro) - abs(other_spectro)))))
+
+    def spectrogram_distance_with_dtw(self, other: "Sample", w: int = 1000) -> float:
+        self._fail_on_different_sample_lengths(other)
+
+        if w < 2:
+            w = 2
+    
+        _, self_spectro = self.spectrogram
+        _, other_spectro = other.spectrogram
+
+        dist, cost, acc_cost, path = dtw(
+            self_spectro.T,
+            other_spectro.T,
+            dist=lambda x, y: numpy.linalg.norm(x - y, ord=1),
+            w=w,
+        )
+        return float(dist)
 
     def plot_sound_overview(self, title: str = "Sound overview") -> None:
         fig, (ax, ax2, ax3) = plt.subplots(3)
