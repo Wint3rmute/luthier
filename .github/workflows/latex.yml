@@ -20,4 +20,4 @@ jobs:
       - uses: xu-cheng/texlive-action/full@v1
         with:
           run: |
-            chktex latex/*.tex
+            bash ./check_latex.sh
