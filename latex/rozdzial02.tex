@@ -1,6 +1,34 @@
 \chapter{Definicja problemu}\label{chap:problem_definition}
 
+Jak opisano w zakresie pracy~(\ref{chap:thesis_scope}), w pracy rozwiązywany jest problem
+budowy grafu przetwarzania sygnałów oraz opracowanie funkcji celu, porównującej dwa
+sygnały pod względem ich barwy. Następnie algorytm generujący graf przetwarzania
+sygnałów oraz funkcja porównująca barwy sygnałów są wykorzystane do rozwiązania
+problemu optymalizacyjnego. 
+Graf przetwarzania sygnałów można opisać jako zbiór połączonych węzłów generujących
+i przetwarzających sygnał dźwiękowy. Każdy węzeł opisany jest poprzez:
+
 \begin{multicols}{2}
+\begin{enumerate}
+  \item zbiór wejść,
+  \item zbiór wyjść,
+  \item operację matematyczną, wykonywaną na sygnale.
+\end{enumerate}
+
+
+  \begin{figure}[H]
+  \centering
+  \includegraphics{rys05/example_sine_node.png}
+  \caption{Przykładowy węzeł w grafie, generujący sygnał sinusoidalny z możliwością modulacji.}
+\end{figure}
+
+\end{multicols}
+
+\noindent
+Przykładowo, dla syntezy subtraktywnej powszechnie wykorzystywane są następujące typy węzłów:
+
+\begin{multicols}{2}
+
 \noindent
 \textbf{Oscylator} (\textit{VCO}):
 \begin{enumerate}
@@ -20,6 +48,7 @@
 \begin{enumerate}
   \item Wejścia:
     \begin{itemize}
+      \item sygnał wejściowy
       \item częstotliwość odcięcia,
       \item rezonans.
     \end{itemize}
@@ -28,21 +57,26 @@
       \item przefiltrowany sygnał.
     \end{itemize}
 \end{enumerate}
+
 \end{multicols}
 
-Graf przetwarzania sygnałów można opisać jako zbiór połączonych węzłów generujących
-i przetwarzających sygnał dźwiękowy. Każdy węzeł można opisać poprzez:
 
-\begin{enumerate}
-  \item zbiór wejść,
-  \item zbiór wyjść,
-  \item operację matematyczną, wykonywaną na sygnale.
-\end{enumerate}
+\section{Budowa grafu}
+
+\begin{figure}[H]\label{fig:example_graph_definition_chapter}
+    \centering
+    \includegraphics[width=0.9\linewidth]{rys05/luthier_simple_analog.png}
+    \caption{
+      Przykładowy graf DSP\@. Wolne wejścia, które nie są modulowane przez
+      źródła sygnału w grafie są optymalizowanymi parametrami.
+    }
+\end{figure}
+
 
 Pełny graf przetwarzania można opisać za pomocą zbioru węzłów oraz
-macierzy połączeń między węzłami:
+listy połączeń między węzłami:
 
-$N$ - liczba węzłów,
+$N = [n_1, n_2, .., n_n]$ - liczba węzłów,
 
 $i_{j} = [ p_1, p_2, \ldots, p_n ]$ -- Zbiór wejść (\textit{inputs}) j-go węzła,
 
@@ -50,27 +84,80 @@ $o_{j} = [ p_1, p_2, \ldots, p_n ]$ -- Zbiór wyjść (\textit{outputs}) j-go w�
 
 $f_i(x)$ -- operacja wykonywana na sygnale przez i-ty węzeł. % chtex 8
 
-$C = [ \{ o_{(j, k)}, i_{(l, m)} \}, \ldots ] $: zbiór połączeń między węzłami, opisujący, które 
+$C = [ \{ o_{(j, k)}, i_{(l, m)} \}, \ldots ] $: lista połączeń między węzłami, opisujący, które 
 $k$-te wyjście $j$-go węzła podłączone jest do którego $m$-go wejścia $l$-go węzła.
 
-Nie wszystkie wejścia w grafie muszą być podłączone do któregoś z wyjść.
-Wejście, które nie zostało nigdzie podłączone przyjmuje jako wartość parametr 
-liczbowy optymalizowany później w funkcji celu~\ref{eq:target_function}.
+Nie wszystkie wejścia w grafie muszą być podłączone do któregoś z wyjść, jak pokazuje
+diagram~\ref{fig:example_graph_definition_chapter}.
+Wejście, które nie zostało nigdzie podłączone przyjmuje jako wartość wejściową parametr 
+liczbowy optymalizowany później w funkcji celu~(\ref{eq:target_function}).
 W przypadku schematu~\ref{fig:minilogue_diagram} takimi~,,wolnymi'' wejściami są przykładowo
-sygnał określający częstotliwość odciącia filtru sygnału lub parametry określające parametry
+sygnał określający częstotliwość odcięcia filtru sygnału lub parametry określające parametry
 generatora obwiedni~(\textit{EG}).
+Genotyp opisujący poszczególny graf przetwarzania sygnału składa się z dwóch części:
+\begin{enumerate}
+  \item fragment decydujący o strukturze grafu, $S = [s_1, s_2,~\ldots]$,
+  \item fragment decydujący o wartości parametrów w wolnych wejściach, $P = [p_2, p_2,~\ldots]$.
+\end{enumerate}
 
+\subsection{Struktura grafu}\label{sec:graph_structure_definition}
 
-\subsection{Funkcja celu}
+Różne rodzaje syntezy dźwięku wykorzystują inne struktury grafu przetwarzania
+sygnałów~\cite{minilogue_diagram}~\cite{digitone_manual}.
+Aby umożliwić dostosowanie grafu przetwarzania sygnałów do wykonywania różnych
+rodzajów syntezy, struktura grafu przetwarzania sygnałów jest dynamicznie
+modyfikowana przez algorytm optymalizacji. Algorytm generujący określoną
+strukturę grafu na podstawie genotypu opisany jest w rozdziale~\ref{chap:solution_algorithm}.
+Genotyp odpowiadający za strukturę grafu ma formę krotki liczb rzeczywistych $S$.
+Praca definiuje funkcję generującą strukturę grafu $G_s$ z genotypu:
+\begin{equation}
+  G_s(S) = N, C
+  \label{eq:graph_structure_generation_function}
+\end{equation}
 
-Funkcja celu, oceniająca, jak sygnał wygenerowany ($\bar{x}$) przez algorytm jest bliski sygnałowi docelowemu ($x$)
-może zostać przedstawiona w następujący sposób:
+\subsection{Przypisanie parametrów do~,,wolnych wejść''}\label{sec:graph_params_definition}
+
+Po stworzeniu grafu o danej strukturze $G_s$, druga część genotypu wykorzystywana
+jest jako wartości poszczególnych parametrów $P$ dla wolnych wejść w grafie przetwarzania
+sygnału.
 
 \begin{equation}
-  F(x, \bar{x}) = q
+  \forall p_j, \forall i_n \text{ gdzie } i_n \notin C, i_n = p_j
+  \label{eq:graph_params_assignment}
+\end{equation}
+
+\section{Funkcja celu}
+
+Wykorzystana w pracy funkcja celu $F$, oceniająca, jak sygnał wygenerowany ($\bar{x}$) przez algorytm
+jest bliski sygnałowi docelowemu ($x$) przedstawiona jest w następujący sposób:
+
+\begin{equation}
+  F(x, \bar{x}) = DTW(MFCC(x),~MFCC(\bar{x}))
   \label{eq:target_function}
 \end{equation}
 
 \noindent
-Gdzie $q$ oznacza liczbę rzeczywistą, która jest tym mniejsza, im bardziej zbliżone do siebie są barwy dźwięku sygnałów $x$ i $\bar{x}$,
-przy założeniu że oba sygnały przedstawiają dźwięk o tej samej częstotliwości podstawowej.
+Gdzie $MFCC$ oznacza \textit{mel-frequency cepstrum coefficients}, natomiast $DTW$ oznacza algorytm
+\textit{dynamic time wrapping}~\cite{mfcc_dtw}. Uzasadnienie wybranej funkcji celu opisane jest z rozdziale~\ref{target_function_chapter}.
+
+\section{Problem optymalizacji}
+
+Sygnał wygenerowany przez graf przetwarzania sygnałów zależy od następujących parametrów:
+
+\begin{equation}
+  \bar{x} = G(G_s(S), P)
+  \label{eq:graph_generated_signal}
+\end{equation}
+
+\noindent
+Gdzie $G$ jest funkcją generującą sygnał dźwiękowy dla konkretnej struktury grafu
+$G_s$~(\ref{sec:graph_structure_definition},~\ref{eq:graph_structure_generation_function}),
+dla wartości parametrów przypisanych z
+$P$~(\ref{sec:graph_params_definition},~\ref{eq:graph_params_assignment}).
+Dla parametrów $S$ oraz $P$, w pracy rozwiązywany jest następujący problem optymalizacyjny:
+
+\begin{equation}
+  \text{Minimize}~F(x,~G(G_s(S), P))
+  \label{eq:target_function}
+\end{equation}
+
