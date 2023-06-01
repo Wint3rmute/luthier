@@ -57,26 +57,12 @@ funkcji celu wykorzystywane w przeanalizowanej literaturze:
 \begin{enumerate}
   \item Różnica w spektrum Fouriera,
   \item Różnica w spektrum Fouriera liczona za pomocą DTW,
-  \item Różnica w spektrum Fouriera ważonym za pomocą RMS\@.
   \item Różnica w MFCC,
   \item Różnica w MFCC liczona za pomocą DTW\@,
   \item Różnica w MFCC ważonym za pomocą RMS\@.
 \end{enumerate}
 
 \section{Proces testowania funkcji celu}
-
-Funkcje celu zostały przetestowane poprzez wykonwanie
-zbioru przekrojów przez uproszczony problem syntezy typu FM\@.
-Testy obejmowały wygenerowanie wartości funkcji celu podczas
-modyfikowania pojedynczego parametru w grafie przetwarzania sygnałów
-przedstawionym na rysunku~\ref{fig:fm_graph_for_benchmarks}.
-Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
-
-\begin{itemize}
-  \item \texttt{HarmonicMultiplier/input\_scale}:  składowe harmoniczne sygnału,
-  \item \texttt{SineOscillator/input\_modulation\_index}: siła składowych harmonicznych,
-  \item \texttt{ADSR/input\_attack}: dynamika dźwięku.
-\end{itemize}
 
 \begin{figure}[H]\label{fig:fm_graph_for_benchmarks}
     \centering
@@ -86,6 +72,25 @@ Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
       i jeden oscylator służący za sygnał modulujący.
     }
 \end{figure}
+
+Funkcje celu zostały przetestowane poprzez wykonanie
+zbioru przekrojów przez uproszczony problem syntezy typu FM oraz
+przez przeprowadzenie próby dostosowania parametrów dwóch grafów
+o predefiniowanej strukturze, dla syntezy FM oraz \textit{analog modeling}.
+
+\section{Przekrój wartości funkcji celu dla prostego problemu syntezy typu FM}
+
+Testy obejmowały wygenerowanie wartości funkcji celu podczas
+modyfikowania pojedynczego parametru w grafie przetwarzania sygnałów
+przedstawionym na rysunku~\ref{fig:fm_graph_for_benchmarks}.
+Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
+
+\begin{itemize}
+  \item \texttt{HarmonicMultiplier/input\_scale}: częstotliwość modulacji FM,
+  \item \texttt{SineOscillator/input\_modulation\_index}: siła składowych harmonicznych,
+  \item \texttt{ADSR/input\_attack}: dynamika dźwięku.
+\end{itemize}
+
 
 \begin{figure}[H]\label{fig:target_function_testing}
     \centering
@@ -98,12 +103,34 @@ Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
     }
 \end{figure}
 
-Wyniki testów zaprezentowane na wykresie~\ref{fig:target_function_testing} pozwalają na wyeliminowanie
-bezpośredniej różnicy między spektrogramami jako funkcji celu, ponieważ w przypadku zmian częstotliwości
-modulacji posiada ona minima lokalne w niewłaściwych pozycjach parametru. W przypadku wpływu 
-zmian w dynamice dźwięku na wartości funkcji celu, zastosowanie DTW znacząco zmienia kształt funkcji celu,
-zależnie od wybranego rozmiaru okna DTW\@. Duży rozmiar okna powoduje zmniejszenie kary za niedokładne
-odwzorowanie dynamiki dźwięku.
+\subsection{Analiza wyników}
+
+Wyniki testów zaprezentowane na wykresach~\ref{fig:target_function_testing} pozwalają na
+wyeliminowanie bezpośredniej różnicy między spektrogramami jako funkcji celu,
+ponieważ w przypadku zmian częstotliwości modulacji posiada ona minimum globalne w 
+niewłaściwej pozycji parametru.
+
+\subsubsection{Częstotliwość modulacji FM}
+
+Wszystkie funkcje z wyjątkiem różnicy między spektrogramami pokazują poprawną, 
+najniższą wartość dla właściwej wartości parametru.
+
+\subsubsection{Dynamika dźwięku}
+
+W przypadku wpływu zmian w dynamice dźwięku na wartości funkcji celu,
+zastosowanie DTW znacząco zmienia kształt funkcji celu, zależnie od wybranego rozmiaru
+okna DTW\@. Duży rozmiar okna powoduje zmniejszenie kary za niedokładne odwzorowanie
+dynamiki dźwięku. 
+
+\subsubsection{Siła modulacji}
+
+Różnica między spektrogramami jest najbardziej chaotyczna, nie maleje wraz
+ze zbliżaniem się do poprawnej wartości parametru. Pozostałe funkcje celu
+wykorzystujące \textit{MFCC} mają lepszą charakterystykę -- maleją
+wraz ze zbliżaniem się do poprawnej wartości parametru.
+
+\section{Optymalizacja parametrów dla predefiniowanych
+grafów syntezy FM oraz \textit{analog modeling}}
 
 % \begin{enumerate}
 %   \item Zastosowanie DTW może pogorszyć 
