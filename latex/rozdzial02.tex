@@ -140,6 +140,18 @@ jest bliski sygnałowi docelowemu ($x$) przedstawiona jest w następujący spos�
 Gdzie $MFCC$ oznacza \textit{mel-frequency cepstrum coefficients}, natomiast $DTW$ oznacza algorytm
 \textit{dynamic time wrapping}~\cite{mfcc_dtw}. Uzasadnienie wybranej funkcji celu opisane jest z rozdziale~\ref{target_function_chapter}.
 
+\section{Ograniczenia}
+
+W algorytmach DSP powszechnie wykorzystuje się ograniczenie wartości
+sygnału do przedziału $(-1.0, 1.0)$, gdy implementacja danego algorytmu wykorzystuje 
+typ \texttt{float} do przechowywania wartości sygnałów. Środowisko zaimplementowane
+w ramach pracy oczekuje, że wartości sygnałów będą znajdowały się w tym przedziale:
+
+\begin{equation}
+  \forall p_i \in P \quad \forall p_i \in S, \quad -1.0 \leq p_i, s_i \leq 1.0
+  \label{eq:parameter_bounds}
+\end{equation}
+
 \section{Problem optymalizacji}
 
 Sygnał wygenerowany przez graf przetwarzania sygnałów zależy od następujących parametrów:
@@ -154,7 +166,8 @@ Gdzie $G$ jest funkcją generującą sygnał dźwiękowy dla konkretnej struktur
 $G_s$~(\ref{sec:graph_structure_definition},~\ref{eq:graph_structure_generation_function}),
 dla wartości parametrów przypisanych z
 $P$~(\ref{sec:graph_params_definition},~\ref{eq:graph_params_assignment}).
-Dla parametrów $S$ oraz $P$, w pracy rozwiązywany jest następujący problem optymalizacyjny:
+Dla parametrów $S$ oraz $P$, ograniczonych przez~\ref{eq:parameter_bounds},
+rozwiązywany jest następujący problem optymalizacyjny:
 
 \begin{equation}
   \text{Minimize}~F(x,~G(G_s(S), P))
