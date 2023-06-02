@@ -49,7 +49,7 @@ pomiędzy sygnałami. Podejścia te można usystematyzować za pomocą dwóch ce
     \end{itemize}
 \end{enumerate}
 
-\subsection{Wybór funkcji celu do przetestowania}
+\subsection{Wybór funkcji celu do przetestowania}~\label{sec:considered_target_functions}
 
 Na podstawie analizy metod z literatury opisanej w rozdziale~\ref{sec:timbre_comparison_systematisation} zostały wybrane wszystkie warianty
 funkcji celu wykorzystywane w przeanalizowanej literaturze:
@@ -106,9 +106,10 @@ Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
 \subsection{Analiza wyników}
 
 Wyniki testów zaprezentowane na wykresach~\ref{fig:target_function_testing} pozwalają na
-wyeliminowanie bezpośredniej różnicy między spektrogramami jako funkcji celu,
+wyeliminowanie różnicy między spektrogramami jako funkcji celu,
 ponieważ w przypadku zmian częstotliwości modulacji posiada ona minimum globalne w 
-niewłaściwej pozycji parametru.
+niewłaściwej pozycji parametru. Późniejsze testy wykorzystują tylko funkcje celu
+wykorzystujące MFCC\@.
 
 \subsubsection{Częstotliwość modulacji FM}
 
@@ -132,7 +133,55 @@ wraz ze zbliżaniem się do poprawnej wartości parametru.
 \section{Optymalizacja parametrów dla predefiniowanych
 grafów syntezy FM oraz \textit{analog modeling}}
 
-% \begin{enumerate}
-%   \item Zastosowanie DTW może pogorszyć 
-% \end{enumerate}
+Drugą częścią procesu testowania funkcji celu z literatury było zweryfikowanie ich skuteczności
+w uproszczonym problemie optymalizacyjnym, polegającym jedynie na odnalezieniu właściwych
+parametrów dla spredefiniowanej struktury grafu DSP\@. Wykorzystano dwa grafy
+DSP~(\ref{fig:analog_graph_for_benchmarks},~\ref{fig:fm_graph_for_benchmarks}),
+wykonujące różne rodzaje syntezy.
 
+\begin{figure}[H]\label{fig:analog_graph_for_benchmarks}
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys03/analog_graph_for_benchmarks.png}
+    \caption{
+      Graf wykonujący syntezę typu \textit{analog modeling}, wykorzystany do testów funkcji celu.
+      Synteza \textit{analog modeling} zazwyczaj wykorzystuje więcej parametrów niż synteza
+      FM~(\ref{fig:fm_graph_for_benchmarks}), więc graf został roszszerzony o węzeł dodający
+      efekt pogłosu~\cite{reverb}.
+    }
+\end{figure}
+
+\subsection{Plan testów}
+
+Dla obu grafów wykonano optymalizację parametrów wejściowych w celu imitacji danej
+próbki dźwięku. Optymalizację wykonano 10 razy dla każdej rozważanej~(\ref{sec:considered_target_functions})
+funkcji celu.
+
+\subsection{Wyniki testów}
+
+\begin{figure}[H]\label{fig:param_optimisation_results_target_fun_plots}
+    \centering
+    % \includegraphics[width=1.0\linewidth]{}
+    \caption{
+      Wykresy zmian funkcji celu podczas optymalizacji. \\
+      TODO obrazek!
+    }
+\end{figure}
+
+\begin{figure}[H]\label{fig:param_optimisation_results_spectrograms}
+    \centering
+    % \includegraphics[width=1.0\linewidth]{}
+    \caption{
+      Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie optymalizacji parametrów grafu. \\
+      TODO obrazek!
+    }
+\end{figure}
+
+Wyniki testów pozwalają jednoznacznie wybrać funkcję celu, która porównuje wartości MFCC
+sygnałów za pomocą algorytmu \textit{dynamic time warping}. W zakresie pracy nie leży szczegółowe
+wytłumaczenie, czemu zastosowanie DFT usprawnia proces optymalizacji. Możliwym intuicyjnym
+wytłumaczeniem tego fenomenu jest fakt, że DFT pozwala na rozpoznanie poszczególnych
+fonemów w nagraniach mowy~\cite{mfcc_dtw}, niezależnie od prędkości wypowiadania słów. 
+Analogicznie, w przypadku porównywania sygnałów dźwiękowych generowanych przez grafy
+przetwarzania sygnałów, wykorzystanie DFT pozwala na~,,wygładzenie'' niedokładności
+w zmianach tembru (transjentach~\cite{transient_music_theory}) i dynamiki dźwięku,
+które występują pomiędzy sygnałem docelowym i wygenerowanym.

@@ -91,7 +91,7 @@ jobs:
 
       - name: Run luthier/dsp.py
         run: |
-          poetry run python luthier/dsp.py
+          poetry run python -m luthier.dsp
 
   test:
     runs-on: ubuntu-latest

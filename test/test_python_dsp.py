@@ -26,6 +26,7 @@ def test_mfcc_dist_with_rms() -> None:
     s = Sample(np.zeros(4096 * 10))
     assert s.mfcc_distance_with_rms(s) == 0
 
+
 def test_spectrogram_dist_with_dtw() -> None:
     s = Sample(np.zeros(4096 * 10))
     assert s.spectrogram_distance_with_dtw(s) == 0
