@@ -1,30 +1,121 @@
 \chapter{Optymalizacja struktury grafu DSP oraz jego parametrów}\label{chap:research}
 
-% Podsumowanie jest miejscem, w którym należy zamieścić syntetyczny opis tego, o czym jest dokument. W szczególności w pracach dyplomowych w podsumowaniu powinno znaleźć się jawnie podane stwierdzenie dotyczące stopnia realizacji celu. Czyli powinny pojawić się w niej akapity ze zdaniami typu:~,,Podczas realizacji pracy udało się zrealizować wszystkie postawione cele''. Ponadto powinna pojawić się dyskusja na temat napotkanych przeszkód i sposobów ich pokonania, perspektyw dalszego rozwoju, możliwych zastosowań wyników pracy itp. 
+Praca proponuje algorytm tworzący strukturę grafu DSP,
+który generuje różne warianty grafów przetwarzania sygnałów powszechnie
+są wykorzystywanych w syntezatorach~\cite{minilogue_diagram}~\cite{digitone_manual}~\cite{yamaha_dx7_manual}.
+Takie podejście pozwala na dostosowanie grafu do danego rodzaju syntezy,
+lub połączenie wielu typów syntezy w celu uzyskania bardziej złożonego brzmienia.
+Algorytm wybiera węzły dla każdej sekcji
+zilustrowanej na rysunku~\ref{fig:synth_architecture_diagram}.
 
-% \section{Sekcja poziomu 1}% 
-% Lorem ipsum dolor sit amet eleifend et, congue arcu. Morbi tellus sit amet, massa. Vivamus est id risus. Sed sit amet, libero. Aenean ac ipsum. Mauris vel lectus. 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/synth_architecture.png}
+    \caption{
+      sekcje przetwarzania sygnałów oraz przykładowe węzły przetwarzania
+      sygnałów, które są w nich powszechnie wykorzystywane.
+    }\label{fig:synth_architecture_diagram}
+\end{figure}
 
-% Nam id nulla a adipiscing tortor, dictum ut, lobortis urna. Donec non dui. Cras tempus orci ipsum, molestie quis, lacinia varius nunc, rhoncus purus, consectetuer congue risus. 
+Przykładowo, w syntezatorach wykorzystujących syntezę typu FM~\cite{yamaha_dx7_manual}, źródłem
+sygnału będą operatory wykorzystujące proste sygnały sinusoidalne, poddane modulacji częstotliwości.
+Dla syntezatorów analogowych (subtraktywnych), zamiast prostych sygnałów wykorzystywane są
+oscylatory generujące fale kwadratowe i piłokształtne, o dużej liczbie składowych harmonicznych.
+Uzasadnia to wykorzystanie filtrów dolnoprzepustowych, które z kolei nie występują w tradycyjnych
+syntezatorach FM (pojawiają się dopiero we współczesnych modelach~\cite{digitone_manual}).
+Instrumenty eksperymentalne, wykorzystujące mniej popularne rodzaje syntezy, takie jak
+\textit{physical modeling}~\cite{yamaha_vl1_manual}, często opierają się jedynie na rozbudowanej
+sekcji oscylatorów, które posiadają wystarczająco dużo parametrów by wynagrodzić tym brak
+sekcji subtraktywnej. Po drugiej stronie spektrum znajdują się instrumenty wykorzystujące
+głównie sekcję efektów i syntezę granularną~\cite{microcosm_hologram_manual},
+aby w nieoczekiwany sposób modyfikować proste próbki dźwięku.
 
-% \subsection{Sekcja poziomu 2}
-% Lorem ipsum dolor sit amet eleifend et, congue arcu. Morbi tellus sit amet, massa. Vivamus est id risus. Sed sit amet, libero. Aenean ac ipsum. Mauris vel lectus. 
-% \subsubsection{Sekcja poziomu 3}
-% Lorem ipsum dolor sit amet eleifend et, congue arcu. Morbi tellus sit amet, massa. Vivamus est id risus. Sed sit amet, libero. Aenean ac ipsum. Mauris vel lectus. 
-% \paragraph{Paragraf 4}
-% Lorem ipsum dolor sit amet eleifend et, congue arcu. Morbi tellus sit amet, massa. Vivamus est id risus. Sed sit amet, libero. Aenean ac ipsum. Mauris vel lectus. 
-% \section{Sekcja poziomu 1}% 
-% Lorem ipsum dolor sit amet eleifend et, congue arcu. Morbi tellus sit amet, massa. Vivamus est id risus. Sed sit amet, libero. Aenean ac ipsum. Mauris vel lectus. 
-%\show\chapter
-%\show\section
-%\show\subsection
+\section{Wybór źródeł sygnału}
 
-%\showthe\secindent
-%\showthe\beforesecskip
-%\showthe\aftersecskip
-%\showthe\secheadstyle
-%\showthe\subsecindent
-%\showthe\beforesubsecskip
-%\showthe\aftersubsecskip
-%\showthe\subseccheadstyle
-%\showthe\parskip
+Graf posiada 3 sloty dla węzłów generujących sygnał. W pracy zaimplementowano różne
+typy syntezy, które mogą być wykorzystane przez algorytm do syntezy dźwięków o różnorodnych barwach. 
+
+\subsection{Synteza FM}
+
+Zaimplementowane w pracy geny odpowiedzialne za syntezy FM odwzorowują uproszczone algorytmy syntezy wykorzystane
+w syntezatorze \textit{Yamaha DX7}~\cite{yamaha_dx7_manual}.
+
+\subsubsection{Gen \texttt{FM1}}
+
+Gen \texttt{FM1}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/gene_fm1.png}
+    \caption{
+      Graf wykorzystujący gen \texttt{FM1}.
+    }\label{fig:gene_f1}
+\end{figure}
+
+
+Gen \texttt{FM1}, przedstawiony na diagramie~\ref{fig:gene_f2}, typową dla syntezy FM
+modulację fali sinusoidalnej za pomocą innej fali sinusoidalnej. Taki układ umożliwia
+uzyskanie dźwięków przypominających dźwięki fletu, trąbki lub dzwonków.
+
+\subsubsection{Gen \texttt{FM2}}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/gene_fm2.png}
+    \caption{
+      Graf wykorzystujący gen \texttt{FM2}.
+    }\label{fig:gene_f2}
+\end{figure}
+
+Gen \texttt{FM2}, zilustrowany na diagramie~\ref{fig:gene_f2}, wykorzystuje pojedynczy
+operator ze sprzężeniem zwrotnym. W zależności od ustawionych parametrów, taka struktura pozwala
+na uzyskanie dźwięków przypominających uderzenie w strunę lub służyć jako źródło szumu.
+
+\subsection{Synteza \textit{analog modeling}}
+
+Zaimplementowane w pracy geny odpowiedzialne za syntezy FM odwzorowują uproszczone algorytmy syntezy wykorzystane
+w syntezatorze \textit{Korg Minilogue xd}~\cite{yamaha_dx7_manual}.
+
+\subsubsection{Gen \texttt{AN1}}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/gene_an1.png}
+    \caption{
+      Graf wykorzystujący gen \texttt{AN1}.
+    }\label{fig:gene_an1}
+\end{figure}
+
+Gen \texttt{AN1} (diagram~\ref{fig:gene_an1}) pozwala na uzyskanie fal prostokątnych o różnej szerokości impulsów.
+
+
+\subsubsection{Gen \texttt{AN2}}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/gene_an2.png}
+    \caption{
+      Graf wykorzystujący gen \texttt{AN2}.
+    }\label{fig:gene_an2}
+\end{figure}
+
+Gen \texttt{AN2}, przedstawiony na diagramie~\ref{fig:gene_an2}, pozwala na uzyskanie sygnałów piłokształtnych.
+
+\section{Wybór filtrów}
+
+W pracy wykorzystano gotową implementację filtru cyfrowego, emulującego
+rezonansowy filtr drabinkowy~\cite{ladder_filter_rust}.
+Implementacja została wykorzystana do wytworzenia filtrów dolno oraz górnoprzepustowego.
+
+\subsection{Filtr górnoprzepustowy}
+
+\subsection{Filtr dolnoprzepustowy}
+
+\section{Wybór efektów}
+
+W pracy wykorzystano gotowy algorytm pogłosu (\textit{reverb}) oparty na~\cite{reverb}.
+Algorytm generujący echo (\textit{delay}) został zaimplementowany jako bufor kołowy.
+
+\subsection{Reverb}
+
+\subsection{Delay}
