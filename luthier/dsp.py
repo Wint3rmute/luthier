@@ -11,7 +11,7 @@ import numpy
 import numpy.typing
 from audioflux.display import fill_spec
 from audioflux.type import SpectralFilterBankScaleType
-from dtw import dtw
+from dtw import accelerated_dtw, dtw
 from IPython.display import Audio, display
 from scipy.optimize import differential_evolution
 
@@ -177,6 +177,17 @@ class Sample:
             other.mfcc.T,
             dist=lambda x, y: numpy.linalg.norm(x - y, ord=1),
             w=w,
+        )
+        return float(dist)
+
+    def mfcc_distance_with_accelerated_dtw(self, other: "Sample") -> float:
+        """TODO: consider using this function and benchmarking the results"""
+        self._fail_on_different_sample_lengths(other)
+
+        dist, cost, acc_cost, path = accelerated_dtw(
+            self.mfcc.T,
+            other.mfcc.T,
+            dist=lambda x, y: numpy.linalg.norm(x - y, ord=1),
         )
         return float(dist)
 
