@@ -139,15 +139,29 @@ parametrów dla spredefiniowanej struktury grafu DSP\@. Wykorzystano dwa grafy
 DSP~(\ref{fig:analog_graph_for_benchmarks},~\ref{fig:fm_graph_for_benchmarks}),
 wykonujące różne rodzaje syntezy.
 
+
+\subsubsection{Synteza FM}
+
+Testowana struktura grafu wykonującego syntezę typu FM wykorzystuje 2 operatory: jedną nośną
+i jeden modulator. Parametry grafu zostały ręcznie zmodyfikowane aby generować krótki
+dźwięk typu \textit{pluck}, w którym modulator przekształca nośną sinusoidę w sygnał zbliżony
+do sygnału prostokątnego. Z perspektywy wynikowego spektrum sygnału, przedstawionego na
+rysunku~\ref{fig:param_optimisation_results_spectrograms} sygnał składa się z częstotliwości
+podstawowej i jednej składowej harmonicznej.
+
+\subsubsection{Synteza \textit{analog modeling}}
+
+Synteza \textit{analog modeling} zazwyczaj wykorzystuje więcej parametrów niż synteza
+FM~(\ref{fig:fm_graph_for_benchmarks}), więc graf został roszszerzony o węzeł dodający
+efekt pogłosu~\cite{reverb}.
+
+
 \begin{figure}[H]\label{fig:analog_graph_for_benchmarks}
     \centering
     \includegraphics[width=1.0\linewidth]{rys03/analog_graph_for_benchmarks.png}
     \caption{
       Graf wykonujący syntezę typu \textit{analog modeling}, wykorzystany do testów funkcji celu.
-      Synteza \textit{analog modeling} zazwyczaj wykorzystuje więcej parametrów niż synteza
-      FM~(\ref{fig:fm_graph_for_benchmarks}), więc graf został roszszerzony o węzeł dodający
-      efekt pogłosu~\cite{reverb}.
-    }
+          }
 \end{figure}
 
 \subsection{Plan testów}
@@ -169,10 +183,10 @@ funkcji celu.
 
 \begin{figure}[H]\label{fig:param_optimisation_results_spectrograms}
     \centering
-    % \includegraphics[width=1.0\linewidth]{}
+    \includegraphics[width=1.0\linewidth]{rys03/spectro_results_fm.png}
     \caption{
-      Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie optymalizacji parametrów grafu. \\
-      TODO obrazek!
+      Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie optymalizacji parametrów grafu.
+      Czerwoną strzałką oznaczono składową harmoniczną, poprawnie odtworzoną przez algorytm genetyczny.
     }
 \end{figure}
 
