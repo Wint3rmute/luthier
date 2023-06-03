@@ -143,7 +143,7 @@ class Sample:
 
     def plot_mfcc(self, ax: plt.Axes, title: str = "MFCC") -> None:
         ax.set_title(title)
-        librosa.display.specshow(self.mfcc, ax=ax)
+        return librosa.display.specshow(self.mfcc, x_axis='time', ax=ax)
 
     def plot_waveform(
         self, ax: plt.Axes, num_samples: int = 400, title: str = "Waveform"
@@ -151,6 +151,7 @@ class Sample:
         ax.set_title(title)
         ax.set_ylim(-1.1, 1.1)
         ax.plot(self.buffer[:num_samples])
+        ax.set_xlabel("Sample number")
 
     def show_player(self) -> None:
         """Display playble audio widget in Jupyter"""

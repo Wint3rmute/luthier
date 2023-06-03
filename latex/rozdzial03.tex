@@ -7,7 +7,7 @@ barwy dźwięku między próbki zadaną i sygnałem generowanym przez graf.
 
 \begin{figure}[H]\label{fig:waveform_not_equal_to_perception}
     \centering
-    \includegraphics[width=0.5\linewidth]{rys03/d_dsp_example_graph.png}
+    \includegraphics[width=0.45\linewidth]{rys03/d_dsp_example_graph.png}
     \caption{
       Przykład trzech próbek dźwięku, które dla słuchacza brzmią identycznie, mimo
       znacznych różnic w kształcie fali. Źródło obrazka:~\cite{engel2020ddsp}.
@@ -34,12 +34,12 @@ Metody zaczerpięte z literatury wykorzystują różne podejścia do porównywan
 pomiędzy sygnałami. Podejścia te można usystematyzować za pomocą dwóch cech:
 
 \begin{enumerate}
-  \item Rodzaj wykonanej transformacji do dziedziny częstotliwości:
+  \item Rodzaj wykonanej transformacji z dziedziny czasu do dziedziny częstotliwości:
   \begin{itemize}
     \item transformata Fouriera (w różnych konfiguracjach)~\cite{riffusion}~\cite{ddx7},
     \item MFCC~\cite{ieee_synth_programming}~\cite{evolutionary_puredata}~\cite{mfcc_dtw}.
   \end{itemize}
-  \item Dalsze przetwarzanie przetransformowanego sygnału w celu ułatwienia optymalizacji:
+  \item Dalsze przetwarzanie reprezentacji sygnału w domenie częstotliwości, w celu ułatwienia optymalizacji:
     \begin{itemize}
       \item dostosowywanie wagi konkretnych próbek na podstawie metryki określającej siłę sygnału
         (na przykład \textit{root-mean-square}, RMS)~\cite{parallel_evolutionary_optimization_synth_parameters},
@@ -133,36 +133,69 @@ wraz ze zbliżaniem się do poprawnej wartości parametru.
 \section{Optymalizacja parametrów dla predefiniowanych
 grafów syntezy FM oraz \textit{analog modeling}}
 
-Drugą częścią procesu testowania funkcji celu z literatury było zweryfikowanie ich skuteczności
-w uproszczonym problemie optymalizacyjnym, polegającym jedynie na odnalezieniu właściwych
-parametrów dla spredefiniowanej struktury grafu DSP\@. Wykorzystano dwa grafy
+Drugą częścią procesu testowania funkcji celu z literatury było zweryfikowanie skuteczności
+każdej z funkcji w uproszczonym problemie optymalizacyjnym, polegającym jedynie na odnalezieniu właściwych
+parametrów dla predefiniowanej struktury grafu DSP\@. Wykorzystano dwa grafy
 DSP~(\ref{fig:analog_graph_for_benchmarks},~\ref{fig:fm_graph_for_benchmarks}),
 wykonujące różne rodzaje syntezy.
 
 
-\subsubsection{Synteza FM}
+\subsection{Synteza FM}
 
-Testowana struktura grafu wykonującego syntezę typu FM wykorzystuje 2 operatory: jedną nośną
-i jeden modulator. Parametry grafu zostały ręcznie zmodyfikowane aby generować krótki
+Testowana struktura grafu wykonującego syntezę typu FM~\ref{fig:fm_graph_for_benchmarks}
+wykorzystuje 2 operatory: jedną nośną
+i jeden modulator. Parametry grafu zostały ręcznie dostrojone aby wygenerować krótki
 dźwięk typu \textit{pluck}, w którym modulator przekształca nośną sinusoidę w sygnał zbliżony
 do sygnału prostokątnego. Z perspektywy wynikowego spektrum sygnału, przedstawionego na
 rysunku~\ref{fig:param_optimisation_results_spectrograms} sygnał składa się z częstotliwości
-podstawowej i jednej składowej harmonicznej.
+podstawowej i jednej składowej harmonicznej. Wizualizacja sygnału została przedstawiona
+na wykresie~\ref{fig:fm_training_sample_overview}.
 
-\subsubsection{Synteza \textit{analog modeling}}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys03/fm_training_sample_overview.png}
+    \caption{
+      Spektrogram, kształt fali oraz wizualizacja MFCC dla próbki dźwięku, którą
+      ma imitować graf syntezy FM podczas testów różnych funkcji celu.
+    }\label{fig:fm_training_sample_overview}
+\end{figure}
 
-Synteza \textit{analog modeling} zazwyczaj wykorzystuje więcej parametrów niż synteza
-FM~(\ref{fig:fm_graph_for_benchmarks}), więc graf został roszszerzony o węzeł dodający
-efekt pogłosu~\cite{reverb}.
 
+\subsection{Synteza \textit{analog modeling}}
 
-\begin{figure}[H]\label{fig:analog_graph_for_benchmarks}
+\begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{rys03/analog_graph_for_benchmarks.png}
     \caption{
       Graf wykonujący syntezę typu \textit{analog modeling}, wykorzystany do testów funkcji celu.
-          }
+    }\label{fig:analog_graph_for_benchmarks}
 \end{figure}
+
+Synteza \textit{analog modeling} zazwyczaj wykorzystuje więcej parametrów niż synteza
+FM~(\ref{fig:fm_graph_for_benchmarks}), aby zwiększyć trudność problemu optymalizacyjnego
+graf został roszszerzony o węzeł dodający efekt pogłosu~\cite{reverb}.
+Struktura grafu (przedstawiona na rysunku~\ref{fig:analog_graph_for_benchmarks}) składa
+się z dwóch oscylatorów generujących sygnał prostokątny. Oscylator \texttt{SquareOscillator \#4}
+generuje sygnał przesunięty o oktawę w dół w stosunku do częstotliwości podstawowej, jednocześnie
+jego parametr \texttt{input\_pwm} skraca szerokość generowanego impulsu, aby wzbogacić barwę dźwięku
+o dodatkowe składowe harmoniczne. Barwa dźwięku zmienia się dynamicznie w czasie dzięki 
+zastosowaniu filtra niskoprzepustowego (\texttt{LowPassFilter \#6}), którego
+częstotliwość odcięcia jest modulowana przez sygnał sterujący \texttt{ADSR \#7}.
+Długość dźwięku generowanego przez oscylatory jest podobna jak w przypadku
+grafu FM~(\ref{fig:fm_graph_for_benchmarks}), zastosowanie węzła \texttt{Reverb \#8}
+przedłuża czas trwania dźwięku i dodatkowo~,,rozmywa go'' w czasie, co pokazuje
+spektrum sygnału na wykresie~\ref{fig:am_training_sample_overview}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.0\linewidth]{rys03/am_training_sample_overview.png}
+  \caption{
+    Spektrogram, kształt fali oraz wizualizacja MFCC dla próbki dźwięku, którą
+    ma imitować graf syntezy \textit{analog\_modeling} podczas testów różnych funkcji celu.
+  }\label{fig:am_training_sample_overview}
+\end{figure}
+
+
 
 \subsection{Plan testów}
 
@@ -172,22 +205,22 @@ funkcji celu.
 
 \subsection{Wyniki testów}
 
-\begin{figure}[H]\label{fig:param_optimisation_results_target_fun_plots}
+\begin{figure}[H]
     \centering
-    % \includegraphics[width=1.0\linewidth]{}
+    \includegraphics[width=1.0\linewidth]{rys03/target_functions_progress.png}
     \caption{
-      Wykresy zmian funkcji celu podczas optymalizacji. \\
-      TODO obrazek!
-    }
+      Wykresy zmian funkcji celu podczas optymalizacji dla grafu syntezy FM\@.
+      TODO obrazek z większą liczbą prób w RMSie
+    }\label{fig:param_optimisation_results_target_fun_plots}
 \end{figure}
 
-\begin{figure}[H]\label{fig:param_optimisation_results_spectrograms}
+\begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{rys03/spectro_results_fm.png}
     \caption{
       Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie optymalizacji parametrów grafu.
       Czerwoną strzałką oznaczono składową harmoniczną, poprawnie odtworzoną przez algorytm genetyczny.
-    }
+    }\label{fig:param_optimisation_results_spectrograms}
 \end{figure}
 
 Wyniki testów pozwalają jednoznacznie wybrać funkcję celu, która porównuje wartości MFCC
