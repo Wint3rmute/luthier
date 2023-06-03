@@ -201,7 +201,8 @@ spektrum sygnału na wykresie~\ref{fig:am_training_sample_overview}.
 
 Dla obu grafów wykonano optymalizację parametrów wejściowych w celu imitacji danej
 próbki dźwięku. Optymalizację wykonano 10 razy dla każdej rozważanej~(\ref{sec:considered_target_functions})
-funkcji celu.
+funkcji celu. Do optymalizacji parametrów wykorzystano algorytm evolucyjny
+\textit{differential evolution}~\cite{2020SciPy-NMeth}.
 
 \subsection{Wyniki testów}
 
@@ -218,10 +219,22 @@ funkcji celu.
     \centering
     \includegraphics[width=1.0\linewidth]{rys03/spectro_results_fm.png}
     \caption{
-      Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie optymalizacji parametrów grafu.
-      Czerwoną strzałką oznaczono składową harmoniczną, poprawnie odtworzoną przez algorytm genetyczny.
+      Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie optymalizacji parametrów grafu FM\@.
+      Czerwoną strzałką oznaczono składową harmoniczną, poprawnie odtworzoną przez algorytm optymalizacji.
     }\label{fig:param_optimisation_results_spectrograms}
 \end{figure}
+
+\subsubsection{Synteza FM}
+
+Algorytm optymalizacji jest w stanie poprawnie dostosować wartości parametrów grafu w przypadku
+zastosowania MFCC+DTW jako funkcji celu. Jak pokazuje spektrogram~(\ref{fig:param_optimisation_results_spectrograms}),
+poprawnie odtworzona jest zarówno dynamika dźwięku i składowa harmoniczna.
+
+\subsubsection{Synteza \textit{analog modeling}}
+
+Tutaj trzeba dodać opis i wygenerowane spektrogramy jak się już przekręci optymalizacja.
+
+\subsection{Wybór funkcji celu na podstawie wyników}
 
 Wyniki testów pozwalają jednoznacznie wybrać funkcję celu, która porównuje wartości MFCC
 sygnałów za pomocą algorytmu \textit{dynamic time warping}. W zakresie pracy nie leży szczegółowe
