@@ -5,6 +5,7 @@ from typing import Any, Callable, Optional
 
 import audioflux as af
 import librosa
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy
 import numpy.typing
@@ -141,9 +142,11 @@ class Sample:
             title=title,
         )
 
-    def plot_mfcc(self, ax: plt.Axes, title: str = "MFCC") -> None:
+    def plot_mfcc(
+        self, ax: plt.Axes, title: str = "MFCC"
+    ) -> matplotlib.collections.QuadMesh:
         ax.set_title(title)
-        return librosa.display.specshow(self.mfcc, x_axis='time', ax=ax)
+        return librosa.display.specshow(self.mfcc, x_axis="time", ax=ax)
 
     def plot_waveform(
         self, ax: plt.Axes, num_samples: int = 400, title: str = "Waveform"
