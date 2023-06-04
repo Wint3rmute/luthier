@@ -77,6 +77,29 @@ pub struct Delay {
     buffer_index: usize,
 }
 
+impl Default for Delay {
+    fn default() -> Self {
+        Self {
+            input_input: 0.0,
+            input_length: 0.3,
+            input_feedback: 0.3,
+            input_dry: 0.9,
+            input_wet: 0.3,
+            output_output: 0.0,
+            buffer: [0.0; SAMPLE_RATE as usize * 2],
+            buffer_index: 0,
+        }
+    }
+}
+
+#[pymethods]
+impl Delay {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
 impl DspNode for Delay {
     fn tick(&mut self) {
         self.output_output =
@@ -86,7 +109,9 @@ impl DspNode for Delay {
             self.buffer[self.buffer_index] * self.input_feedback + self.input_input;
 
         self.buffer_index += 1;
-        if self.buffer_index > ((self.input_length + 1.0) / 2.0 * SAMPLE_RATE) as usize {
+        if self.buffer_index
+            >= (self.buffer.len() as f64 * (self.input_length + 1.0) / 2.0) as usize
+        {
             self.buffer_index = 0;
         }
     }
@@ -740,6 +765,10 @@ impl DspGraph {
         self.add_node(Box::new(adsr))
     }
 
+    fn add_delay(&mut self, delay: Delay) -> NodeId {
+        self.add_node(Box::new(delay))
+    }
+
     fn add_reverb(&mut self, reverb: Reverb) -> NodeId {
         self.add_node(Box::new(reverb))
     }
@@ -940,6 +969,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<HarmonicMultiplier>()?;
     m.add_class::<LowPassFilter>()?;
     m.add_class::<HighPassFilter>()?;
+    m.add_class::<Delay>()?;
 
     Ok(())
 }

@@ -146,6 +146,22 @@ def test_mverb(build_luthier: Any) -> None:
     graph.play(100)
 
 
+def test_delay(build_luthier: Any) -> None:
+    from luthier import luthier
+
+    graph = luthier.DspGraph()
+    square = luthier.SquareOscillator()
+    square_id = graph.add_square(square)
+
+    delay = luthier.Delay()
+    delay_id = graph.add_delay(delay)
+
+    graph.patch(delay_id, "output_output", graph.speaker_node_id, "input_input")
+    graph.patch(square_id, "output_output", delay_id, "input_input")
+
+    graph.play(100)
+
+
 def test_triangle_oscillator(build_luthier: Any) -> None:
     from luthier import luthier
 
