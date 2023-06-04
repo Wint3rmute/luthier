@@ -211,7 +211,6 @@ funkcji celu. Do optymalizacji parametrów wykorzystano algorytm evolucyjny
     \includegraphics[width=1.0\linewidth]{rys03/target_functions_progress.png}
     \caption{
       Wykresy zmian funkcji celu podczas optymalizacji dla grafu syntezy FM\@.
-      TODO obrazek z większą liczbą prób w RMSie
     }\label{fig:param_optimisation_results_target_fun_plots}
 \end{figure}
 
@@ -220,7 +219,8 @@ funkcji celu. Do optymalizacji parametrów wykorzystano algorytm evolucyjny
     \includegraphics[width=1.0\linewidth]{rys03/spectro_results_fm.png}
     \caption{
       Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie optymalizacji parametrów grafu FM\@.
-      Czerwoną strzałką oznaczono składową harmoniczną, poprawnie odtworzoną przez algorytm optymalizacji.
+      Czerwoną strzałką oznaczono składową harmoniczną (słabo widoczną na spektrogramie),
+      która została poprawnie odtworzona przez algorytm optymalizacji.
     }\label{fig:param_optimisation_results_spectrograms}
 \end{figure}
 
@@ -228,11 +228,14 @@ funkcji celu. Do optymalizacji parametrów wykorzystano algorytm evolucyjny
 
 Algorytm optymalizacji jest w stanie poprawnie dostosować wartości parametrów grafu w przypadku
 zastosowania MFCC+DTW jako funkcji celu. Jak pokazuje spektrogram~(\ref{fig:param_optimisation_results_spectrograms}),
-poprawnie odtworzona jest zarówno dynamika dźwięku i składowa harmoniczna.
+poprawnie odtworzona jest zarówno dynamika dźwięku i składowa harmoniczna. Pozostałe funkcje celu nie pozwalają
+na odtworzenie sygnału, który w bliski sposób przypomina dźwięk docelowy.
 
 \subsubsection{Synteza \textit{analog modeling}}
 
-Tutaj trzeba dodać opis i wygenerowane spektrogramy jak się już przekręci optymalizacja.
+Podobnie jak podczas testów syntezy FM, funkcja celu MFCC+DTW pozwala na dokładne odwzorowanie barwy dźwięku.
+Na spektrogramie widoczne są poprawnie odtworzone składowe harmoniczne i przebieg dynamiczny dźwięku.
+\textbf{Tutaj trzeba dodać więcej tekstu i spektrogramy jak się już przekręci cała optymalizacja.}
 
 \subsection{Wybór funkcji celu na podstawie wyników}
 
@@ -242,6 +245,6 @@ wytłumaczenie, czemu zastosowanie DFT usprawnia proces optymalizacji. Możliwym
 wytłumaczeniem tego fenomenu jest fakt, że DFT pozwala na rozpoznanie poszczególnych
 fonemów w nagraniach mowy~\cite{mfcc_dtw}, niezależnie od prędkości wypowiadania słów. 
 Analogicznie, w przypadku porównywania sygnałów dźwiękowych generowanych przez grafy
-przetwarzania sygnałów, wykorzystanie DFT pozwala na~,,wygładzenie'' niedokładności
+przetwarzania sygnałów, wykorzystanie DFT może powodować~,,wygładzenie'' niedokładności
 w zmianach tembru (transjentach~\cite{transient_music_theory}) i dynamiki dźwięku,
 które występują pomiędzy sygnałem docelowym i wygenerowanym.
