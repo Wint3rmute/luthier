@@ -260,9 +260,10 @@ class Sample:
 class DspGraphOptimizer:
     def __init__(
         self,
-        graph_creation_function: Callable[[], luthier.DspGraph],
+        graph_creation_function: Callable[[numpy.typing.NDArray[numpy.float64]], luthier.DspGraph],
         difference_function: Callable[[Sample, Sample], float],
         target_audio: Sample,
+        base_frequency: float,
         max_iterations: int = 100,
         population_size: int = 30,
         workers: int = -1,
@@ -275,6 +276,11 @@ class DspGraphOptimizer:
         self.graph_creation_function = graph_creation_function
         self.difference_function = difference_function
         self.target_audio = target_audio
+
+        if base_frequency > 1.0:
+            raise ValueError("Frequency higher than 1.0, shoud be e.x. 0.440 for A4")
+
+        self.base_frequency: float = base_frequency
         self.max_iterations = max_iterations
         self.population_size = population_size
 
@@ -299,8 +305,8 @@ class DspGraphOptimizer:
         self.best_parameters.append(x)
 
     def _make_sound(self, inputs: numpy.typing.NDArray[numpy.float64]) -> Sample:
-        graph = self.graph_creation_function()
-        graph.set_inputs(inputs)
+        graph = self.graph_creation_function(inputs)
+        graph.set_input(graph.base_frequency_node_id, "input_base_frequency", self.base_frequency)
 
         return Sample(graph.play(len(self.target_audio)))
 
@@ -313,7 +319,8 @@ class DspGraphOptimizer:
         return float(dist)
 
     def optimize(self) -> None:
-        num_inputs = self.graph_creation_function().num_inputs()
+        # num_inputs = self.graph_creation_function().num_inputs()
+        num_inputs = 50
 
         differential_evolution(
             self._target_function,
