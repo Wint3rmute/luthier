@@ -129,15 +129,20 @@ W pracy wykorzystano gotową implementację filtru cyfrowego, emulującego
 rezonansowy filtr drabinkowy~\cite{ladder_filter_rust}.
 Implementacja została wykorzystana do wytworzenia filtrów dolno oraz górnoprzepustowego.
 
-\subsection{Filtr górnoprzepustowy}
-
-\subsection{Filtr dolnoprzepustowy}
-
 \section{Wybór efektów}
 
 W pracy wykorzystano gotowy algorytm pogłosu (\textit{reverb}) oparty na~\cite{reverb}.
 Algorytm generujący echo (\textit{delay}) został zaimplementowany jako bufor kołowy.
+Algorym generujący efekt \textit{chorus} został zaimplementowany jako wariant algorytmu \textit{delay},
+w którym długość bufora jest modulowana przez falę sinusoidalną. Efekty połączone sa w łańcuch
+$chorus \rightarrow delay \rightarrow reverb$. Algorytm generacji wybiera, które efekty będą obecne w grafie.
+Diagram~\ref{fig:example_generated_effects} ilustruje fragment grafu,
+w którego strukturze znajdują się wszystkie 3 efekty.
 
-\subsection{Reverb}
-
-\subsection{Delay}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/example_generated_effects.png}
+    \caption{
+      Przykładowy łańcuch efektów w grafie.
+    }\label{fig:example_generated_effects}
+\end{figure}
