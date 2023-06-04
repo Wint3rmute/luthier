@@ -1,6 +1,7 @@
 \chapter{Wstęp}
 
-Rozpowszechnione algorytmy sztucznej inteligencji wspomagające pracę inżynierów dźwięku można podzielić na trzy główne kategorie~\cite{analysis_generative}~\label{traditional_algos}:
+Rozpowszechnione algorytmy sztucznej inteligencji wspomagające pracę inżynierów dźwięku i kompozytorów
+można podzielić na trzy główne kategorie~\cite{analysis_generative}~\label{traditional_algos}:
 
 \begin{enumerate}
     \item algorytmy generujące symboliczny zapis muzyki (nuty lub dane MIDI) (\ref{fig:lamus_notes}),~\cite{zhang2023language},
@@ -22,15 +23,16 @@ natomiast modele matematyczne takie jak łańcuchy Markowa służą za mechanizm
     }\label{fig:lamus_notes}
 \end{figure}
 
-Druga grupa algorytmów, generująca pliki audio, rozwija się na bazie nowych możliwości,
-które zapewniają algorytmy wywodzące się ze \textit{Stable Diffusion}~\cite{stablediffusion}.
-Najnowsze modele generujące pliki audio zgodne z opisem tekstowym 
+Druga grupa algorytmów, generująca pliki audio, bazuje na klasie algorytmów
+wywodzących się ze \textit{Stable Diffusion}~\cite{stablediffusion}.
+Modele generujące pliki audio zgodne z opisem tekstowym 
 (przykładowo \texttt{,,smutny jazz''} bądź \texttt{,,muzyka taneczna w stylu Depeche Mode''})
-szkolone są w taki sam sposób jak algorytmy stable diffusion. 
-Jednakże zamiast na obrazach artystów, modele takie jak \textit{Stable Riffusion}~\cite{riffusion} 
-uczą się na spektrogramach, które następnie są w stanie wygenerować (\ref{fig:riffusion_spectro}).
-Po wygenerowaniu spektrogramu przez model,
-jest on konwertowany do pliku audio za pomocą odwrotnej transformaty Fouriera.
+szkolone są w taki sam sposób jak algorytmy \textit{stable diffusion},
+dane treningowe składają się z obrazów spektrogramów~\cite{riffusion}. 
+Po trenowaniu, model jest wstanie wygenerować spektrogram zawierający
+utwór muzyczny zgodny z promptem użytkownika (\ref{fig:riffusion_spectro}).
+Wygenerowany przez model spektrogram jest konwertowany 
+do sygnału dżwiękowego za pomocą odwrotnej transformaty Fouriera.
 
 \begin{figure}[H]
     \centering
@@ -57,14 +59,14 @@ Podsumowując, wykorzystanie wygenerowanego przez komputer zapisu nutowego jest 
 Wykorzystanie wygenerowanego przez komputer \textbf{dźwięku} jest ograniczone ze względu na fakt, że do generowania złożonych sygnałów dźwiękowych wykorzystywane są techniki takie jak głębokie sieci neuronowe, w których utrudniona jest dokładna kontrola nad konkretnymi parametrami funkcjonowania sieci.
 
 Niniejsza praca sugeruje nową metodę podejścia do problemu generowania sygnałów dźwiękowych,
-którego nie da się zaklasyfikować do żadnej z dwóch wyżej wymienionych~(\ref{traditional_algos}) głównych dziedzin komputerowej kompozycji muzycznej.
+którego nie da się zaklasyfikować do żadnej z wyżej wymienionych~(\ref{traditional_algos}) dziedzin komputerowej kompozycji muzycznej.
 Wynik pracy algorytmu implementowanego w ramach pracy magisterskiej jest \textbf{gotowym elektronicznym
 instrumentem muzycznym}, który może być wykorzystany w programie do komponowania muzyki. Algorytm nie generuje bezpośrednio sygnału dźwiękowego, lecz tworzy graf przetwarzania sygnałów, który jest zrozumiały dla użytkownika i \textbf{pozwala na precyzyjne dostosowanie parametrów syntezy}.
 Tego typu proces generowania grafów przetwarzania sygnałów dźwiękowych może być porównany z procesem projektowania instrumentu muzycznego.
 
-Modyfikowanie grafu przetwarzania sygnału jest techniką często wykorzystywaną w muzyce
+Modyfikowanie ścieżki przetwarzania sygnału jest techniką często wykorzystywaną w muzyce
 elektronicznej, do tworzenia dźwięków o interesującej barwie bądź dynamice. Syntezatory dźwięku
-dostępne na rynku często wyposażone są w \textit{patch bay}~(\ref{fig:mother32}), pozwalający na modyfikowanie
+dostępne na rynku często wyposażone są w tzw. \textit{patch bay}~(\ref{fig:mother32}), pozwalający na modyfikowanie
 grafu przepływu sygnałów wewnątrz syntezatora, bądź połączenie go z zewnętrznym sprzętem muzycznym
 bądź elektronicznym.
 
@@ -92,7 +94,7 @@ tworząc i konfigurując grafy przetwarzania sygnałów dźwiękowych, dostępne
 programach typu \textit{digital audio workstation}~(\ref{fig:ableton_patch}). Badania obejmują dwa zagadnienia:
 \textbf{
 \begin{enumerate}\label{research_types}
-    \item metody generowania grafu przetwarzania sygnałów oraz późniejszej modyfikacji grafu -- jego struktury oraz parametrów,
+    \item opracowanie metody generowania grafu przetwarzania sygnałów oraz późniejszej modyfikacji grafu -- jego struktury i parametrów,
     \item dobór funkcji celu, na podstawie której algorytm optymalizujący będzie modyfikował graf przetwarzania sygnałów.
 \end{enumerate}
 }
@@ -101,7 +103,7 @@ programach typu \textit{digital audio workstation}~(\ref{fig:ableton_patch}). Ba
     \centering
     \includegraphics[width=0.8\linewidth]{rys01/ableton_patch.jpg}
     \caption{
-      Zbiór parametrów konfigurujących przykładowy syntezator dźwięku w programie \textit{Ableton}
+      Zbiór parametrów konfigurujących syntezator dźwięku \textit{Wavetable} w programie \textit{Ableton}
     }\label{fig:ableton_patch}
 \end{figure}
 
@@ -113,7 +115,7 @@ Przykładowy graf przetwarzania sygnału dla syntezatora analogowego subtraktywn
 przedstawiony jest na schemacie~\ref{fig:minilogue_diagram}.
 Pierwsze zagadnienie sprowadza się do opracowania algorytmu pozwalającego na wygenerowanie
 grafu przetwarzania sygnałów DSP oraz jego późniejszą modyfikację. Przykładem modyfikacji grafu
-może być wprowadzanie w nim losowych zmian lub krzyżowanie dwóch różnych grafów DSP\@.
+może być wprowadzanie do niego nowych źródeł modulacji bądź zmiana algorytmu generującego sygnał.
 
 \begin{figure}[H]
     \centering
@@ -130,18 +132,23 @@ Drugie zagadnienie obejmuje przetestowanie szeregu algorytmów, które można
 wykorzystać do zbudowania funkcji celu, która będzie optymalizowana
 poprzez~,,dostrajanie'' parametrów i struktury grafu przetwarzania sygnałów dźwiękowych.
 % todo: więcej o funkcji celu
-Praca proponuje wykorzystanie [
-  \textbf{Tutaj dokładna propozycja jak już się przekręcą wszystkie symulacje}
-] jako funkcji celu. Proces wyboru funkcji celu został
+Praca proponuje wykorzystanie współczynników cepstralnych sygnału (MFCC) w połączeniu
+z dynamicznym skalowaniem czasu (\textit{dynamic time wrapping}, DTW) jako funkcji celu.
+Proces wyboru funkcji celu został
 opisany w rozdziale~\ref{target_function_chapter}.
 
 \subsection{Problem optymalizacyjny}
 
-Następnie, dla danego układu $N$ węzłów przetwarzania oraz dla macierzy połączeń $C$, 
-należy rozwiązać następujący problem optymalizacji, należy rozwiązać problem
-maksymalizacji funkcji opisanej równaniem~\ref{eq:target_function} dla
-parametrów wszystkich wejść $i_j$ oraz $o_j$, które nie są połączone bezpośrednio
-pomiędzy węzłami.
+W pracy rozwiązywany jest problem optymalizacyjny, w którym
+struktura oraz parametry grafu przetwarzania sygnałów dostosowywane
+są tak, aby wygenerować zadaną próbkę dźwięku. Tak wytworzony
+graf może być wykorzystany jako elektroniczny instrument muzyczny. 
+
+% Następnie, dla danego układu $N$ węzłów przetwarzania oraz dla macierzy połączeń $C$, 
+% należy rozwiązać następujący problem optymalizacji, należy rozwiązać problem
+% maksymalizacji funkcji opisanej równaniem~\ref{eq:target_function} dla
+% parametrów wszystkich wejść $i_j$ oraz $o_j$, które nie są połączone bezpośrednio
+% pomiędzy węzłami.
 
 
 
@@ -152,8 +159,7 @@ pomiędzy węzłami.
 
 Głównym problemem przy generowaniu grafu przetwarzania sygnałów są ograniczenia nałożone na strukturę grafu,
 które należy spełnić, by graf był logicznie interpretowalny jako łańcuch przetwarzania sygnałów.
-Graf musi być grafem skierowanym, który nie zawiera pętli o dodatnim sprzężeniu zwrotnym 
-(lub nie zawiera ich wcale, co można założyć dla uproszczenia problemu).
+Graf musi być grafem skierowanym, który nie zawiera pętli o dodatnim sprzężeniu zwrotnym.
 Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika. 
 Automatyczna ewolucja może dążyć w kierunku wykorzystania nadmiarowej liczby
 bloków przetwarzania sygnału, jeśli funkcja celu nie będzie zawierała kary za zbyt złożone grafy.
