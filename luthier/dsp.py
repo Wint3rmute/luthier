@@ -260,7 +260,9 @@ class Sample:
 class DspGraphOptimizer:
     def __init__(
         self,
-        graph_creation_function: Callable[[numpy.typing.NDArray[numpy.float64]], luthier.DspGraph],
+        graph_creation_function: Callable[
+            [numpy.typing.NDArray[numpy.float64]], luthier.DspGraph
+        ],
         difference_function: Callable[[Sample, Sample], float],
         target_audio: Sample,
         base_frequency: float,
@@ -306,7 +308,9 @@ class DspGraphOptimizer:
 
     def _make_sound(self, inputs: numpy.typing.NDArray[numpy.float64]) -> Sample:
         graph = self.graph_creation_function(inputs)
-        graph.set_input(graph.base_frequency_node_id, "input_base_frequency", self.base_frequency)
+        graph.set_input(
+            graph.base_frequency_node_id, "input_base_frequency", self.base_frequency
+        )
 
         return Sample(graph.play(len(self.target_audio)))
 
@@ -336,15 +340,17 @@ class DspGraphOptimizer:
 
 if __name__ == "__main__":
 
-    def graph_create_fun() -> luthier.DspGraph:
-        return luthier.DspGraph()
+    def graph_create_fun(
+        params: numpy.typing.NDArray[numpy.float64],
+    ) -> luthier.DspGraph:
+        graph = luthier.DspGraph()
+        graph.set_inputs(params)
+        return graph
 
     def mfcc_dtw_distance(target: Sample, other: Sample) -> float:
         return target.mfcc_distance_with_dtw(other)
 
     o = DspGraphOptimizer(
-        graph_create_fun,
-        mfcc_dtw_distance,
-        Sample(numpy.zeros(1000)),
+        graph_create_fun, mfcc_dtw_distance, Sample(numpy.zeros(1000)), 0.440
     )
     o.optimize()
