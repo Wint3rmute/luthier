@@ -78,7 +78,7 @@ zbioru przekrojów przez uproszczony problem syntezy typu FM oraz
 przez przeprowadzenie próby dostosowania parametrów dwóch grafów
 o predefiniowanej strukturze, dla syntezy FM oraz \textit{analog modeling}.
 
-\section{Przekrój wartości funkcji celu dla prostego problemu syntezy typu FM}
+\section{Przekrój wartości funkcji celu dla prostego problemu syntezy typu FM}\label{sec:fm_synth_params_cross_section}
 
 Testy obejmowały wygenerowanie wartości funkcji celu podczas
 modyfikowania pojedynczego parametru w grafie przetwarzania sygnałów
@@ -229,7 +229,8 @@ funkcji celu. Do optymalizacji parametrów wykorzystano algorytm evolucyjny
 Algorytm optymalizacji jest w stanie poprawnie dostosować wartości parametrów grafu w przypadku
 zastosowania MFCC+DTW jako funkcji celu. Jak pokazuje spektrogram~(\ref{fig:param_optimisation_results_spectrograms}),
 poprawnie odtworzona jest zarówno dynamika dźwięku i składowa harmoniczna. Pozostałe funkcje celu nie pozwalają
-na odtworzenie sygnału, który w bliski sposób przypomina dźwięk docelowy.
+na odtworzenie sygnału, który w bliski sposób przypomina dźwięk docelowy, pomimo uzyskiwania wyników zbliżonych
+do MFCC+DTW we wcześniejszych testach~(\ref{sec:fm_synth_params_cross_section}).
 
 \subsubsection{Synteza \textit{analog modeling}}
 
