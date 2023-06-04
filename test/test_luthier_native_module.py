@@ -100,12 +100,22 @@ def test_num_inputs(build_luthier: Any) -> None:
     assert inputs[0] == 0.15
 
 
-def test_low_pass(build_luthier: Any) -> None:
+def test_high_pass(build_luthier: Any) -> None:
     from luthier import luthier
 
     graph = luthier.DspGraph()
     lowpass = luthier.LowPassFilter()
     graph.add_lowpass(lowpass)
+
+    graph.play(100)
+
+
+def test_low_pass(build_luthier: Any) -> None:
+    from luthier import luthier
+
+    graph = luthier.DspGraph()
+    highpass = luthier.HighPassFilter()
+    graph.add_highpass(highpass)
 
     graph.play(100)
 

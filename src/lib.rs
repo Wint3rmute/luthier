@@ -143,6 +143,46 @@ impl DspNode for Reverb {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
+pub struct HighPassFilter {
+    input_cutoff: f64,
+    input_input: f64,
+    output_output: f64,
+    prev_input: f64,
+    prev_output: f64,
+}
+
+#[pymethods]
+impl HighPassFilter {
+    #[new]
+    fn new() -> Self {
+        Self {
+            input_cutoff: 0.5,
+            input_input: 0.0,
+            output_output: 0.0,
+            // filter: LadderFilter::default(),
+            prev_input: 0.0,
+            prev_output: 0.0,
+        }
+    }
+}
+
+impl DspNode for HighPassFilter {
+    fn tick(&mut self) {
+        let dt = 1.0 / SAMPLE_RATE;
+        let rc =
+            1.0 / (2.0 * std::f64::consts::PI * (1.0 - self.input_cutoff.abs() + 0.0001) * 20000.);
+        let alpha = rc / (rc + dt);
+
+        let output = alpha * (self.prev_output + self.input_input - self.prev_input);
+        self.prev_input = self.input_input;
+        self.prev_output = output;
+
+        self.output_output = output;
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone)]
 pub struct LowPassFilter {
     input_cutoff: f64,
     input_resonance: f64,
@@ -688,6 +728,10 @@ impl DspGraph {
         self.add_node(Box::new(lowpass))
     }
 
+    fn add_highpass(&mut self, highpass: HighPassFilter) -> NodeId {
+        self.add_node(Box::new(highpass))
+    }
+
     fn add_sum(&mut self, sum: Sum) -> NodeId {
         self.add_node(Box::new(sum))
     }
@@ -895,6 +939,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<Multiplier>()?;
     m.add_class::<HarmonicMultiplier>()?;
     m.add_class::<LowPassFilter>()?;
+    m.add_class::<HighPassFilter>()?;
 
     Ok(())
 }

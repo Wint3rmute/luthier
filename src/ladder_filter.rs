@@ -123,6 +123,7 @@ impl LadderFilter {
         // } else {
         //
         self.run_ladder_linear(input);
+        // self.run_ladder_nonlinear(input);
         // }
         self.update_state();
     }
