@@ -64,6 +64,66 @@ impl DspNode for BaseFrequency {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
+pub struct Chorus {
+    input_input: f64,
+    input_feedback: f64,
+    input_dry: f64,
+    input_wet: f64,
+
+    output_output: f64,
+
+    buffer_length_lfo_state: f64,
+    buffer_index: usize,
+    buffer: [f64; 1000],
+}
+
+impl Default for Chorus {
+    fn default() -> Self {
+        Self {
+            input_input: 0.0,
+            input_feedback: 0.0,
+            input_dry: 1.0,
+            input_wet: 0.4,
+
+            output_output: 0.0,
+
+            buffer_length_lfo_state: 0.0,
+
+            buffer_index: 0,
+            buffer: [0.0; 1000],
+        }
+    }
+}
+
+#[pymethods]
+impl Chorus {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+}
+
+impl DspNode for Chorus {
+    fn tick(&mut self) {
+        self.output_output =
+            self.input_input * self.input_dry + self.buffer[self.buffer_index] * self.input_wet;
+
+        self.buffer[self.buffer_index] =
+            self.buffer[self.buffer_index] * self.input_feedback + self.input_input;
+
+        self.buffer_index += 1;
+        self.buffer_length_lfo_state += 1.0 / SAMPLE_RATE;
+        self.buffer_length_lfo_state %= 2.0 * std::f64::consts::PI;
+
+        if self.buffer_index >= self.buffer.len() - (self.buffer_length_lfo_state * 100.0) as usize
+        {
+            self.buffer_index = 0;
+        }
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone)]
 pub struct Delay {
     input_input: f64,
     input_length: f64,
@@ -769,6 +829,10 @@ impl DspGraph {
         self.add_node(Box::new(delay))
     }
 
+    fn add_chorus(&mut self, chorus: Chorus) -> NodeId {
+        self.add_node(Box::new(chorus))
+    }
+
     fn add_reverb(&mut self, reverb: Reverb) -> NodeId {
         self.add_node(Box::new(reverb))
     }
@@ -970,6 +1034,7 @@ fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<LowPassFilter>()?;
     m.add_class::<HighPassFilter>()?;
     m.add_class::<Delay>()?;
+    m.add_class::<Chorus>()?;
 
     Ok(())
 }
