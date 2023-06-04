@@ -150,4 +150,19 @@ w którego strukturze znajdują się wszystkie 3 efekty.
 \section{Porównanie wyników optymalizacji z literaturą~\cite{evolutionary_puredata}}
 
 Do wykonania porównania wykorzystano wyniki pracy z przeglądu
-literatury~\cite{evolutionary_puredata_results}.
+literatury~\cite{evolutionary_puredata_results}. Wykorzystano próbki dźwięku,
+które \textbf{nie zostały wygenerowane} za pomocą
+\textit{Pure Data}~\cite{pure_data}, ponieważ oryginalna praca wykorzystywała
+to oprogramowanie jako środowisko do przeprowadzenia optymalizacji -- takie porównanie
+nie byłoby miarodajne.
+
+Przed przeprowadzeniem optymalizacji ustalono wartość częstotliwości podstawowej $f_0$
+dla każdego z testowanych dźwięków. Do tego celu zastosowano implementację algorytmu
+\textit{YIN}~\cite{yin_pitch_estimation}, dostępną w pakiecie obliczeniowym
+\texttt{librosa}~\cite{librosa}.
+
+\subsection{Dźwięk fletu}
+
+\subsection{Sampel z syntezatora \textit{OP-1}}
+
+\subsection{Transjent}
