@@ -143,9 +143,35 @@ jest bliski sygnałowi docelowemu ($x$) przedstawiona jest w następujący spos�
 \end{equation}
 
 \noindent
-Gdzie $MFCC$ oznacza \textit{mel-frequency cepstrum coefficients}~(\ref{eq:mfcc_equation}), natomiast $DTW$
-oznacza algorytm \textit{dynamic time warping}~\cite{mfcc_dtw}. Uzasadnienie wybranej funkcji celu opisane
-jest z rozdziale~\ref{target_function_chapter}.
+Gdzie $MFCC$ oznacza \textit{mel-frequency cepstrum coefficients}~(\ref{fig:mfcc_calculation_diagram}),
+natomiast $DTW$ oznacza algorytm \textit{dynamic time warping}~\cite{mfcc_dtw}.
+Uzasadnienie wybranej funkcji celu opisane jest z rozdziale~\ref{target_function_chapter}.
+
+
+\begin{figure}[H]\label{fig:mfcc_calculation_diagram}
+\centering
+
+\begin{tikzpicture}[node distance=2cm]
+\node (signal) [startstop] {Sygnał dźwiękowy};
+\node (preemphasis) [process, right of=signal, xshift=2cm] {Preemfaza};
+\node (windowing) [process, right of=preemphasis, xshift=2cm] {Ramkowanie i okienkowanie};
+\node (ffts) [process, right of=windowing, xshift=2cm] {$|FFT|^2$};
+\node (mel) [process, below of=signal] {zestaw filtrów w skali \textit{MEL}};
+\node (log) [process, right of=mel, xshift=2cm] {skala \\ logarytmiczna};
+\node (dct) [process, right of=log, xshift=2cm] {dyskretna transformata cosinusowa};
+\node (mfcc) [startstop, right of=dct, xshift=2cm] {Współczynniki MFCC};
+
+\draw [arrow] (signal) -- (preemphasis);
+\draw [arrow] (preemphasis) -- (windowing);
+\draw [arrow] (windowing) -- (ffts);
+\draw[thick, ->,rounded corners] (ffts) |- node[fill=white,inner sep=2pt]{} ++(-12,-1) -- (mel);
+\draw [arrow] (mel) -- (log);
+\draw [arrow] (log) -- (dct);
+\draw [arrow] (dct) -- (mfcc);
+\end{tikzpicture}\caption{Schemat algorytmu obliczania współczynników MFCC,
+  zaczerpnięty z \cite{kacprzak2010inteligentne}.
+  Praca wykorzystuje gotową implementację algorytmu obliczającego współcznyniki MFCC z pakietu \texttt{librosa}~\cite{librosa}.}
+\end{figure}
 
 % \begin{equation}
 % \text{MFCC}(n) = \text{DCT} \left( \log \left( \sum_{m=1}^{M} H(m) \left| X(m, n) \right|^2 \right) \right)
