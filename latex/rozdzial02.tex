@@ -16,7 +16,7 @@ i przetwarzających sygnał dźwiękowy. Każdy węzeł opisany jest poprzez:
 \end{enumerate}
 
 
-  \begin{figure}[H]
+\begin{figure}[H]
   \centering
   \includegraphics{rys05/example_sine_node.png}
   \caption{Przykładowy węzeł w grafie, generujący sygnał sinusoidalny z możliwością modulacji.}
@@ -143,8 +143,23 @@ jest bliski sygnałowi docelowemu ($x$) przedstawiona jest w następujący spos�
 \end{equation}
 
 \noindent
-Gdzie $MFCC$ oznacza \textit{mel-frequency cepstrum coefficients}, natomiast $DTW$ oznacza algorytm
-\textit{dynamic time warping}~\cite{mfcc_dtw}. Uzasadnienie wybranej funkcji celu opisane jest z rozdziale~\ref{target_function_chapter}.
+Gdzie $MFCC$ oznacza \textit{mel-frequency cepstrum coefficients}~(\ref{eq:mfcc_equation}), natomiast $DTW$
+oznacza algorytm \textit{dynamic time warping}~\cite{mfcc_dtw}. Uzasadnienie wybranej funkcji celu opisane
+jest z rozdziale~\ref{target_function_chapter}.
+
+% \begin{equation}
+% \text{MFCC}(n) = \text{DCT} \left( \log \left( \sum_{m=1}^{M} H(m) \left| X(m, n) \right|^2 \right) \right)
+% \label{eq:mfcc_equation}
+% \end{equation}
+% where:
+% \begin{align*}
+% \text{MFCC}(n) & \text{ represents the MFCC vector for frame } n \\
+% \text{DCT} & \text{ refers to the Discrete Cosine Transform} \\
+% X(m, n) & \text{ denotes the complex-valued Fourier Transform of frame } n \text{ at frequency bin } m \\
+% H(m) & \text{ represents the Mel filterbank} \\
+% M & \text{ is the number of Mel filterbank channels}
+% \end{align*}
+
 
 \section{Ograniczenia}
 
