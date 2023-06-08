@@ -1168,7 +1168,10 @@ mod tests {
         let inputs_before = g.num_inputs();
 
         g.add_node(Box::new(Sum::new()));
-        assert_eq!(g.num_inputs(), inputs_before);
+
+        // only 4 new mix inputs should appear,
+        // even though the sum node has 8 inputs
+        assert_eq!(g.num_inputs(), inputs_before + 4);
     }
 
     #[test]
