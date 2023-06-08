@@ -924,12 +924,25 @@ impl DspGraph {
         let gradient = colorous::RED_BLUE;
 
         let node_to_color = std::collections::HashMap::from([
-            ("SineOscillator", "#FF5370"),
-            ("ADSR", "#BB80B3FCB6B"),
-            ("Sum", "#C792EA"),
-            ("Multiplier", "#FFCB6B"),
-            ("HarmonicMultiplier", "#F78C6C"),
             ("BaseFrequency", "#82AAFF"),
+            // Sources
+            ("SineOscillator", "#FF5370"),
+            ("SquareOscillator", "#FF5370"),
+            ("TriangleOscillator", "#FF5370"),
+            ("SawOscillator", "#FF5370"),
+            ("KarplusStrong", "#FF5370"),
+            //Filters
+            ("HighPassFilter", "#FF5370"),
+            ("LowPassFilter", "#FF5370"),
+            //Effects
+            ("Delay", "#C3E88D"),
+            ("Reverb", "#C3E88D"),
+            ("Chorus", "#C3E88D"),
+            // Control signals
+            ("ADSR", "#FFCB6B"),
+            ("Sum", "#FFCB6B"),
+            ("Multiplier", "#FFCB6B"),
+            ("HarmonicMultiplier", "#FFCB6B"),
         ]);
 
         graphviz_code.push_str(
