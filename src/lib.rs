@@ -466,8 +466,10 @@ impl DspNode for KarplusStrong {
         let one_minus_feedback = 1.0 - feedback;
 
         self.output_output = self.buffer[self.buffer_index];
-        self.buffer[self.buffer_index] =
-            self.buffer[self.buffer_index] * feedback + previous_value * one_minus_feedback;
+        self.buffer[self.buffer_index] = if self.input_invert > 0.0 { -1.0 } else { 1.0 }
+            * self.buffer[self.buffer_index]
+            * feedback
+            + previous_value * one_minus_feedback;
     }
 }
 
