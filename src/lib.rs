@@ -414,6 +414,65 @@ impl DspNode for SquareOscillator {
 
 #[pyclass(set_all, get_all, freelist = 64)]
 #[derive(DspConnectibleDerive, Clone)]
+struct KarplusStrong {
+    input_frequency: f64,
+    input_feedback: f64,
+    input_invert: f64,
+
+    output_output: f64,
+
+    buffer: [f64; (SAMPLE_RATE * 2.0) as usize],
+    buffer_index: usize,
+}
+
+#[pymethods]
+impl KarplusStrong {
+    #[new]
+    fn new() -> Self {
+        let mut result = Self {
+            input_frequency: 0.220,
+            input_feedback: 0.0,
+            input_invert: 0.0,
+            output_output: 0.0,
+            buffer: [0.0; (SAMPLE_RATE * 2.0) as usize],
+            buffer_index: 0,
+        };
+
+        let mut rng = rand::thread_rng();
+        for sample in result.buffer.iter_mut() {
+            *sample = rng.gen::<f64>() - 0.5;
+        }
+
+        result
+    }
+}
+
+impl DspNode for KarplusStrong {
+    fn tick(&mut self) {
+        let previous_value = self.buffer[self.buffer_index];
+
+        self.buffer_index += 1;
+        let mut frequency = (self.input_frequency * 1000.0).abs();
+        if frequency < 50. {
+            frequency = 50.0
+        }
+
+        let buffer_max = (100000.0 / frequency) as usize;
+        if self.buffer_index >= buffer_max {
+            self.buffer_index = 0;
+        }
+
+        let feedback = (self.input_feedback + 1.0) / 2.0;
+        let one_minus_feedback = 1.0 - feedback;
+
+        self.output_output = self.buffer[self.buffer_index];
+        self.buffer[self.buffer_index] =
+            self.buffer[self.buffer_index] * feedback + previous_value * one_minus_feedback;
+    }
+}
+
+#[pyclass(set_all, get_all, freelist = 64)]
+#[derive(DspConnectibleDerive, Clone)]
 struct SineOscillator {
     input_frequency: f64,
     input_modulation: f64,
@@ -805,6 +864,10 @@ impl DspGraph {
         self.add_node(Box::new(sine))
     }
 
+    fn add_karplus_strong(&mut self, karplus_strong: KarplusStrong) -> NodeId {
+        self.add_node(Box::new(karplus_strong))
+    }
+
     fn add_saw(&mut self, saw: SawOscillator) -> NodeId {
         self.add_node(Box::new(saw))
     }
@@ -1022,6 +1085,7 @@ node [fontname="Fira Code"]
 #[pymodule]
 fn luthier(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_class::<DspGraph>()?;
+    m.add_class::<KarplusStrong>()?;
     m.add_class::<Reverb>()?;
     m.add_class::<Sum>()?;
     m.add_class::<SineOscillator>()?;

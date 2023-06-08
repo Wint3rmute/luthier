@@ -1,4 +1,5 @@
 from typing import Any
+import pytest
 
 
 def test_graph_build(build_luthier: Any) -> None:
@@ -195,3 +196,20 @@ def test_saw_oscillator(build_luthier: Any) -> None:
     saw = luthier.SawOscillator()
 
     graph.add_saw(saw)
+
+
+@pytest.mark.parametrize("frequency", [ i/100 for i in range(-100, 100, 5) ])
+def test_karplus_strong(build_luthier: Any, frequency: float) -> None:
+    from luthier import luthier
+
+    graph = luthier.DspGraph()
+
+    ks = luthier.KarplusStrong()
+    ks.input_frequency = frequency
+    ks.input_feedback = 0.80
+
+    ks_id = graph.add_karplus_strong(ks)
+
+    graph.patch(ks_id, "output_output", graph.speaker_node_id, "input_input")
+
+    output = graph.play(48000 * 5)
