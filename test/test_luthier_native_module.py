@@ -55,6 +55,9 @@ def test_sum(build_luthier: Any) -> None:
     sum.input_in_1 = 1.0
     sum.input_in_2 = 2.0
 
+    sum.input_mix_1 = 1.0
+    sum.input_mix_2 = 1.0
+
     sum_id = graph.add_sum(sum)
 
     graph.patch(sum_id, "output_output", graph.speaker_node_id, "input_input")

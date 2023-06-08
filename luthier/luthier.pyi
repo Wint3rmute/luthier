@@ -38,6 +38,10 @@ class Sum:
     input_in_2: float
     input_in_3: float
     input_in_4: float
+    input_mix_1: float
+    input_mix_2: float
+    input_mix_3: float
+    input_mix_4: float
     output_output: float
 
 class HighPassFilter:

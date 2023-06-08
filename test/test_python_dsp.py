@@ -5,13 +5,13 @@ from luthier.dsp import Sample
 
 
 def test_mfcc_distance() -> None:
-    s = Sample(np.zeros(100))
+    s = Sample(np.zeros(2048))
     assert s.mfcc_distance(s) == 0
 
 
 def test_mfcc_distance_fails_on_different_sample_sizes() -> None:
-    s1 = Sample(np.zeros(10))
-    s2 = Sample(np.zeros(11))
+    s1 = Sample(np.zeros(4096))
+    s2 = Sample(np.zeros(4097))
 
     with pytest.raises(ValueError):
         s1.mfcc_distance(s2)
