@@ -7,6 +7,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[a4paper,onecolumn,oneside,12pt,extrafontsizes]{memoir}
+\usepackage[pdftex]{graphicx}
+\usepackage[dvipsnames]{xcolor}
 %  W celu przygotowania wydruku do archiwum można:
 %  a) przygotować pdf, w którym dwie strony zostaną wstawione na jedną fizyczną stronę i taki dokument wydrukować dwustronnie (podejście zalecane)
 %
@@ -231,7 +233,7 @@ fill=green!30]
 \definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
  
 % \definecolor{keyword_color}{RGB}{0, 191, 255}
-\usepackage[dvipsnames]{xcolor}
+% \usepackage[dvipsnames]{xcolor}
 
 \lstdefinelanguage{Rust}{ 
 	keywords={type, true, false, catch, fn, return, None, catch, match, var, if, in, for, else, impl, break},
