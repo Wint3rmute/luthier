@@ -145,6 +145,26 @@ Gen \texttt{AN2}, przedstawiony na diagramie~\ref{fig:gene_an2}, pozwala na uzys
 
 Gen \texttt{AN3}, (diagram~\ref{fig:gene_an3}), generuje sygnały trójkątne.
 
+
+\subsection{Synteza \textit{physical modeling}}
+
+Algorytmy wykonujące syntezę typu \textit{physical modeling}
+pochodzą z~\cite{computational_music_synthesis}. W pracy zaimplementowano
+podstawowy wariant algorytmu \textit{Karplus-Strong}.
+
+\subsubsection{Gen \texttt{PM1}}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/gene_pm1.png}
+    \caption{
+      Graf wykorzystujący gen \texttt{PM1}.
+    }\label{fig:gene_an3}
+\end{figure}
+
+Gen \texttt{PM1} generuje sygnał przypominający strunę gitarową 
+za pomocą algorytmu \textit{Karplus-Strong}.
+
 \section{Wybór filtrów}
 
 W pracy wykorzystano gotową implementację filtru cyfrowego, emulującego
