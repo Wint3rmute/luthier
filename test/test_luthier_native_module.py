@@ -212,4 +212,4 @@ def test_karplus_strong(build_luthier: Any, frequency: float) -> None:
 
     graph.patch(ks_id, "output_output", graph.speaker_node_id, "input_input")
 
-    output = graph.play(48000 * 5)
+    graph.play(48000 * 5)
