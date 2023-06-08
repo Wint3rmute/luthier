@@ -147,6 +147,7 @@ Gdzie $MFCC$ oznacza \textit{mel-frequency cepstrum coefficients}~(\ref{fig:mfcc
 natomiast $DTW$ oznacza algorytm \textit{dynamic time warping}~\cite{mfcc_dtw}.
 Uzasadnienie wybranej funkcji celu opisane jest w rozdziale~\ref{target_function_chapter}.
 
+\subsection{Wyliczanie współczynników MFCC~\cite{kacprzak2010inteligentne}}
 
 \begin{figure}[H]\label{fig:mfcc_calculation_diagram}
 \centering
@@ -174,18 +175,51 @@ Uzasadnienie wybranej funkcji celu opisane jest w rozdziale~\ref{target_function
   Praca wykorzystuje gotową implementację algorytmu obliczającego współcznyniki MFCC z pakietu \texttt{librosa}~\cite{librosa}.}
 \end{figure}
 
-% \begin{equation}
-% \text{MFCC}(n) = \text{DCT} \left( \log \left( \sum_{m=1}^{M} H(m) \left| X(m, n) \right|^2 \right) \right)
-% \label{eq:mfcc_equation}
-% \end{equation}
-% where:
-% \begin{align*}
-% \text{MFCC}(n) & \text{ represents the MFCC vector for frame } n \\
-% \text{DCT} & \text{ refers to the Discrete Cosine Transform} \\
-% X(m, n) & \text{ denotes the complex-valued Fourier Transform of frame } n \text{ at frequency bin } m \\
-% H(m) & \text{ represents the Mel filterbank} \\
-% M & \text{ is the number of Mel filterbank channels}
-% \end{align*}
+Algorytm obliczania współczynników MFCC przedstawiony jest na rysunku~\ref{fig:mfcc_calculation_diagram}.
+Pierwszym krokiem w algorytmie jest zastosowanie preemfazy, która wzmacnia składowe wysokoczęstotliwościowe
+i osłabia składowe niskoczęstotliwościowe:
+
+\begin{equation}
+  x^\prime_n = x_n - a~x_{n-1}
+  \label{eq:preemphasis}
+\end{equation}
+
+\noindent
+W następnym kroku sygnał jest ramkowany, na każdą ramkę nakładane jest okno Hamminga:
+
+\begin{equation}
+  Ham(N) = 0.54 - 0.46 \cos(2\pi \frac{n-1}{N-1})
+  \label{eq:hamming_window}
+\end{equation}
+
+Dla każdej ramki wyliczana jest transformata Fouriera, aby
+obliczyć widmo mocy sygnału $|FFT|^2$. Widmo przetwarzane jest
+przez zbiór filtrów $H_m$, których środki są rozmieszczone
+w równomiernych odstępach w skali mel. Typ i liczba filtrów zależy
+od implementacji algorytmu (w pracy wykorzystano~\cite{librosa}).
+Wyjście każdego z filtrów wykorzystane
+jest do obliczenia energii przefiltrowanego pasma:
+
+\begin{equation}
+  S_m = \sum_{k=1}^{N}| X_r(k) |^2 H_m(k),
+  \label{eq:band_energy}
+\end{equation}
+
+\noindent
+gdzie $X_r$ oznacza widmo danej ramki, $m$ jest numerem filtra.
+
+W ostatnim kroku do obliczenia wartości współczynników MFCC
+wykorzystuje się dyskretną transformatę kosinusową.
+Aby lepiej przybliżyć wrażliwość ludzkiego ucha na głośność dźwięku,
+wykorzystuje się logarytm energii pasma:
+
+\begin{equation}
+  c_i = \sqrt{\frac{2}{M}} \sum_{m_1}^{M} \log(S_m) \cos( \frac{\pi i}{M}(M - 0.5) ),
+  \label{eq:mfcc_coefficients}
+\end{equation}
+
+Gdzie M to liczba użytych filtrów w zbiorze~\ref{eq:band_energy},
+a $i$ jest numerem współczynnika.
 
 
 \section{Ograniczenia}
@@ -193,7 +227,8 @@ Uzasadnienie wybranej funkcji celu opisane jest w rozdziale~\ref{target_function
 W algorytmach DSP powszechnie wykorzystuje się ograniczenie wartości
 sygnału do przedziału $(-1.0, 1.0)$, gdy implementacja danego algorytmu wykorzystuje 
 typ \texttt{float} do przechowywania wartości sygnałów. Środowisko zaimplementowane
-w ramach pracy oczekuje, że wartości sygnałów będą znajdowały się w tym przedziale:
+w ramach pracy oczekuje, że wartości sygnałów i parametrów sterujących
+będą znajdowały się w tym przedziale:
 
 \begin{equation}
   \forall p_j \in P,  -1.0 \leq p_j \leq 1.0, \quad \forall s_i \in S, -1.0 \leq s_i \leq 1.0
