@@ -235,8 +235,28 @@ do MFCC+DTW we wcześniejszych testach~(\ref{sec:fm_synth_params_cross_section})
 
 \subsubsection{Synteza \textit{analog modeling}}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys03/am_training_results.png}
+    \caption{
+      Wykresy zmian funkcji celu podczas optymalizacji dla grafu syntezy \textit{analog modeling}.
+      \textbf{TODO\@: pełny wykres}.
+    }\label{fig:am_target_fun_plots}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=1.0\linewidth]{rys03/am_spectro_results.png}
+    \caption{
+      Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie
+      optymalizacji parametrów grafu \textit{analog modeling}.
+      \textbf{TODO\@: obrazek}.
+    }\label{fig:am_param_optimisation_results_spectrograms}
+\end{figure}
+
 Podobnie jak podczas testów syntezy FM, funkcja celu MFCC+DTW pozwala na dokładne odwzorowanie barwy dźwięku.
-Na spektrogramie widoczne są poprawnie odtworzone składowe harmoniczne i przebieg dynamiczny dźwięku.
+Na spektrogramie~(\ref{fig:am_param_optimisation_results_spectrograms}) widoczne są poprawnie odtworzone
+składowe harmoniczne, przebieg dynamiczny dźwięku oraz parametry efektu pogłosu.
 \textbf{Tutaj trzeba dodać więcej tekstu i spektrogramy jak się już przekręci cała optymalizacja.}
 
 \subsection{Wybór funkcji celu na podstawie wyników}
