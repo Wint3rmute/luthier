@@ -9,6 +9,8 @@ bibtex Dyplom && pdflatex -interaction=nonstopmode Dyplom.tex
 
 ## Notatki (pl)
 
+**trzeba ogarnąć czemu wykresy MFCC mają inną długość niż fourier, możliwe
+wytłumaczenie [tutaj](https://github.com/librosa/librosa/issues/691)**
 
 2. Definicja formlna problemu
 
