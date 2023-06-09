@@ -240,13 +240,12 @@ do MFCC+DTW we wcześniejszych testach~(\ref{sec:fm_synth_params_cross_section})
     \includegraphics[width=1.0\linewidth]{rys03/am_training_results.png}
     \caption{
       Wykresy zmian funkcji celu podczas optymalizacji dla grafu syntezy \textit{analog modeling}.
-      \textbf{TODO\@: pełny wykres}.
     }\label{fig:am_target_fun_plots}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=1.0\linewidth]{rys03/am_spectro_results.png}
+    \includegraphics[width=1.0\linewidth]{rys03/spectro_results_am.png}
     \caption{
       Spektrogram dźwięku docelowego oraz dźwięków uzyskanych w procesie
       optymalizacji parametrów grafu \textit{analog modeling}.
@@ -255,9 +254,10 @@ do MFCC+DTW we wcześniejszych testach~(\ref{sec:fm_synth_params_cross_section})
 \end{figure}
 
 Podobnie jak podczas testów syntezy FM, funkcja celu MFCC+DTW pozwala na dokładne odwzorowanie barwy dźwięku.
-Na spektrogramie~(\ref{fig:am_param_optimisation_results_spectrograms}) widoczne są poprawnie odtworzone
-składowe harmoniczne, przebieg dynamiczny dźwięku oraz parametry efektu pogłosu.
-\textbf{Tutaj trzeba dodać więcej tekstu i spektrogramy jak się już przekręci cała optymalizacja.}
+Na spektrogramie~\ref{fig:am_param_optimisation_results_spectrograms} widoczne są poprawnie odtworzone
+składowe harmoniczne, przebieg dynamiczny dźwięku oraz parametry efektu pogłosu. Funkcja celu wykorzystująca
+tylko współczynniki MFCC nie jest w stanie odtworzyć przebiegu dynamicznego dźwięku i jedynie częściowo odtwarza
+poprawne składowe harmoniczne. MFCC+RMS nie jest w stanie odtworzyć żadnej z cech docelowego dźwięku.
 
 \subsection{Wybór funkcji celu na podstawie wyników}
 
