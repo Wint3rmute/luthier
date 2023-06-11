@@ -1,6 +1,82 @@
 \chapter{Instrukcja wdrożeniowa}
-Jeśli praca skończyła się wykonaniem jakiegoś oprogramowania, to w dodatku powinna pojawić się instrukcja wdrożeniowa (o tym jak skompilować/zainstalować to oprogramowanie).
-Przydałoby się również krótkie~,,\emph{how to}'' (jak uruchomić system i coś w nim zrobić -- zademonstrowane na jakimś najprostszym przypadku użycia). Można z tego zrobić osobny dodatek.
+% Jeśli praca skończyła się wykonaniem jakiegoś oprogramowania, to w dodatku powinna pojawić się instrukcja wdrożeniowa (o tym jak skompilować/zainstalować to oprogramowanie).
+% Przydałoby się również krótkie~,,\emph{how to}'' (jak uruchomić system i coś w nim zrobić -- zademonstrowane na jakimś najprostszym przypadku użycia). Można z tego zrobić osobny dodatek.
 
-\noindent
-\texttt{cargo run} i jazda
+Algorytm optymalizacyjny i środowisko eksperymentowe zostały zaimplementowane
+w systemie Linux, powinny działać również na innych systemach z rodziny UNIX
+oraz na platformie Windows.
+
+\section{Wymagane oprogramowanie}
+
+\begin{itemize}
+  \item Instalacja języka \texttt{Python} w wersji \texttt{3.10} (w momencie pisania
+    pracy biblioteka \texttt{llvmlite}, wymagana przez \texttt{librosa}, wspierała najwyżej
+    wersję \texttt{3.10}),
+  \item instalacja języka \texttt{Rust} w wersji 1.71 lub wyższej.
+    Rekomendowana instalacja z wykorzystaniem \url{https://rustup.rs/},
+    toolchain w wersji \texttt{stable},
+  \item pakiet \texttt{poetry} (\url{https://python-poetry.org/}) do zarządzania zależnościami
+    w języku \texttt{Python}.
+  \item pakiet \texttt{graphviz} dostępny za pośrednictwem zmiennej środowiskowej \texttt{\$PATH}.
+  \item biblioteka \texttt{libasound2-dev} lub jej odpowiednik dla danego
+        systemu operacyjnego (nie wymagana w przypadku systemu Windows).
+\end{itemize}
+
+\section{Instalacja}
+
+Środowisko eksperymentowe wykorzystuje
+bibliotekę \textit{extension module}~\cite{python_extension_module},
+zaimplementowaną w języku \texttt{Rust}, proces instalacji wymaga
+zainstalowania bibliotek języka \texttt{Python} \textbf{oraz} skompilowania
+\textit{extension module}.
+W powłoce systemu operacyjnego należy uruchomić następujące polecenia:
+
+\begin{lstlisting}[language=Bash]
+poetry install  # instalacja pakietów dla Pythona
+poetry run maturin develop  # skompilowanie extension module w Ruście
+\end{lstlisting}
+
+\section{Weryfikacja poprawności działania projektu}
+
+Projekt wyposażony jest w testy jednostkowe, które należy uruchomić w celu
+zweryfikowania poprawności instalacji:
+
+\begin{lstlisting}[language=Bash]
+cargo test  # Uruchomienie testów jednostkowych dla języka Rust
+poetry run pytest .  # Uruchomienie testów dla języka Python
+\end{lstlisting}
+
+
+\section{Praca ze środowiskiem eksperymentowym}
+
+Repozytorium projektu zawiera pliki \texttt{.ipynb}
+dla środowiska \textit{Jupyter Lab}, które
+jest instalowane jako zależność projektu. Repozytorium
+zawiera następujące~,,notebooki'':
+
+\begin{enumerate}
+  \item \texttt{demo.ipynb} -- prezentuje podstawowe funkcjonalności projektu: 
+    budowę grafów, analizę barwy dźwięku oraz generowanie wykresów.
+  \item \texttt{target\_function.ipynb} -- wykonuje porównanie między różnymi
+    funkcjami celu, opisane w rozdziale~\ref{target_function_chapter}.
+  \item \texttt{prototyping.ipynb} -- zawiera kod dynamicznie budujący strukturę
+    grafu DSP na podstawie genotypu oraz wykonuje optymalizację struktury i
+    parametrów grafu dla porównania opisanego w rozdziale~\ref{chap:research}.
+\end{enumerate}
+
+
+\subsection{Funkcja celu i detale algorytmu genetycznego}
+
+Dostępne funkcje celu oraz algorytm genetyczny optymalizujący strukturę
+i parametry grafu zaimplementowane są w pliku \texttt{luthier/dsp.py}.
+
+\subsection{Implementacja algorytmów syntezy i grafu DSP}
+
+Algorytmy związane z syntezą dźwięku i grafem DSP podzielone są na 3 moduły:
+
+\begin{enumerate}
+  \item \texttt{node\_traits/lib.rs} -- definicja interfejsów (\textit{traits} w języku \texttt{Rust}) dla węzłów w grafie DSP,
+  \item \texttt{node\_macro/lib.rs} -- makro proceduralne~(\cite{proc_macro}) automatycznie implementujące powtarzalne interfejsy zdefiniowane w \texttt{node\_traits},
+  \item \texttt{src/lib.rs} - implementacja węzłów DSP oraz grafu DSP, wykorzystująca wyżej wymienione moduły.
+\end{enumerate}
+
