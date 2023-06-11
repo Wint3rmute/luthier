@@ -366,10 +366,13 @@ if __name__ == "__main__":
     def mfcc_dtw_distance(target: Sample, other: Sample) -> float:
         return target.mfcc_distance_with_dtw(other)
 
+    transient_sample_data, transient_sample_rate = librosa.load('./target_transient.wav', sr=None)
+
     o = DspGraphOptimizer(
-        graph_create_fun, mfcc_dtw_distance, Sample(numpy.zeros(1000)), 0.440,
+        graph_create_fun, mfcc_dtw_distance, Sample(transient_sample_data), 0.440,
         "test_optimisation_process",
         max_iterations = 2,
-        population_size = 2
+        population_size = 2,
+        workers=1
     )
     o.optimize()
