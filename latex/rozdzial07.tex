@@ -8,7 +8,8 @@ Wyniki przedstawione w rozdziałach~\ref{chap:research} oraz~\ref{target_functio
 wskazują, że zaimplementowany algorytm optymalizacji wytwarza poprawne rozwiązania
 dla części problemów. Nawet gdy finalnie wygenerowane brzmienie różni
 się od dźwięku docelowego, algorytm wytwarza interesujące barwy dźwięku,
-które mogą być wartościowe dla potencjalnych użytkowników.
+które można zakwalifikować jako ,,wariacje'' na temat oryginalnego sygnału.
+Tego typu wyniki mogą być wartościowe dla potencjalnych użytkowników algorytmu.
 W niniejszym rozdziale przeprowadzono szczegółową analizę obserwacji,
 uzyskanych podczas procesu badawaczego.
 
@@ -44,13 +45,14 @@ FM~(\ref{fig:param_optimisation_results_spectrograms})
 i umiarkowanie złożonych problemów syntezy
 \textit{analog modeling}~(\ref{fig:am_param_optimisation_results_spectrograms}).
 Testy na małej próbie słuchaczy pozwalają stwierdzić,
-że sygnały dźwiękowe wygenerowane dla problemów z rozzdiału~\ref{target_function_chapter}
-są nie do rozróżnienia od dźwięków docelowych.
+że nie są oni w stanie odróżnić sygnałów wygenerowanych
+dla problemów z rozdziału~\ref{target_function_chapter}
+od dźwięków docelowych.
 
-\begin{enumerate}
-  \item Nawet jak nie działa to idzie w kierunku celu, często generując interesujące brzmienia po drodze,
-  \item Problemy ze zmianami w dynamice, szczególnie pierwsze ułamki sekund,
-\end{enumerate}
+% \begin{enumerate}
+%   \item Nawet jak nie działa to idzie w kierunku celu, często generując interesujące brzmienia po drodze,
+%   \item Problemy ze zmianami w dynamice, szczególnie pierwsze ułamki sekund,
+% \end{enumerate}
 
 
 \section{Potencjał wykorzystania w przemyśle muzycznym}
@@ -78,14 +80,77 @@ Istnieje możliwość, że niedoskonałości funkcji celu mogą wpływać korzys
 odbiór przez słuchaczy, ponieważ dostarczą nieoczekiwanych efektów, 
 które mogą być wykorzystane jako źródło inspiracji w procesie kreatywnym.
 
-\section{Możliwe drogi dalszego rozwoju algorytmu}
-
-\begin{enumerate}
-  \item Szybszy wariant DTF,
-  \item Różne wielkości okna DTF,
-  \item MFCC/Fourier na GPU\@.
-  \item Lepsze analizy funkcji celu - brakuje tutaj prac.
-  \item Integracja z softwami DAW\@, bo na MCU w środku zwykłego syntha raczej nie wejdzie.
-\end{enumerate}
+\section{Potencjalne usprawnienia wydajności algorytmu}
 
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys07/profile_target_function_execution.png}
+    \caption{
+      Wizualizacja danych wygenerowanych przez profiler języka Python
+      dla przykładowego problemu optymalizacji. Widoczne składowe wpływające
+      na sumaryczny czas ewaluacji funkcji celu.
+      Czerwoną strzałką oznaczono czas poświęcony
+      na syntezę dźwięku w grafie DSP.
+    }\label{fig:target_function_profiling}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys07/mfcc_search.png}
+    \caption{
+      Porównanie czasu obliczania współczynników MFCC (\texttt{dsp.py:115})
+      oraz czasu działania algorytmu DTW (\texttt{dsp.py:171}).
+    }\label{fig:mfcc_profiling}
+\end{figure}
+
+Rysunki~\ref{fig:target_function_profiling} oraz \ref{fig:mfcc_profiling}
+przedstawiają wyniki profilowania zaimplementowanego algorytmu, wykonane
+za pomocą narzędzia \href{https://jiffyclub.github.io/snakeviz/}{\texttt{snakeviz}}.
+W pracy została wykorzystana gotowa implementacja
+algorytmu DTW (\textit{dynamic time warping}) w języku \texttt{Python}, której
+wykonanie zajmuje największą część czasu obliczania wartości funkcji celu.
+Wykorzystanie pakietu numerycznego \texttt{numpy} bądź implementacja DTW w
+kompilowanym języku programowania może znacząco poprawić szybkość działania algorytmu.
+
+  % \item Szybszy wariant DTF,
+  % \item MFCC/Fourier na GPU\@.
+
+\section{Potencjalne drogi dalszego rozwoju algorytmu}
+
+Pierwszym krokiem, który należy wykonać w celu usprawnienia
+algorytmu optymalizacji jest przygotowanie zbioru dźwięków,
+które będą służyły za \textbf{zbiór weryfikujący poprawność działania algorytmu}.
+Przykłady zaczerpnięte z literatury~\cite{evolutionary_puredata_results}
+nie zawierają wystarczająco bogatej gamy możliwych do wygenerowania
+barw dźwięku, które wymusiłyby na algorytmie optymalizacji wykorzystanie
+różnorodnych algorytmów syntezy i struktur grafu DSP\@.
+
+% Po przygotowaniu zbioru walidacyjnego
+
+% Podczas implementacji algorytmu optymalizacji grafu oraz prowadzenia badań
+
+\subsection{Rozmiar okna w algorytmie DTW}
+
+W domyślnym wariancie, algorytm DTW przeszukuje cały sygnał
+przy poszukuwaniu pasujących do siebie segmentów. Takie
+zachowanie zwiększa złożoność czasową algorytmu, jednocześnie
+zmniejszając karę za niedokładne odwzorowanie zmian w dynamice dźwięku.
+Przeprowadzone w ramach pracy testy pozwalają sugerować, że zmniejszenie
+rozmiaru okna w algorytmie DTW pozwoli na jednoczesne przyspieszenie czasu
+wyliczania funkcji celu i usprawni wyniki optymalizacji.
+
+  % \item Różne wielkości okna DTW,
+\subsection{Lepsza reprezentacja struktury grafu DSP w genotypie}
+
+\subsection{Dalsze poszukiwania funkcji celu porównującej barwę sygnałów dźwiękowych}
+  % \item Lepsze analizy funkcji celu - brakuje tutaj prac.
+
+
+\subsection{Trenowanie na coraz dłuższych fragmentach dźwięku}
+
+Ponieważ złożoność czasowa algorytmu DTW wynosi $O(N^2/\log\log N)$~\cite{dtw_time_complexity},
+im dłuższy jest zadany sygnał dźwiękowy, tym bardziej czas wyliczenia
+wartości funkcji celu dominuje nad czasem syntezy sygnału dźwiękowego. Potencjalnym
+rozwiązaniem tego problemu jest podzielenie optymalizacji na etapy, w których
+do optymalizacji grafu DSP wykorzystywane są coraz dłuższe fragmenty dźwięku docelowego.
