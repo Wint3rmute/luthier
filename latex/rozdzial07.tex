@@ -1,19 +1,84 @@
 \chapter{Analiza wyników, możliwe drogi dalszych badań}\label{chap:results_analysis}
 
-\begin{center}
-  \large Na razie luźnym językiem
-\end{center}
 
-\section{Analiza wyników}
+% Wyniki uzyskane przez zaimplementowany algorytm optymalizacji
+% opisane w rozdziałach~\ref{chap:research} oraz~\ref{target_function_chapter} pozwalają
+
+Wyniki przedstawione w rozdziałach~\ref{chap:research} oraz~\ref{target_function_chapter}
+wskazują, że zaimplementowany algorytm optymalizacji wytwarza poprawne rozwiązania
+dla części problemów. Nawet gdy finalnie wygenerowane brzmienie różni
+się od dźwięku docelowego, algorytm wytwarza interesujące barwy dźwięku,
+które mogą być wartościowe dla potencjalnych użytkowników.
+W niniejszym rozdziale przeprowadzono szczegółową analizę obserwacji,
+uzyskanych podczas procesu badawaczego.
+
+\section{Zbiór danych testowych} \label{sec:not_enough_benchmarking_data}
+
+% Automatyczna budowa elektronicznych instrumentów muzycznych
+% jest stosunkowo nowym zagadnieniem, więc nie istnieją jeszcze
+% takie zbiory danych na których możnaby robić sensowne porównania różnych algorytmów.
+% W pracy trzeba było przeszukiwać internet żeby znaleźć jakiekolwiek materiały
+% pozwalajace na porównanie. Finalnie też generowanie dźwięku jest zagadnieniem
+% sprowadzającym się do subiektywnego odbioru słuchaczy. To czy dana barwa dźwięku
+% jest zgodna według jakiejś metryki nie oznacza od razu że dźwięk będzie się podobał
+% użytkownikowi. Możliwe że niedoskonałość funkcji celu będzie działała na plus
+% dla algorytmu bo pokaże użytkownikowi coś niespodziewanego, a o to właśnie
+% chodzi w procesie kreatywnym.
+
+Automatyczna konstrukcja elektronicznych instrumentów muzycznych jest stosunkowo
+nowym obszarem badań, w związku z czym brakuje odpowiednich zbiorów danych
+umożliwiających porównywanie sprawności różnych algorutmów.
+Porównanie wykonane w niniejszej pracy nie stanowi przekroju
+przez wiele możliwych typów syntezy, ponieważ w procesie przeglądu
+literatury nie udało się znaleźć stosownego zbioru danych. Mimo
+to, wykonane porówanie pozwala stwierdzić, że
+\textbf{tutaj tekst jak się przekręcą symulacje}.
+
+
+\section{Optymalizacja parametrów grafu dla problemów o małej złożoności}
+
+Jak wykazały testy przeprowadzone w rozdziale~\ref{target_function_chapter},
+zaimplementowany algorytm jest w stanie dokładnie odtworzyć wartości
+parametrów grafu dla prostych problemów syntezy
+FM~(\ref{fig:param_optimisation_results_spectrograms})
+i umiarkowanie złożonych problemów syntezy
+\textit{analog modeling}~(\ref{fig:am_param_optimisation_results_spectrograms}).
+Testy na małej próbie słuchaczy pozwalają stwierdzić,
+że sygnały dźwiękowe wygenerowane dla problemów z rozzdiału~\ref{target_function_chapter}
+są nie do rozróżnienia od dźwięków docelowych.
 
 \begin{enumerate}
-  \item Fajnie że działa i jest w stanie wygenerować podobne dźwięki, dla prostych przypadków 1:1,
   \item Nawet jak nie działa to idzie w kierunku celu, często generując interesujące brzmienia po drodze,
   \item Problemy ze zmianami w dynamice, szczególnie pierwsze ułamki sekund,
-  \item Z jakiegoś powodu algorytm nie~,,dociąga'' parametrów do końca skali.
 \end{enumerate}
 
-\section{Możliwe drogi dalszego rozwoju}
+
+\section{Potencjał wykorzystania w przemyśle muzycznym}
+
+Wytwarzane przez algorytm barwy są zróżnicowane i brzmią
+w sposób ,,muzyczny'' -- nawet gdy wygenerowany dźwięk
+znacząco różni się od docelowej barwy, algorytm nie generuje
+szumu ani ,,kakofonii''. 
+Zaimplementowany algorytm może być uruchomiony na standardowym komputerze,
+dostępnym dla przeciętnego użytkownika, co otwiera możliwość jego integracji
+z oprogramowaniem typu \textit{digital audio workstation}. Integracja
+z oprogramowaniem do produkcji muzyki otwiera drogę do wykorzystania
+wtyczek \texttt{VST}, znacznie zwiększając liczbę dostępnych
+dla algorytmu węzłów przetwarzania sygnału, potencjalnie usprawniając
+jego działanie.
+
+
+\section{Subiektywna natura porównania}
+
+Generowanie dźwięku stanowi zagadnienie,
+które w dużej mierze zależy od subiektywnego odbioru słuchaczy.
+Ocena zgodności barwy dźwięku dźwięku według określonej funkcji celu
+niekoniecznie przekłada się na subiektywną preferencję użytkownika.
+Istnieje możliwość, że niedoskonałości funkcji celu mogą wpływać korzystnie na 
+odbiór przez słuchaczy, ponieważ dostarczą nieoczekiwanych efektów, 
+które mogą być wykorzystane jako źródło inspiracji w procesie kreatywnym.
+
+\section{Możliwe drogi dalszego rozwoju algorytmu}
 
 \begin{enumerate}
   \item Szybszy wariant DTF,
@@ -22,4 +87,5 @@
   \item Lepsze analizy funkcji celu - brakuje tutaj prac.
   \item Integracja z softwami DAW\@, bo na MCU w środku zwykłego syntha raczej nie wejdzie.
 \end{enumerate}
+
 
