@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+import json
+import datetime
+from pathlib import Path
 from dataclasses import is_dataclass
 from functools import cache, cached_property
 from typing import Any, Callable, Optional
@@ -65,7 +68,6 @@ class DspNode(ABC):
 
     @cache
     def output_names(self) -> list[str]:
-        # __import__('pdb').set_trace()
         try:
             return sorted(
                 field for field in dir(self.outputs) if not field.startswith("_")
@@ -266,6 +268,7 @@ class DspGraphOptimizer:
         difference_function: Callable[[Sample, Sample], float],
         target_audio: Sample,
         base_frequency: float,
+        sample_name: str,
         max_iterations: int = 100,
         population_size: int = 30,
         workers: int = -1,
@@ -278,6 +281,10 @@ class DspGraphOptimizer:
         self.graph_creation_function = graph_creation_function
         self.difference_function = difference_function
         self.target_audio = target_audio
+
+        optimisation_start_date = str(datetime.datetime.now()).replace(" ", "_")
+        self.snapshots_path = Path(f"./snapshots_{optimisation_start_date}_{sample_name}")
+        self.snapshots_path.mkdir()
 
         if base_frequency > 1.0:
             raise ValueError("Frequency higher than 1.0, shoud be e.x. 0.440 for A4")
@@ -305,6 +312,15 @@ class DspGraphOptimizer:
         # plt.show()
         self.target_fun_values.append(target_fun)
         self.best_parameters.append(x)
+
+        iteration_num = len(self.target_fun_values)
+        with open(self.snapshots_path / f"{iteration_num}.json", "w") as snapshot_file:
+            json.dump({
+                "target_fun": target_fun,
+                "params": list(x),
+                # "best_parameters" : list(self.best_parameters),
+                "target_fun_values": list(self.target_fun_values),
+            }, snapshot_file)
 
     def _make_sound(self, inputs: numpy.typing.NDArray[numpy.float64]) -> Sample:
         graph = self.graph_creation_function(inputs)
@@ -351,6 +367,9 @@ if __name__ == "__main__":
         return target.mfcc_distance_with_dtw(other)
 
     o = DspGraphOptimizer(
-        graph_create_fun, mfcc_dtw_distance, Sample(numpy.zeros(1000)), 0.440
+        graph_create_fun, mfcc_dtw_distance, Sample(numpy.zeros(1000)), 0.440,
+        "test_optimisation_process",
+        max_iterations = 2,
+        population_size = 2
     )
     o.optimize()
