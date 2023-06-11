@@ -8,12 +8,12 @@ Wyniki przedstawione w rozdziałach~\ref{chap:research} oraz~\ref{target_functio
 wskazują, że zaimplementowany algorytm optymalizacji wytwarza poprawne rozwiązania
 dla części problemów. Nawet gdy finalnie wygenerowane brzmienie różni
 się od dźwięku docelowego, algorytm wytwarza interesujące barwy dźwięku,
-które można zakwalifikować jako ,,wariacje'' na temat oryginalnego sygnału.
+które można zakwalifikować jako~,,wariacje'' na temat oryginalnego sygnału.
 Tego typu wyniki mogą być wartościowe dla potencjalnych użytkowników algorytmu.
 W niniejszym rozdziale przeprowadzono szczegółową analizę obserwacji,
 uzyskanych podczas procesu badawaczego.
 
-\section{Zbiór danych testowych} \label{sec:not_enough_benchmarking_data}
+\section{Zbiór danych testowych}\label{sec:not_enough_benchmarking_data}
 
 % Automatyczna budowa elektronicznych instrumentów muzycznych
 % jest stosunkowo nowym zagadnieniem, więc nie istnieją jeszcze
@@ -58,9 +58,9 @@ od dźwięków docelowych.
 \section{Potencjał wykorzystania w przemyśle muzycznym}
 
 Wytwarzane przez algorytm barwy są zróżnicowane i brzmią
-w sposób ,,muzyczny'' -- nawet gdy wygenerowany dźwięk
+w sposób~,,muzyczny'' -- nawet gdy wygenerowany dźwięk
 znacząco różni się od docelowej barwy, algorytm nie generuje
-szumu ani ,,kakofonii''. 
+szumu ani~,,kakofonii''. 
 Zaimplementowany algorytm może być uruchomiony na standardowym komputerze,
 dostępnym dla przeciętnego użytkownika, co otwiera możliwość jego integracji
 z oprogramowaniem typu \textit{digital audio workstation}. Integracja
@@ -91,7 +91,7 @@ które mogą być wykorzystane jako źródło inspiracji w procesie kreatywnym.
       dla przykładowego problemu optymalizacji. Widoczne składowe wpływające
       na sumaryczny czas ewaluacji funkcji celu.
       Czerwoną strzałką oznaczono czas poświęcony
-      na syntezę dźwięku w grafie DSP.
+      na syntezę dźwięku w grafie DSP\@.
     }\label{fig:target_function_profiling}
 \end{figure}
 
@@ -104,7 +104,7 @@ które mogą być wykorzystane jako źródło inspiracji w procesie kreatywnym.
     }\label{fig:mfcc_profiling}
 \end{figure}
 
-Rysunki~\ref{fig:target_function_profiling} oraz \ref{fig:mfcc_profiling}
+Rysunki~\ref{fig:target_function_profiling} oraz~\ref{fig:mfcc_profiling}
 przedstawiają wyniki profilowania zaimplementowanego algorytmu, wykonane
 za pomocą narzędzia \href{https://jiffyclub.github.io/snakeviz/}{\texttt{snakeviz}}.
 W pracy została wykorzystana gotowa implementacja
@@ -143,8 +143,35 @@ wyliczania funkcji celu i usprawni wyniki optymalizacji.
   % \item Różne wielkości okna DTW,
 \subsection{Lepsza reprezentacja struktury grafu DSP w genotypie}
 
+Jak opisano w sekcji~\ref{sec:graph_structure_definition}, genotyp grafu DSP
+podzielony jest na dwa fragmenty:
+
+\begin{itemize}
+  \item $S$ -- fragment odpowiadający za strukturę grafu,
+  \item $P$ -- fragment odpowiadający za wartości parametrów w grafie.
+\end{itemize}
+
+Po wygenerowaniu danej struktury grafu $G_s$~(\ref{eq:graph_structure_generation_function}),
+parametry grafu przypisywane są poprzez równoczesne iterowanie przez wektor $P$ oraz
+przez listę parametrów w wygenerowanym grafie $G_s$. Zastosowanie takiego algorytmu
+powoduje, że zmiana struktury grafu może spowodować przypisanie parametrów w inne miejsca
+na nowym grafie, gdzie ich wartości będą miały zupełnie inny wpływ na sygnał
+generowany przez graf. Problem można rozwiązać poprzez trwałe przypisanie danych
+parametrów $p_i$ do konkretnych parametrów konkretnej struktury w grafie. Jeśli gen 
+tworzący daną strukturę nie będzie aktywny, geny określające parametry tej struktury nie będą
+miały wpływu na generowany sygnał i nie zaburzą sposobu przypisania pozostałych genów.
+
+
 \subsection{Dalsze poszukiwania funkcji celu porównującej barwę sygnałów dźwiękowych}
-  % \item Lepsze analizy funkcji celu - brakuje tutaj prac.
+
+W pracach przeanalizowanych podczas przeglądu literatury wykorzystano 2 podejścia
+do porównania barwy sygnałów dźwiękowych: różnica między spektrogramami oraz
+różnica między wartościami współczynników MFCC
+(szczegóły opisano w rozdziale~\ref{target_function_chapter}).
+Wyniki przeglądu literatury pozwalają podejrzewać, że porównywanie sygnałów
+dźwiękowych pod względem ich barwy w kontekście brzmienia muzycznego
+nie jest szeroko zbadanym problemem i istnieje potencjał na opracowanie
+nowych rozwiązań.
 
 
 \subsection{Trenowanie na coraz dłuższych fragmentach dźwięku}
