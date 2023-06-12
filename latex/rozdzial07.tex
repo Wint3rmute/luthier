@@ -13,27 +13,19 @@ Tego typu wyniki mogą być wartościowe dla potencjalnych użytkowników algory
 W niniejszym rozdziale przeprowadzono szczegółową analizę obserwacji,
 uzyskanych podczas procesu badawaczego.
 
-\section{Zbiór danych testowych}\label{sec:not_enough_benchmarking_data}
 
-% Automatyczna budowa elektronicznych instrumentów muzycznych
-% jest stosunkowo nowym zagadnieniem, więc nie istnieją jeszcze
-% takie zbiory danych na których możnaby robić sensowne porównania różnych algorytmów.
-% W pracy trzeba było przeszukiwać internet żeby znaleźć jakiekolwiek materiały
-% pozwalajace na porównanie. Finalnie też generowanie dźwięku jest zagadnieniem
-% sprowadzającym się do subiektywnego odbioru słuchaczy. To czy dana barwa dźwięku
-% jest zgodna według jakiejś metryki nie oznacza od razu że dźwięk będzie się podobał
-% użytkownikowi. Możliwe że niedoskonałość funkcji celu będzie działała na plus
-% dla algorytmu bo pokaże użytkownikowi coś niespodziewanego, a o to właśnie
-% chodzi w procesie kreatywnym.
+\section{Zbiór danych testowych}\label{sec:not_enough_benchmarking_data}
 
 Automatyczna konstrukcja elektronicznych instrumentów muzycznych jest stosunkowo
 nowym obszarem badań, w związku z czym brakuje odpowiednich zbiorów danych
 umożliwiających porównywanie sprawności różnych algorutmów.
 Porównanie wykonane w niniejszej pracy nie stanowi przekroju
 przez wiele możliwych typów syntezy, ponieważ w procesie przeglądu
-literatury nie udało się znaleźć stosownego zbioru danych. Mimo
-to, wykonane porówanie pozwala stwierdzić, że
-\textbf{tutaj tekst jak się przekręcą symulacje}.
+literatury nie udało się znaleźć stosownego zbioru danych.
+
+% Mimo
+% to, wykonane porówanie pozwala stwierdzić, że
+% \textbf{tutaj tekst jak się przekręcą symulacje}.
 
 
 \section{Optymalizacja parametrów grafu dla problemów o małej złożoności}
@@ -45,7 +37,7 @@ FM~(\ref{fig:param_optimisation_results_spectrograms})
 i umiarkowanie złożonych problemów syntezy
 \textit{analog modeling}~(\ref{fig:am_param_optimisation_results_spectrograms}).
 Testy na małej próbie słuchaczy pozwalają stwierdzić,
-że nie są oni w stanie odróżnić sygnałów wygenerowanych
+że \textbf{nie są oni w stanie odróżnić} sygnałów wygenerowanych
 dla problemów z rozdziału~\ref{target_function_chapter}
 od dźwięków docelowych.
 
@@ -70,18 +62,7 @@ dla algorytmu węzłów przetwarzania sygnału, potencjalnie usprawniając
 jego działanie.
 
 
-\section{Subiektywna natura porównania}
-
-Generowanie dźwięku stanowi zagadnienie,
-które w dużej mierze zależy od subiektywnego odbioru słuchaczy.
-Ocena zgodności barwy dźwięku dźwięku według określonej funkcji celu
-niekoniecznie przekłada się na subiektywną preferencję użytkownika.
-Istnieje możliwość, że niedoskonałości funkcji celu mogą wpływać korzystnie na 
-odbiór przez słuchaczy, ponieważ dostarczą nieoczekiwanych efektów, 
-które mogą być wykorzystane jako źródło inspiracji w procesie kreatywnym.
-
 \section{Potencjalne usprawnienia wydajności algorytmu}
-
 
 \begin{figure}[H]
     \centering
@@ -181,3 +162,28 @@ im dłuższy jest zadany sygnał dźwiękowy, tym bardziej czas wyliczenia
 wartości funkcji celu dominuje nad czasem syntezy sygnału dźwiękowego. Potencjalnym
 rozwiązaniem tego problemu jest podzielenie optymalizacji na etapy, w których
 do optymalizacji grafu DSP wykorzystywane są coraz dłuższe fragmenty dźwięku docelowego.
+
+\subsection{Rozszerzenie genotypu grafu DSP o źródła modulacji}
+
+W syntezatorach dźwięku często wykorzystuje się sygnały modulujące (przedstawione
+na rysunkach~\ref{fig:mother32} oraz~\ref{fig:minilogue_diagram}), które modulują
+dane parametry generowanego sygnału za pomocą sygnałów kontrolnych (CV). 
+W pracy wykorzystano jedynie sygnał obwiedni (\textit{ADSR envelope}),
+modulujący intensywność modulacji w przypadku syntezy FM~(\ref{fig:gene_f1})
+lub częstotliwość odcięcia w przypadku syntezy
+\textit{analog modeling}~(\ref{sec:filters_selection_graph_structure}).
+Rozszerzenie zbioru dostępnych sygnałów kontrolnych o oscylator niskoczęstotliwościowy
+(\textit{LFO - low frequency oscillator}), który w zależności od genotypu
+moduluje różne parametry w grafie DSP może znacząco zwiększyć różnorodność
+generowanych barw dźwięku.
+
+
+\section{Subiektywna natura porównania}
+
+Generowanie dźwięku stanowi zagadnienie,
+które w dużej mierze zależy od subiektywnego odbioru słuchaczy.
+Ocena zgodności barwy dźwięku dźwięku według określonej funkcji celu
+niekoniecznie przekłada się na subiektywną preferencję użytkownika.
+Istnieje możliwość, że niedoskonałości funkcji celu mogą wpływać korzystnie na 
+odbiór przez słuchaczy, ponieważ dostarczą nieoczekiwanych efektów, 
+które mogą być wykorzystane jako źródło inspiracji w procesie kreatywnym.
