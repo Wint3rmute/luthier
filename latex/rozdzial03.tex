@@ -140,7 +140,6 @@ parametrów dla predefiniowanej struktury grafu DSP\@. Wykorzystano dwa grafy
 DSP~(\ref{fig:analog_graph_for_benchmarks},~\ref{fig:fm_graph_for_benchmarks}),
 wykonujące różne rodzaje syntezy.
 
-
 \subsection{Synteza FM}
 
 Testowana struktura grafu wykonującego syntezę typu FM~\ref{fig:fm_graph_for_benchmarks}
@@ -203,7 +202,14 @@ spektrum sygnału na wykresie~\ref{fig:am_training_sample_overview}.
 Dla obu grafów wykonano optymalizację parametrów wejściowych w celu imitacji danej
 próbki dźwięku. Optymalizację wykonano 10 razy dla każdej rozważanej~(\ref{sec:considered_target_functions})
 funkcji celu. Do optymalizacji parametrów wykorzystano algorytm evolucyjny
-\textit{differential evolution}~\cite{2020SciPy-NMeth}.
+\textit{differential evolution}~\cite{2020SciPy-NMeth}. 
+Zastosowano następujące parametry algorytmu genetycznego:
+
+\begin{enumerate}
+  \item Rozmiar populacji: 50,
+  \item Liczba iteracji: 200.
+\end{enumerate}
+
 
 \subsection{Wyniki testów}
 
