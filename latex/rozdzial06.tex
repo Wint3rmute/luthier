@@ -28,6 +28,11 @@ W badaniach zastosowano następujące parametry algorytmu genetycznego:
 
 \section{Dźwięk fletu}
 
+Dźwięk \texttt{flute\_.wav}~(rysunel~\ref{fig:literature_flute_sound_overview})
+jest nagraniem prawdziwego instrumentu dętego. Kształt fali jest nieregularny,
+charakterystyka spektralna zawiera dynamicznie pojawiające się i słabnące 
+składowe częstotliwościowe.
+
 \begin{multicols}{3}
 \begin{figure}[H]
     \centering
@@ -59,17 +64,13 @@ W badaniach zastosowano następujące parametry algorytmu genetycznego:
 \end{figure}
 \end{multicols}
 
-Dźwięk \texttt{flute\_.wav}~(\ref{fig:literature_flute_sound_overview})
-jest nagraniem prawdziwego instrumentu dętego. Kształt fali jest nieregularny,
-charakterystyka spektralna zawiera dynamicznie pojawiające się i słabnące 
-składowe częstotliwościowe.
 
 \section{Sampel z syntezatora \textit{OP-1}}
 
 Dźwięk \texttt{op1\_1.wav}, wygenerowany przy pomocy syntezatora \textit{OP-1} jest próbą
 zasymulowania dźwięku instrumentu dętego przez syntezator. Podobnie jak w przypadku
 prawdziwego dźwięku fletu, widoczne są zmienne w czasie składowe harmoniczne, jednak
-sygnał jest bardziej stabilny.
+sygnał wygenerowany na syntezatorze jest bardziej stabilny.
 
 \begin{multicols}{3}
 \begin{figure}[H]
@@ -107,7 +108,7 @@ sygnał jest bardziej stabilny.
 Dźwięk \texttt{transient.wav}, przedstawiony na rysunku~\ref{fig:literature_transient_sound_overview},
 został wykorzystany w literaturze~\cite{evolutionary_puredata} do sprawdzenia jak dobrze algorytm
 generujący dźwięk potrafi przybliżyć dźwięki o dynamicznych zmianach w charakterystyce spektralnej.
-Tego typu dźwięki są typowe dla instrumentów klawiszowych: fortepian lub klawesyn.
+Tego typu dźwięki przypominają brzmienie instrumentów klawiszowych: fortepianu lub klawesynu.
 
 \begin{multicols}{3}
 \begin{figure}[H]
@@ -136,6 +137,35 @@ Tego typu dźwięki są typowe dla instrumentów klawiszowych: fortepian lub kla
       przez algorytm z literatury~\cite{evolutionary_puredata} na wzór
       \texttt{transient.wav}.
     }\label{fig:evolved_literature_transient_sound_overview}.
+\end{figure}
+\end{multicols}
+
+\section{Dźwięki inne niż przykłady z literatury}
+
+Badania przeprowadzone w ramach~\cite{evolutionary_puredata}
+wykorzystują ograniczony zbiór dźwięków, koncentrując
+się na instrumentach dętych i syntezie FM. Algorytm przetestowano
+również na samodzielnie wytworzonych dźwiękach, wykorzystując syntezę
+subtraktywną~\ref{fig:minilogue_target_sample}.
+
+\begin{multicols}{2}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/target_minilogue.png}
+    \caption{
+      Spektrum fouriera i współczynniki MFCC dla dźwięku wygenerowanego 
+      na syntezatorze \textit{Korg Minilogue xd}.
+    }\label{fig:minilogue_target_sample}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/evolved_minilogue.png}
+    \caption{
+      Spektrum fouriera i współczynniki MFCC dla dźwięku wygenerowanego 
+      przez zaimplementowany w ramach pracy algorytm na
+      wzór~\ref{fig:minilogue_target_sample}.
+    }\label{fig:evolved_minilogue_sample}.
 \end{figure}
 \end{multicols}
 
