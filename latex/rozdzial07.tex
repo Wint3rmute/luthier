@@ -23,9 +23,13 @@ Porównanie wykonane w niniejszej pracy nie stanowi przekroju
 przez wiele możliwych typów syntezy, ponieważ w procesie przeglądu
 literatury nie udało się znaleźć stosownego zbioru danych.
 
-% Mimo
-% to, wykonane porówanie pozwala stwierdzić, że
-% \textbf{tutaj tekst jak się przekręcą symulacje}.
+Jak pokazały wyniki opisane w sekcji~\ref{sec:non_literature_samples},
+zaimplementowany algorytm generuje lepsze rozwiązania w przypadku
+syntezy \textit{analog modeling}, podczas gdy praca służąca
+za porównanie~\cite{evolutionary_puredata} zawiera głownie przykłady
+syntezy FM oraz nagrania instrumentów dętych. Sugestie dotyczące
+stworzenia bardziej różnorodnego zbioru dźwięków o różnych barwach
+i dynamice zawarto w sekcji~\ref{sec:potential_improvements}.
 
 
 \section{Optymalizacja parametrów grafu dla problemów o małej złożoności}
@@ -94,10 +98,7 @@ wykonanie zajmuje największą część czasu obliczania wartości funkcji celu.
 Wykorzystanie pakietu numerycznego \texttt{numpy} bądź implementacja DTW w
 kompilowanym języku programowania może znacząco poprawić szybkość działania algorytmu.
 
-  % \item Szybszy wariant DTF,
-  % \item MFCC/Fourier na GPU\@.
-
-\section{Potencjalne drogi dalszego rozwoju algorytmu}
+\section{Potencjalne drogi dalszego rozwoju algorytmu}\label{sec:potential_improvements}
 
 Pierwszym krokiem, który należy wykonać w celu usprawnienia
 algorytmu optymalizacji jest przygotowanie zbioru dźwięków,
@@ -105,7 +106,25 @@ które będą służyły za \textbf{zbiór weryfikujący poprawność działania
 Przykłady zaczerpnięte z literatury~\cite{evolutionary_puredata_results}
 nie zawierają wystarczająco bogatej gamy możliwych do wygenerowania
 barw dźwięku, które wymusiłyby na algorytmie optymalizacji wykorzystanie
-różnorodnych algorytmów syntezy i struktur grafu DSP\@.
+różnorodnych algorytmów syntezy i struktur grafu DSP\@. Wyniki
+eksperymentów wykonanych w rozdziale~\ref{chap:research} pozwalają
+na zasugerowanie zbioru cech dźwięków, których warianty
+powinny być zawarte w zbiorze weryfikującym:
+
+\begin{enumerate}
+  \item Typ syntezy:
+  \begin{itemize}
+    \item synteza \textit{analog modeling},
+    \item synteza FM,
+    \item synteza \textit{physical modeling}.
+  \end{itemize}
+  \item Dynamika dźwięku:
+    \begin{itemize}
+      \item Głośny od samego początku, dynamicznie słabnący,
+      \item Równomiernie głośny przez całą długość nagrania,
+      \item Powoli narastający i powoli słabnący.
+    \end{itemize}
+\end{enumerate}
 
 % Po przygotowaniu zbioru walidacyjnego
 
