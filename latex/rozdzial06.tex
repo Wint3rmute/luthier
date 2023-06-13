@@ -65,6 +65,7 @@ składowe częstotliwościowe.
 \end{multicols}
 
 
+
 \section{Sampel z syntezatora \textit{OP-1}}
 
 Dźwięk \texttt{op1\_1.wav}, wygenerowany przy pomocy syntezatora \textit{OP-1} jest próbą
@@ -103,6 +104,17 @@ sygnał wygenerowany na syntezatorze jest bardziej stabilny.
 \end{figure}
 \end{multicols}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/evolved_graph_op1.png}
+    \caption{
+      Graf DSP wygenerowany przez zaimplementowany algorytm
+      dla dźwięku docelowego \texttt{op1\_1.wav}.
+    }\label{fig:evolved_graph_op1}
+\end{figure}
+
+\newpage
+
 \section{Transjent}
 
 Dźwięk \texttt{transient.wav}, przedstawiony na rysunku~\ref{fig:literature_transient_sound_overview},
@@ -140,6 +152,16 @@ Tego typu dźwięki przypominają brzmienie instrumentów klawiszowych: fortepia
 \end{figure}
 \end{multicols}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/evolved_graph_transient.png}
+    \caption{
+      Graf DSP wygenerowany przez zaimplementowany algorytm
+      dla dźwięku docelowego \texttt{transient.wav}.
+    }\label{fig:evolved_graph_transient}
+\end{figure}
+
+\newpage
 \section{Dźwięki inne niż przykłady z literatury}\label{sec:non_literature_samples}
 
 Badania przeprowadzone w ramach~\cite{evolutionary_puredata}
@@ -168,6 +190,18 @@ subtraktywną~\ref{fig:minilogue_target_sample}.
     }\label{fig:evolved_minilogue_sample}.
 \end{figure}
 \end{multicols}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{rys06/evolved_graph_minilogue.png}
+    \caption{
+      Graf DSP wygenerowany przez zaimplementowany algorytm
+      dla dźwięku docelowego~\ref{fig:minilogue_target_sample}.
+      Poprawnie został odtworzony filtr niskoprzepustowy oraz
+      sterujący nim sygnał ADSR\@.
+    }\label{fig:evolved_graph_op1}
+\end{figure}
 
 % \section{Próba odtworzenia dźwięku spoza literatury}
 
