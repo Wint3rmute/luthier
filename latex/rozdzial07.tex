@@ -18,7 +18,7 @@ uzyskanych podczas procesu badawaczego.
 
 Automatyczna konstrukcja elektronicznych instrumentów muzycznych jest stosunkowo
 nowym obszarem badań, w związku z czym brakuje odpowiednich zbiorów danych
-umożliwiających porównywanie sprawności różnych algorutmów.
+umożliwiających porównywanie sprawności różnych algorytmów.
 Porównanie wykonane w niniejszej pracy nie stanowi przekroju
 przez wiele możliwych typów syntezy, ponieważ w procesie przeglądu
 literatury nie udało się znaleźć stosownego zbioru danych.
@@ -26,8 +26,8 @@ literatury nie udało się znaleźć stosownego zbioru danych.
 Jak pokazały wyniki opisane w sekcji~\ref{sec:non_literature_samples},
 zaimplementowany algorytm generuje lepsze rozwiązania w przypadku
 syntezy \textit{analog modeling}, podczas gdy praca służąca
-za porównanie~\cite{evolutionary_puredata} zawiera głownie przykłady
-syntezy FM oraz nagrania instrumentów dętych. Sugestie dotyczące
+za porównanie~\cite{evolutionary_puredata} zawiera głownie dźwięki wytworzone
+za pomocą syntezy FM oraz nagrania instrumentów dętych. Sugestie dotyczące
 stworzenia bardziej różnorodnego zbioru dźwięków o różnych barwach
 i dynamice zawarto w sekcji~\ref{sec:potential_improvements}.
 
@@ -51,7 +51,7 @@ od dźwięków docelowych.
 % \end{enumerate}
 
 
-\section{Potencjał wykorzystania w przemyśle muzycznym}
+\section{Potencjał wykorzystania w przemyśle muzycznym}\label{sec:music_industry_usage}
 
 Wytwarzane przez algorytm barwy są zróżnicowane i brzmią
 w sposób~,,muzyczny'' -- nawet gdy wygenerowany dźwięk
@@ -63,10 +63,22 @@ z oprogramowaniem typu \textit{digital audio workstation}. Integracja
 z oprogramowaniem do produkcji muzyki otwiera drogę do wykorzystania
 wtyczek \texttt{VST}, znacznie zwiększając liczbę dostępnych
 dla algorytmu węzłów przetwarzania sygnału, potencjalnie usprawniając
-jego działanie.
+jego działanie. Proponowanym środowiskiem, które można wykorzystać w celu zintegrowania
+zaimplementowanego algorytmu z oprogramowaniem \textit{digital audio workstation}
+i wtyczkami w technologii \texttt{VST} jest program
+\texttt{DawDreamer}~(\url{https://github.com/DBraun/DawDreamer}).
 
 
 \section{Potencjalne usprawnienia wydajności algorytmu}
+
+Rysunki~\ref{fig:target_function_profiling} oraz~\ref{fig:mfcc_profiling}
+przedstawiają wyniki profilowania zaimplementowanego algorytmu, wykonane
+za pomocą narzędzia \href{https://jiffyclub.github.io/snakeviz/}{\texttt{snakeviz}}.
+W pracy została wykorzystana gotowa implementacja
+algorytmu DTW (\textit{dynamic time warping}) w języku \texttt{Python}, której
+wykonanie zajmuje największą część czasu obliczania wartości funkcji celu.
+Wykorzystanie pakietu numerycznego \texttt{numpy} bądź implementacja DTW w
+kompilowanym języku programowania może znacząco poprawić szybkość działania algorytmu.
 
 \begin{figure}[H]
     \centering
@@ -89,14 +101,6 @@ jego działanie.
     }\label{fig:mfcc_profiling}
 \end{figure}
 
-Rysunki~\ref{fig:target_function_profiling} oraz~\ref{fig:mfcc_profiling}
-przedstawiają wyniki profilowania zaimplementowanego algorytmu, wykonane
-za pomocą narzędzia \href{https://jiffyclub.github.io/snakeviz/}{\texttt{snakeviz}}.
-W pracy została wykorzystana gotowa implementacja
-algorytmu DTW (\textit{dynamic time warping}) w języku \texttt{Python}, której
-wykonanie zajmuje największą część czasu obliczania wartości funkcji celu.
-Wykorzystanie pakietu numerycznego \texttt{numpy} bądź implementacja DTW w
-kompilowanym języku programowania może znacząco poprawić szybkość działania algorytmu.
 
 \section{Potencjalne drogi dalszego rozwoju algorytmu}\label{sec:potential_improvements}
 
@@ -136,9 +140,10 @@ W domyślnym wariancie, algorytm DTW przeszukuje cały sygnał
 przy poszukuwaniu pasujących do siebie segmentów. Takie
 zachowanie zwiększa złożoność czasową algorytmu, jednocześnie
 zmniejszając karę za niedokładne odwzorowanie zmian w dynamice dźwięku.
-Przeprowadzone w ramach pracy testy pozwalają sugerować, że zmniejszenie
-rozmiaru okna w algorytmie DTW pozwoli na jednoczesne przyspieszenie czasu
-wyliczania funkcji celu i usprawni wyniki optymalizacji.
+Przeprowadzone w ramach pracy testy pozwalają wnioskować, że zmniejszenie
+rozmiaru okna w algorytmie DTW pozwoli na skrócenie czasu
+wyliczania funkcji celu i jednocześnie usprawni wyniki optymalizacji
+w zakresie dokładności odwzorowania dynamiki dźwięku.
 
   % \item Różne wielkości okna DTW,
 \subsection{Lepsza reprezentacja struktury grafu DSP w genotypie}
@@ -182,18 +187,32 @@ wartości funkcji celu dominuje nad czasem syntezy sygnału dźwiękowego. Poten
 rozwiązaniem tego problemu jest podzielenie optymalizacji na etapy, w których
 do optymalizacji grafu DSP wykorzystywane są coraz dłuższe fragmenty dźwięku docelowego.
 
+\subsection{Rozszerzenie liczby dostępnych w grafie DSP węzłów}
+
+Poza zasugerowaną w sekcji~\ref{sec:music_industry_usage} integracją
+zaimplementowanego algorytmu z oprogramowaniem typu \textit{digital audio workstation},
+możliwe jest również dalsze implementowanie kolejnych węzłów generujących
+i przetwarzających sygnał. Ze względu na ograniczenia czasowe,
+w pracy nie zaimplementowano wielu rodzajów filtrów
+(przykładowo o różnych szerokościach pasma przepustowego) ani wielu rodzajów
+efektów \textit{delay} oraz \textit{reverb}. Zastosowanie ręcznie zaimplementowanych
+węzłów przetwarzania sygnału może pozwolić na przeprowadzenie dokładniejszych
+testów algorytmu optymalizacji (jak dostępne węzły wpływają na sprawność optymalizacji),
+niż w przypadku wykorzystania gotowych wtyczek
+\texttt{VST}, które spowodują znaczne zwiększenie liczby modyfikowalnych parametrów w grafie.
+
 \subsection{Rozszerzenie genotypu grafu DSP o dodatkowe źródła modulacji}
 
 W syntezatorach dźwięku często wykorzystuje się sygnały modulujące (przedstawione
-na rysunkach~\ref{fig:mother32} oraz~\ref{fig:minilogue_diagram}), które modulują
-dane parametry generowanego sygnału za pomocą sygnałów kontrolnych (CV). 
+na rysunkach~\ref{fig:mother32} oraz~\ref{fig:minilogue_diagram}), które dynamicznie
+modyfikują parametry generowanego dźwięku za pomocą sygnałów kontrolnych (CV). 
 W pracy wykorzystano jedynie sygnał obwiedni (\textit{ADSR envelope}),
 modulujący intensywność modulacji w przypadku syntezy FM~(\ref{fig:gene_f1})
 lub częstotliwość odcięcia w przypadku syntezy
 \textit{analog modeling}~(\ref{sec:filters_selection_graph_structure}).
 Rozszerzenie zbioru dostępnych sygnałów kontrolnych o oscylator niskoczęstotliwościowy
 (\textit{LFO - low frequency oscillator}), który w zależności od genotypu
-moduluje różne parametry w grafie DSP może znacząco zwiększyć różnorodność
+moduluje inne parametry w grafie DSP może znacząco zwiększyć różnorodność
 generowanych barw dźwięku.
 
 
