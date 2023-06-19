@@ -191,7 +191,9 @@ Podsumowując, nie jest jasne jak ten algorytm działa. Nie jest jasne, jakie s�
 
 # Rozdział 5
 
-- ten rozdział faktycznie jest o implementacji; tak go należy nazwać
+<!-- - ten rozdział faktycznie jest o implementacji; tak go należy nazwać -->
+- nazwano
+
 - punkt 5.1 "Podstawy syntezy dźwięku w syntezatorach modułowych" to zupełnie nie tutaj. Tutaj już musimy mieć wszystkie podstawy i wstępy teoretyczne daleko za sobą. Tutaj jest już tylko na temat przygotowanego rozwiązania. Tego rodzaju informacje można przenieść do wstępu (do opisu grafu DSP), albo do sformułowania problemu.
 35 "Pojedynczy węzeł DSP ..." to już było w sformułowaniu.
 - nie wiem czy warto tutaj wspominać o "wymaganiach" - one wynikają z rozwiązywanego problemu; jeśli faktycznie jest to istotne, to może warto je zebrać na początku rozdziału
