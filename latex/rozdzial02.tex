@@ -1,28 +1,21 @@
 \chapter{Definicja problemu}\label{chap:problem_definition}
 
-Jak opisano w zakresie pracy~(\ref{chap:thesis_scope}), w pracy rozwiązywany jest problem
-budowy grafu przetwarzania sygnałów oraz opracowywana jest funkcja celu, porównująca dwa
-sygnały pod względem ich barwy. Następnie algorytm generujący graf przetwarzania
-sygnałów oraz funkcja porównująca barwy sygnałów są wykorzystane do rozwiązania
-problemu optymalizacyjnego. 
 Graf przetwarzania sygnałów można opisać jako zbiór połączonych węzłów generujących
 i przetwarzających sygnał dźwiękowy. Każdy węzeł opisany jest poprzez:
 
-\begin{multicols}{2}
 \begin{enumerate}
   \item zbiór wejść,
   \item zbiór wyjść,
-  \item operację matematyczną wykonywaną na sygnale.
+  \item procedurę obliczeniową wykonywaną na sygnale.
 \end{enumerate}
 
 
 \begin{figure}[H]
   \centering
-  \includegraphics{rys05/example_sine_node.png}
-  \caption{Przykładowy węzeł w grafie, generujący sygnał sinusoidalny z możliwością modulacji.}
+  \includegraphics[width=0.4\linewidth]{rys05/example_sine_node.png}
+  \caption{Przykładowy węzeł w grafie, generujący sygnał sinusoidalny z możliwością modulacji fazy.}
 \end{figure}
 
-\end{multicols}
 
 \noindent
 Przykładowo, dla syntezy subtraktywnej powszechnie wykorzystywane są następujące typy węzłów:

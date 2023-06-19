@@ -91,13 +91,16 @@ W pracy są też Dodatki (może lepiej Załączniki) - o nich też należy wspom
 
 # Rozdział 2
 
-18 zbędne: "Jak opisano w zakresie pracy (1.2), w pracy rozwiązywany jest problem budowy grafu przetwa-
-rzania sygnałów oraz opracowywana jest funkcja celu, porównująca dwa sygnały pod względem
-ich barwy. Następnie algorytm generujący graf przetwarzania sygnałów oraz funkcja porównu-
-jąca barwy sygnałów są wykorzystane do rozwiązania problemu optymalizacyjnego."
-nie ma co się powtarzać
+<!-- 18 zbędne: "Jak opisano w zakresie pracy (1.2), w pracy rozwiązywany jest problem budowy grafu przetwa- -->
+<!-- rzania sygnałów oraz opracowywana jest funkcja celu, porównująca dwa sygnały pod względem -->
+<!-- ich barwy. Następnie algorytm generujący graf przetwarzania sygnałów oraz funkcja porównu- -->
+<!-- jąca barwy sygnałów są wykorzystane do rozwiązania problemu optymalizacyjnego." -->
+<!-- nie ma co się powtarzać -->
+- powtórzenia usunięte
 
-18 Rysunek 2.1 jest nieczytelny; powiększyć i dać na środek
+<!-- 18 Rysunek 2.1 jest nieczytelny; powiększyć i dać na środek -->
+- powiększony
+
 18 czym jest "synteza subtraktywna"; wykorzystane są tu pojęcia, które nie zostały do końca opisane - np. czym są częstotliwość odcięcia i rezonans, jaka jest postać sygnału wejściowego albo wygenerowanego? Proponuję poświęcić trochę miejsca na opis pojedynczego wierzchołka grafu; napisać jaką postać będą miały wejścia i wyjścia; jakie mogą być zastosowane operacje matematyczne. W końcu w pracy dalej wykorzystywane są konkretne.
 
 19 Rysunek 2.2 jest nieczytelny; w zasadzie wszystkie rysunki z grafami są nieczytelne i wymagają przeróbki (a może umieścić je w pracy poziomo?)
@@ -132,15 +135,18 @@ Same oznaczenia S, P mogą oczywiście zostać, ale trzeba je jasno przedstawić
 # Rozdział 3
 
 22 "Aby stopniowo dostosować graf przetwarzania sygnałów zaimplementowany w rozdziale" grafu nie będzie nikt implementować, implementowany będzie algorytm generacji grafu; odwołanie do rodziału nr 5 jest tu zbędne
-22 "Autoregressive, Waveform != Perception" trzymajmy się polskiego
+<!-- 22 "Autoregressive, Waveform != Perception" trzymajmy się polskiego -->
+- Usunięty angielski podpis
+
 22 brak odwołania w tekście do rys 3.1 (jest do 3)
 22 może warto te prace 17, 19, 12 (kolejność??) itd. opisać
 
-23 "dwóch cech:" -- kropka
+<!-- 23 "dwóch cech:" -- kropka -->
 
 23 czy RMS i DTW można jakoś wyjaśnić?
 
-27 "TODO: obrazek"
+<!-- 27 "TODO: obrazek" -->
+- usunięte, obrazek już dodany
 
 Przyznam się, po dokładnym przeczytaniu tego rozdziału, że proces doboru funkcji celu jest niezrozumiały. Dlaczego? Ano dlatego, że spodziewałem się analizy własności funkcji celu pod kątem percepcji słuchacza; w końcu tak zaczyna się rozdział. Ostatecznie dostajemy coś zupełnie innego.
 
