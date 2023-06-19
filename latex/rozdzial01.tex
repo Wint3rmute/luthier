@@ -5,14 +5,14 @@ można podzielić na trzy główne kategorie~\cite{analysis_generative}~\label{t
 
 \begin{enumerate}
     \item algorytmy generujące symboliczny zapis muzyki (nuty lub dane MIDI) (\ref{fig:lamus_notes}),~\cite{zhang2023language},
-    \item algorytmy generujące gotowy plik audio (\ref{fig:riffusion_spectro}).
-    \item algorytmy symulujące brzmienie instrumentów muzycznych za pomocą sieci neuronowych~\cite{engel2017neural}.
+    \item algorytmy generujące gotowy plik audio na podstawie opisu użytkownika (\ref{fig:riffusion_spectro}).
+    \item algorytmy symulujące brzmienie instrumentów muzycznych~\cite{engel2017neural}.
 \end{enumerate}
 
 Pierwsza grupa algorytmów znana jest już od lat 80, gdyż zagadnienie generowania zapisu symbolicznego wymaga mniej mocy obliczeniowej niż wytworzenie pełnego pliku audio.
 Powszechnie wykorzystywana jest w nich teoria muzyki, pozwalająca określić matematyczne relacje występujące w rytmach, melodiach i progresjach akordów.
 Wiedza dotyczącą teorii muzyki pozwala na wyznaczenie możliwej przestrzeni stanów, w której generowana jest kompozycja,
-natomiast modele matematyczne takie jak łańcuchy Markowa służą za mechanizmy decyzyjne, które~,,nawigują'' w przestrzeni stanów.
+natomiast modele matematyczne takie jak łańcuchy Markowa służą za mechanizmy decyzyjne.
 
 \begin{figure}[H]
     \centering
@@ -30,7 +30,7 @@ Modele generujące pliki audio zgodne z opisem tekstowym
 szkolone są w taki sam sposób jak algorytmy \textit{stable diffusion},
 dane treningowe składają się z obrazów spektrogramów~\cite{riffusion}. 
 Po trenowaniu, model jest wstanie wygenerować spektrogram zawierający
-utwór muzyczny zgodny z promptem użytkownika (\ref{fig:riffusion_spectro}).
+utwór muzyczny zgodny z poleceniem użytkownika (\ref{fig:riffusion_spectro}).
 Wygenerowany przez model spektrogram jest konwertowany 
 do sygnału dżwiękowego za pomocą odwrotnej transformaty Fouriera.
 
@@ -43,6 +43,11 @@ do sygnału dżwiękowego za pomocą odwrotnej transformaty Fouriera.
     }\label{fig:riffusion_spectro}
 \end{figure}
 
+Trzecia grupa algorytmów, symulowanie brzemienia instrumentów muzycznych, najczęściej wykorzystuje sieci
+neuronowe trenowane na brzmieniu prawdziwych instrumentów~\cite{engel2017neural}~\cite{engel2020ddsp}. 
+Tego typu algorytmy pozwalają symulowanie instrumentów o złożonych barwach, takich jak instrumenty
+smyczkowe lub dęte oraz na płynne przechodzenie między brzmieniami różnych instrumentów muzycznych.
+
 % TODO: check later
 % https://github.com/Kinyugo/msanii
 
@@ -53,15 +58,17 @@ Jednakże, z perspektywy użytkownika, zapis symboliczny jest bardziej praktyczn
 ponieważ możliwe jest zaimportowanie go do programu DAW i późniejsza modyfikacja zapisu nutowego.
 Obecnie dostępne modele generujące pełne nagrania z muzyką nie umożliwiają
 szczegółowego edytowania parametrów wygenerowanego dźwięku, ponieważ operują bardzo wysokopoziomowo 
--- syntezują muzykę na podstawie opisu słownego.
+-- syntezują muzykę na podstawie opisu słownego. Podobne problemy występują również podczas wykorzystywania
+algorytmów z grupy trzeciej, głębokie sieci neuronowe nie są przystosowane do ręcznej modyfikacji przez użytkownika.
 
 Podsumowując, wykorzystanie wygenerowanego przez komputer zapisu nutowego jest proste, ze względu na symboliczną naturę zapisu.
-Wykorzystanie wygenerowanego przez komputer \textbf{dźwięku} jest ograniczone ze względu na fakt, że do generowania złożonych sygnałów dźwiękowych wykorzystywane są techniki takie jak głębokie sieci neuronowe, w których utrudniona jest dokładna kontrola nad konkretnymi parametrami funkcjonowania sieci.
+Wykorzystanie wygenerowanego przez komputer dźwięku jest ograniczone ze względu na fakt, że do generowania złożonych sygnałów dźwiękowych wykorzystywane są techniki takie jak głębokie sieci neuronowe, w których utrudniona jest dokładna kontrola nad konkretnymi parametrami funkcjonowania sieci.
 
 Niniejsza praca sugeruje nową metodę podejścia do problemu generowania sygnałów dźwiękowych,
 którego nie da się zaklasyfikować do żadnej z wyżej wymienionych~(\ref{traditional_algos}) dziedzin komputerowej kompozycji muzycznej.
-Wynik pracy algorytmu implementowanego w ramach pracy magisterskiej jest \textbf{gotowym elektronicznym
-instrumentem muzycznym}, który może być wykorzystany w programie do komponowania muzyki. Algorytm nie generuje bezpośrednio sygnału dźwiękowego, lecz tworzy graf przetwarzania sygnałów, który jest zrozumiały dla użytkownika i \textbf{pozwala na precyzyjne dostosowanie parametrów syntezy}.
+Graf przetwarzania sygnałów wytworzony przez algorytm implementowany w ramach pracy magisterskiej jest przepisem na gotowy elektroniczny instrument muzyczny,
+który może być wykorzystany w programie do komponowania muzyki. Algorytm nie generuje bezpośrednio sygnału dźwiękowego, lecz tworzy
+graf przetwarzania sygnałów, który jest zrozumiały dla użytkownika i pozwala na precyzyjne dostosowanie parametrów syntezy.
 Tego typu proces generowania grafów przetwarzania sygnałów dźwiękowych może być porównany z procesem projektowania instrumentu muzycznego.
 
 Modyfikowanie ścieżki przetwarzania sygnału jest techniką często wykorzystywaną w muzyce
@@ -83,10 +90,8 @@ bądź elektronicznym.
 
 \section{Cel pracy}
 
-
-Celem pracy jest zbadanie, czy algorytmy optymalizacyjne są w stanie
-wytworzyć graf przetwarzania sygnałów audio, który wykona syntezę próbki
-dźwięku zadanej przez użytkownika.
+Celem pracy jest \textbf{opracowanie algorytmu generacji grafów przetwarzania sygnałów, który
+który wykona syntezę próbki dźwięku zadanej przez użytkownika}.
 Problem poruszany w pracy można zakwalifikować do grupy zagadnień związanych
 z pojęciami \textit{computer-aided design} oraz \textit{generative artificial intelligence}, zastosowanymi w dziedzienie inżynierii dźwięku. Docelowo
 zaimplementowany algorytm będzie automatyzował pracę inżyniera dźwięku,
@@ -96,6 +101,8 @@ programach typu \textit{digital audio workstation}~(\ref{fig:ableton_patch}). Ba
 \begin{enumerate}\label{research_types}
     \item opracowanie metody generowania grafu przetwarzania sygnałów oraz późniejszej modyfikacji grafu -- jego struktury i parametrów,
     \item dobór funkcji celu, na podstawie której algorytm optymalizujący będzie modyfikował graf przetwarzania sygnałów.
+    \item przeprowadzenie badań symulacyjnych, które zweryfikują skuteczność opracowanego algorytmu.
+    \item porównanie wyników badań symulacyjnych z pracami naukowymi o podobnej tematyce.
 \end{enumerate}
 }
 
@@ -160,7 +167,7 @@ graf może być wykorzystany jako elektroniczny instrument muzyczny.
 Głównym problemem przy generowaniu grafu przetwarzania sygnałów są ograniczenia nałożone na strukturę grafu,
 które należy spełnić, by graf był logicznie interpretowalny jako łańcuch przetwarzania sygnałów.
 Graf musi być grafem skierowanym, który nie zawiera pętli o dodatnim sprzężeniu zwrotnym.
-Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika. 
+% Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika. 
 Automatyczna ewolucja może dążyć w kierunku wykorzystania nadmiarowej liczby
 bloków przetwarzania sygnału, jeśli funkcja celu nie będzie zawierała kary za zbyt złożone grafy.
 Podobne prace~\cite{evolutionary_puredata} wykorzystują podejście oparte o 
@@ -199,38 +206,22 @@ do przetestowania w ramach projektów zawarte są:
 
 \section{Struktura i zawartość pracy}
 
-Praca podzielona jest na następujące części:
+% Praca podzielona jest na następujące części:
 
-\subsection*{Definicja problemu (\ref{chap:problem_definition})}
-
-Formalizuje i opisuje problem optymalizacyjny rozwiązywany w pracy.
-
-\subsection*{Analiza i wybór funkcji celu (\ref{target_function_chapter}) }
-
-Porównuje funkcje z dziedziny przetwarzania sygnałów, które pozwalają określić jak podobna jest barwa dźwięku dwóch sygnałów dźwiękowych.
-Uzasadnia wybór funkcji celu, która została zastosowana w pracy.
-
-\subsection*{Algorytm rozwiązania (\ref{chap:solution_algorithm})}
-
-Opisuje algorytm wykorzystany do rozwiązania problemu
+Rozdział \textbf{Definicja problemu} formalizuje i opisuje problem optymalizacyjny rozwiązywany w pracy.
+W rozdziale \textbf{Analiza i wybór funkcji celu} opisano proces porównywania funkcji z dziedziny przetwarzania sygnałów,
+które pozwalają określić jak podobna jest barwa dźwięku dwóch sygnałów dźwiękowych i
+uzasadniono wybór funkcji celu, która została zastosowana w pracy.
+Rozdział \textbf{Algorytm rozwiązania} opisuje algorytm wykorzystany do rozwiązania problemu
 zdefiniowanego w rozdziale~\ref{chap:problem_definition}.
-
-\subsection*{Graf przetwarzania sygnałów (\ref{dsp_graph_chapter}) }
-
-Opisuje zaimplementowane w ramach pracy środowisko eksperymentalne,
+W rozdziale \textbf{Graf przetwarzania sygnałów} opisane zostało zaimplementowane w ramach pracy środowisko eksperymentalne,
 pozwalające na wytwarzanie grafów przetwarzania sygnałów o dowolnej strukturze.
-Przedstawia zaimplementowane algorytmy syntezy i przetwarzania sygnałów dźwiękowych.
-
-
-\subsection*{Wyniki padań (\ref{chap:research}) }
-
-Opisuje proces badawczy, w którym narzędzia wytworzone w rozdziałach~\ref{dsp_graph_chapter} oraz~\ref{target_function_chapter}
+Przedstawione są w nim również zaimplementowane algorytmy syntezy i przetwarzania sygnałów dźwiękowych.
+Rozdział \textbf{Wyniki badań} opisuje proces badawczy, w którym narzędzia wytworzone w
+rozdziałach~\ref{dsp_graph_chapter} oraz~\ref{target_function_chapter}
 zostały wykorzystane do automatycznego wytworzenia grafu DSP, który naśladuje barwę zadanej próbki dźwięku.
 Porównuje uzyskane wyniki z podobną pracą badawczą~\cite{evolutionary_puredata}.
-
-\subsection*{Analiza wyników, dyskusja nad skutecznością działania algorytmu oraz możliwe drogi dalszego rozwoju (\ref{chap:results_analysis})}
-
-Rozdział podsumowuje uzyskane wyniki badań, podejmuje dyskusję nad ogólną skutecznością i przydatnością zaimplementowanego rozwiązania oraz
+Rozdział \textbf{Analiza wyników, możliwe drogi dalszego rozwoju} podsumowuje uzyskane wyniki badań, podejmuje dyskusję nad ogólną skutecznością i przydatnością zaimplementowanego rozwiązania oraz
 kreśli potencjalne drogi dalszego rozwoju prac badawczych w podobnej tematyce. W czasie, gdy niniejsza praca była tworzona, zostały opublikowane badania
 dotyczące podobnego problemu~\cite{ieee_synth_programming}, rozdział podejmuje dyskusję o różnicach w podejściu do problemu oraz potencjalnych
 zalet i wad każdego z podejść.
