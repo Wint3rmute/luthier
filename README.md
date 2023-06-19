@@ -180,7 +180,8 @@ Dalej jest mowa o wyborze źródeł sygnału. Czy korzystamy tu z algorytmu gene
 
 Punkt 4.1 - czy można coś o tych generatorach powiedzieć dokładniej? Dlaczego te zostały wybrane? Czym może tu manipulować algorytm genetyczny.
 
-Punkt 4.2 - tu na pewno trzeba napisać zdecydowanie więcej; co to za filtr, jakie ma parametry, czym może manipulować algorytm genetyczny.
+<!-- Punkt 4.2 - tu na pewno trzeba napisać zdecydowanie więcej; co to za filtr, jakie ma parametry, czym może manipulować algorytm genetyczny. -->
+- dopisałem trochę więcej, ale tutaj opis z perspektywy "co filtr potrafi" jest wystarczający
 
 Punkt 4.3 - analogicznie, jakie parametry mają te efekty, czym manipuluje algorytm genetyczny, co wchodzi w skład osobnika? Pojawia się też pytanie, dlaczego mamy strukturę chorus -> delay -> reverb. W końcu czy nie było zamiarem pracy strukturę generować dynamicznie?
 

@@ -1,5 +1,15 @@
 \chapter{Algorytm rozwiązania}\label{chap:solution_algorithm}
 
+Jak opisano w rozdziale poświęconym definicji problemu~(\ref{chap:problem_definition}), praca
+rozwiązuje problem budowy grafu DSP z wykorzystaniem dwóch algorytmów, których współpracę przedstawiono na
+rysunku~\ref{fig:solution_algorithm_diagram}.
+
+\begin{enumerate}
+  \item Algorytm generujący graf DSP, opisany w rozdziale~\ref{dsp_graph_chapter},
+  \item Algorytm oceniający jak bardzo wygenerowany dźwięk jest bliski dźwiękowi docelowemu pod względem barwy,
+    opisany w rozdziale~\ref{target_function_chapter}.
+\end{enumerate}
+
 \begin{figure}[H]    
     \centering
     \includegraphics[width=1.0\linewidth]{rys04/solution_algorithm_diagram.png}
@@ -10,14 +20,6 @@
       proces wyboru funkcji celu opisuje rozdział~\ref{target_function_chapter}.
     }\label{fig:solution_algorithm_diagram}
 \end{figure}
-
-Jak opisano w rozdziale poświęconym definicji problemu~(\ref{chap:problem_definition}), praca
-rozwiązuje problem budowy grafu DSP z wykorzystaniem dwóch algorytmów:
-\begin{enumerate}
-  \item Algorytm generujący graf DSP, opisany w rozdziale~\ref{dsp_graph_chapter},
-  \item Algorytm oceniający jak bardzo wygenerowany dźwięk jest bliski dźwiękowi docelowemu pod względem barwy,
-    opisany w rozdziale~\ref{target_function_chapter}.
-\end{enumerate}
 
 Praca wykorzystuje algorytm genetyczny, w którym genotyp odpowiada za
 strukturę grafu~\ref{fig:example_generated_graph} oraz wartości
@@ -168,8 +170,17 @@ za pomocą algorytmu \textit{Karplus-Strong}.
 \section{Wybór filtrów}\label{sec:filters_selection_graph_structure}
 
 W pracy wykorzystano gotową implementację filtru cyfrowego, emulującego
-rezonansowy filtr drabinkowy~\cite{ladder_filter_rust}.
-Implementacja została wykorzystana do wytworzenia filtrów dolno oraz górnoprzepustowego.
+rezonansowy filtr drabinkowy~\cite{ladder_filter_rust}. Implementacja została
+wykorzystana do wytworzenia filtrów dolno oraz górnoprzepustowego.
+Węzeł filtra posiada 3 wejścia:
+
+\begin{enumerate}
+  \item częstotliwość odcięcia,
+  \item intensywność rezonansu,
+  \item sygnał poddawany filtracji.
+\end{enumerate}
+
+
 
 \section{Wybór efektów}
 
