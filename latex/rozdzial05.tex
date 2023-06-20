@@ -18,32 +18,32 @@ interfejsuje się z językiem \texttt{Python}, co umożliwia wykorzystanie gotow
     }
 \end{figure}
 
-\section{Podstawy syntezy dźwięku w syntezatorach modułowych}
+\section{Zaimplementowane środowisko a istniejące rozwiązania}
 
-Proces syntezy dźwięku może zostać przedstawiony jako zbiór węzłów wykonujących syntezę lub
-przetwarzanie sygnału audio oraz połączeń między węzłami. Przykładowe elementy grafu:
+% Proces syntezy dźwięku może zostać przedstawiony jako zbiór węzłów wykonujących syntezę lub
+% przetwarzanie sygnału audio oraz połączeń między węzłami. Przykładowe elementy grafu:
 
-\begin{enumerate}
-  \item Węzły:
-    \begin{enumerate}
-      \item generujące sygnał:
-        \begin{itemize}
-          \item synteza sygnałów (sinusoida, trójkąt, sygnał prostokątny),
-          \item sygnał modulujący (LFO, ADSR).
-        \end{itemize}
-      \item przetwarzające sygnał:
-        \begin{itemize}
-          \item filtry (górnoprzepustowy, dolnoprzepustowy, pasmowo-przepustowy),
-          \item efekty (pogłos, echo).
-        \end{itemize}
-    \end{enumerate}
-  \item Połączenia między węzłami:
-    \begin{itemize}
-      \item modulowanie parametrów syntezy i przetwarzania sygnału.
-    \end{itemize}
-\end{enumerate}
+% \begin{enumerate}
+%   \item Węzły:
+%     \begin{enumerate}
+%       \item generujące sygnał:
+%         \begin{itemize}
+%           \item synteza sygnałów (sinusoida, trójkąt, sygnał prostokątny),
+%           \item sygnał modulujący (LFO, ADSR).
+%         \end{itemize}
+%       \item przetwarzające sygnał:
+%         \begin{itemize}
+%           \item filtry (górnoprzepustowy, dolnoprzepustowy, pasmowo-przepustowy),
+%           \item efekty (pogłos, echo).
+%         \end{itemize}
+%     \end{enumerate}
+%   \item Połączenia między węzłami:
+%     \begin{itemize}
+%       \item modulowanie parametrów syntezy i przetwarzania sygnału.
+%     \end{itemize}
+% \end{enumerate}
 
-\noindent
+% \noindent
 Odpowiednikiem implementowanego środowiska w świecie rzeczywistym są syntezatory modułowe (przykładowo~\ref{fig:eurorack_setup}),
 które pozwalają na dowolne łączenie modułów wykonujących operacje DSP\@.
 Barwę dźwięku w syntezatorze modyfikuje się na dwa sposoby:

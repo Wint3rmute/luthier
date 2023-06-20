@@ -14,8 +14,10 @@ nie byłoby miarodajne, ponieważ algorytm z literatury miałby do dyspozycji
 dokładnie takie same algorytmy, które zostały wykorzystane do wygenerowania
 dźwięków docelowych.
 Przed przeprowadzeniem optymalizacji ustalono wartość częstotliwości podstawowej~$f_0$
-dla każdego z testowanych dźwięków. Zastosowano implementację algorytmu
-estymującego częstotliwość podstawową
+dla każdego z testowanych dźwięków, aby algorytm optymalizował parametry kontrolujące
+jedynie barwę dźwięku dla z góry zadanej właściwej wysokości dźwięku.
+Podobną praktykę stosują badania z literatury~\cite{ieee_synth_programming}.
+Zastosowano implementację algorytmu estymującego częstotliwość podstawową
 \textit{YIN}~\cite{yin_pitch_estimation}, dostępną w pakiecie obliczeniowym
 \texttt{librosa}~\cite{librosa}. Przebieg procesu optymalizacji dla każdego z testowanych
 dźwięków umieszczony jest na płycie CD, co opisuje dodatek~\ref{chap:opis-plyty}.
