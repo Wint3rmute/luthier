@@ -65,87 +65,91 @@ aby w nieoczekiwany sposób modyfikować proste próbki dźwięku.
 
 \section{Wybór źródeł sygnału}
 
-Graf posiada 3 sloty dla węzłów generujących sygnał. W pracy zaimplementowano różne
+Graf posiada 4 sloty dla węzłów generujących sygnał. W pracy zaimplementowano różne
 typy syntezy, które mogą być wykorzystane przez algorytm do syntezy dźwięków o różnorodnych barwach. 
+Parametry $s_1$, $s_2$, $s_3$ oraz $s_4$ wybierają źródło dźwięku zastosowane w danym
+slocie. Przykładowo, wartości w zakresie $0.0 - 0.14$ powodują wytworzenie się
+źródła \texttt{FM1}, dla zakresu $0.15-0.29$ wytwarzane jest źródło \texttt{FM2}
+i tak dalej.
 
 \subsection{Synteza FM}
 
-Zaimplementowane w pracy geny odpowiedzialne za syntezy FM odwzorowują uproszczone algorytmy syntezy wykorzystane
+Zaimplementowane w pracy źródła wykonujące syntezę FM odwzorowują uproszczone algorytmy syntezy wykorzystane
 w syntezatorze \textit{Yamaha DX7}~\cite{yamaha_dx7_manual}.
 
-\subsubsection{Gen \texttt{FM1}}
-
-Gen \texttt{FM1}
+\subsubsection{Źródło \texttt{FM1}}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{rys06/gene_fm1.png}
     \caption{
-      Graf wykorzystujący gen \texttt{FM1}.
+      Graf wykorzystujący źródło \texttt{FM1}.
     }\label{fig:gene_f1}
 \end{figure}
 
 
-Gen \texttt{FM1}, przedstawiony na diagramie~\ref{fig:gene_f2}, typową dla syntezy FM
+Źródło \texttt{FM1}, przedstawione na diagramie~\ref{fig:gene_f2},
+implementuje typową dla syntezy FM
 modulację fali sinusoidalnej za pomocą innej fali sinusoidalnej. Taki układ umożliwia
 uzyskanie dźwięków przypominających dźwięki fletu, trąbki lub dzwonków.
 
-\subsubsection{Gen \texttt{FM2}}
+\subsubsection{Źródło \texttt{FM2}}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{rys06/gene_fm2.png}
     \caption{
-      Graf wykorzystujący gen \texttt{FM2}.
+      Graf wykorzystujący źródło \texttt{FM2}.
     }\label{fig:gene_f2}
 \end{figure}
 
-Gen \texttt{FM2}, zilustrowany na diagramie~\ref{fig:gene_f2}, wykorzystuje pojedynczy
+Źródło \texttt{FM2}, zilustrowane na diagramie~\ref{fig:gene_f2}, wykorzystuje pojedynczy
 operator ze sprzężeniem zwrotnym. W zależności od ustawionych parametrów, taka struktura pozwala
 na uzyskanie dźwięków przypominających uderzenie w strunę lub służyć jako źródło szumu.
 
 \subsection{Synteza \textit{analog modeling}}
 
-Zaimplementowane w pracy geny odpowiedzialne za syntezy FM odwzorowują uproszczone algorytmy syntezy wykorzystane
+Zaimplementowane w pracy źródła odpowiedzialne za algorytmy syntezy FM odwzorowują uproszczone algorytmy syntezy wykorzystane
 w syntezatorze \textit{Korg Minilogue xd}~\cite{yamaha_dx7_manual}.
 
-\subsubsection{Gen \texttt{AN1}}
+\subsubsection{Źródło \texttt{AN1}}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{rys06/gene_an1.png}
     \caption{
-      Graf wykorzystujący gen \texttt{AN1}.
+      Graf wykorzystujący źródło \texttt{AN1}.
     }\label{fig:gene_an1}
 \end{figure}
 
-Gen \texttt{AN1} (diagram~\ref{fig:gene_an1}) pozwala na uzyskanie fal prostokątnych o różnej szerokości impulsów.
+Źródło \texttt{AN1} (diagram~\ref{fig:gene_an1}) pozwala na uzyskanie fal prostokątnych o różnej szerokości impulsów.
 
 
-\subsubsection{Gen \texttt{AN2}}
+\subsubsection{Źródło \texttt{AN2}}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{rys06/gene_an2.png}
     \caption{
-      Graf wykorzystujący gen \texttt{AN2}.
+      Graf wykorzystujący źródło \texttt{AN2}.
     }\label{fig:gene_an2}
 \end{figure}
 
-Gen \texttt{AN2}, przedstawiony na diagramie~\ref{fig:gene_an2}, pozwala na uzyskanie sygnałów piłokształtnych.
+Źródło \texttt{AN2}, przedstawiony na diagramie~\ref{fig:gene_an2},
+pozwala na uzyskanie sygnałów piłokształtnych.
 
 
-\subsubsection{Gen \texttt{AN3}}
+\subsubsection{Źródło \texttt{AN3}}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{rys06/gene_an3.png}
     \caption{
-      Graf wykorzystujący gen \texttt{AN3}.
+      Graf wykorzystujący źródło \texttt{AN3}.
     }\label{fig:gene_an3}
 \end{figure}
 
-Gen \texttt{AN3}, (diagram~\ref{fig:gene_an3}), generuje sygnały trójkątne.
+Źródło \texttt{AN3}, (diagram~\ref{fig:gene_an3}), generuje sygnały trójkątne.
 
 
 \subsection{Synteza \textit{physical modeling}}
@@ -154,17 +158,17 @@ Algorytmy wykonujące syntezę typu \textit{physical modeling}
 pochodzą z~\cite{computational_music_synthesis}. W pracy zaimplementowano
 podstawowy wariant algorytmu \textit{Karplus-Strong}.
 
-\subsubsection{Gen \texttt{PM1}}
+\subsubsection{Źródło \texttt{PM1}}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{rys06/gene_pm1.png}
     \caption{
-      Graf wykorzystujący gen \texttt{PM1}.
+      Graf wykorzystujący źródło \texttt{PM1}.
     }\label{fig:gene_an3}
 \end{figure}
 
-Gen \texttt{PM1} generuje sygnał przypominający strunę gitarową 
+Źródło \texttt{PM1} generuje sygnał przypominający strunę gitarową 
 za pomocą algorytmu \textit{Karplus-Strong}.
 
 \section{Wybór filtrów}\label{sec:filters_selection_graph_structure}
@@ -182,11 +186,18 @@ Węzeł filtru posiada 3 wejścia:
   \item sygnał poddawany filtracji.
 \end{enumerate}
 
+Parametr $s_4$ kontroluje typ filtru wykorzystanego w grafie. W zależności
+od jego wartości generowany jest filtr niskoprzepustowy, wysokoprzepustowy lub
+żaden.
+
 
 \section{Wybór efektów}
 
 Efekty połączone sa w łańcuch
-$chorus \rightarrow delay \rightarrow reverb$. Algorytm generacji wybiera, które efekty będą obecne w grafie.
+$chorus \rightarrow delay \rightarrow reverb$. Jeśli wartość parametru $s_5$ jest
+większa niż 0, generowany jest efekt \textit{chorus}. Jeśli wartość
+parmetru $s_6$ jest większa niz 0, generowany jest efekt \textit{delay}.
+Jeśli wartość parametru $s_7$ jest większa niz 0, generowany jest efekt \textit{reverb}.
 Diagram~\ref{fig:example_generated_effects} ilustruje fragment grafu,
 w którego strukturze znajdują się wszystkie 3 efekty.
 
