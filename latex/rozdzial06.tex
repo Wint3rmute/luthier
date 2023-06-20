@@ -88,6 +88,25 @@ składowe częstotliwościowe.
 \end{figure}
 
 
+Zaimplementowany algorytm nie jest w stanie przybliżyć dźwięku fletu.
+Wygenerowany sygnał przedstawiony na rysunku~\ref{fig:evolved_flute_sound_overview}
+zawiera nieregularne częstotliwości składowe,
+jednak nie pokrywają się one z częstotliwościami w dźwięku docelowym.
+Wygenerowane składowe o niskiej częstotliwości zupełnie nie występują w dźwięku docelowym.
+Na wygenerowanej strukturze grafu (rysunek~\ref{fig:evolved_graph_flute}) widoczny
+jest filtr wysokoprzepustowy (\texttt{HighPassFilter \#11}), co pozwala wnioskować,
+że odfiltrowanie niskich częstotliwości poprawiało uzyskiwane wartości funkcji celu.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[angle=90,width=0.45\linewidth]{rys06/evolved_graph_flute.png}
+    \caption{
+      Graf DSP wygenerowany przez zaimplementowany algorytm
+      dla dźwięku docelowego \texttt{flute.wav}.
+    }\label{fig:evolved_graph_flute}
+\end{figure}
+
+
 
 \section{Sampel z syntezatora \textit{OP-1}}
 
@@ -127,22 +146,26 @@ sygnał wygenerowany na syntezatorze jest bardziej stabilny.
 \end{figure}
 % \end{multicols}
 
-\begin{figure}
-    \centering
-    \includegraphics[angle=90,width=0.45\linewidth]{rys06/evolved_graph_op1.png}
-    \caption{
-      Graf DSP wygenerowany przez zaimplementowany algorytm
-      dla dźwięku docelowego \texttt{op1\_1.wav}.
-    }\label{fig:evolved_graph_op1}
-\end{figure}
-
-
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\linewidth]{rys06/op1_target_fun_values.png}
     \caption{
       Zmiany wartości funkcji celu podczas optymalizacji.
     }%\label{fig:evolved_literature_flute}
+\end{figure}
+
+Zaimplementowany algorytm generuje dźwięk bliski do szumu, wygenerowane
+składowe częstotliwościowe nie pokrywają się z dźwiękiem docelowym.
+Algorytm z literatury lepiej przybliża docelowy dźwięk -- odtwarza
+pojedynczą częstotliwość składową, widoczną na rysunku~\ref{fig:literature_op_1_sound_overview}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[angle=90,width=0.45\linewidth]{rys06/evolved_graph_op1.png}
+    \caption{
+      Graf DSP wygenerowany przez zaimplementowany algorytm
+      dla dźwięku docelowego \texttt{op1\_1.wav}.
+    }\label{fig:evolved_literature_op1_sound_overview}
 \end{figure}
 
 \section{Transjent}
