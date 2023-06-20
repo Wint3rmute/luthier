@@ -18,9 +18,9 @@ bibtex Dyplom && pdflatex -interaction=nonstopmode Dyplom.tex
 4 dobór funkcji celu to rozdział, który sprawia największe problemy, ale o tym będzie dalej
 5 badania i analiza wyników w jednym rozdziale "Badania symulacyjne"
 
-9 jeśli nie ma tabel, to spis tabel należy usunąć; to rodzi pytanie, dlaczego nie ma tabel? obok wykresów można dodać tabele, nawet jeśli reprezentują te same dane (wykresy są wtedy poglądowe, tabele bardziej szczegółowe)
+<!-- 9 jeśli nie ma tabel, to spis tabel należy usunąć; to rodzi pytanie, dlaczego nie ma tabel? obok wykresów można dodać tabele, nawet jeśli reprezentują te same dane (wykresy są wtedy poglądowe, tabele bardziej szczegółowe) -->
 
-Zastanawiam się, czy warto wprowadzać punkt "Skróty" (czy takie są teraz wymagania w szablonie?). Czytając pracę brakowało mi jednak wyjaśnień bezpośrednio w tekście, przy pojawianiu się oznaczeń. Może warto w tekście podawać chociaż nazwy angielskie (np. DAW w tekście pojawia się najpierw bez angielskiej wersji, dopiero dalej jest po angielsku - to nie ma sensu).
+<!-- Zastanawiam się, czy warto wprowadzać punkt "Skróty" (czy takie są teraz wymagania w szablonie?). Czytając pracę brakowało mi jednak wyjaśnień bezpośrednio w tekście, przy pojawianiu się oznaczeń. Może warto w tekście podawać chociaż nazwy angielskie (np. DAW w tekście pojawia się najpierw bez angielskiej wersji, dopiero dalej jest po angielsku - to nie ma sensu). -->
 
 <!-- DAW jest wiele, skróty sugerują, że jedno. -->
 
