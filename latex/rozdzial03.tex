@@ -1,9 +1,8 @@
 \chapter{Funkcja celu -- porównanie barwy dźwięku}~\label{target_function_chapter}
 
-Aby stopniowo dostosować graf przetwarzania sygnałów zaimplementowany 
-w rozdziale~\ref{dsp_graph_chapter} do imitowania zadanej próbki dźwięku,
+Aby stopniowo dostosować graf przetwarzania sygnałów tak, aby imitował zadaną próbkę dźwięku,
 należy wykorzystać funkcję celu, która maleje wraz ze wzrostem podobieństwa
-barwy dźwięku między próbki zadaną i sygnałem generowanym przez graf. 
+barwy dźwięku między próbki zadaną i sygnałem generowanym przez graf.
 
 \begin{figure}[H]\label{fig:waveform_not_equal_to_perception}
     \centering
@@ -171,7 +170,7 @@ na wykresie~\ref{fig:fm_training_sample_overview}.
     }\label{fig:analog_graph_for_benchmarks}
 \end{figure}
 
-Synteza \textit{analog modeling} zazwyczaj wykorzystuje więcej parametrów niż synteza
+Synteza \textit{analog modeling} zazwyczaj wykorzystuje mniej parametrów niż synteza
 FM~(\ref{fig:fm_graph_for_benchmarks}), aby zwiększyć trudność problemu optymalizacyjnego
 graf został roszszerzony o węzeł dodający efekt pogłosu~\cite{reverb}.
 Struktura grafu (przedstawiona na rysunku~\ref{fig:analog_graph_for_benchmarks}) składa

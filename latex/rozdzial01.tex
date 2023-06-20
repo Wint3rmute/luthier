@@ -114,13 +114,56 @@ programach typu \textit{digital audio workstation}~(\ref{fig:ableton_patch}). Ba
     }\label{fig:ableton_patch}
 \end{figure}
 
+\subsection{Podstawy syntezy dźwięku}\label{sec:basics_of_sound_synthesis}
+
+W syntezie dźwięku wykorzystuje się algorytmy generujące
+i przetwarzające sygnały w zakresie częstotliwości słyszalnych.
+Praca wykorzystuje powszechnie używane typy algorytmów syntezy,
+opisane w~\cite{computational_music_synthesis}.
+
+\subsubsection{Synteza FM}
+
+Synteza FM wykorzystuje sygnał sinusoidalny jako źródło sygnału podstawowego
+(\textit{carrier}). Zróżnicowane barwy dźwięku uzyskiwane są przez modulowanie
+częstotliwości sinusoidy podstawowej przez inne sygnały sinusoidalne (\textit{modulators}),
+które zazwyczaj generują sygnał o częstotliwości będącej wielokrotnością
+częstotliwości podstawowej~\cite{spectral_audio_processing}. Siła modulacji
+może być zmieniana w trakcie syntezy, co powoduje zmiany
+w odczuwanej barwie dźwięku.
+
+\subsubsection{Synteza subtraktywna}
+
+W syntezie subtraktywnej wykorzystuje się sygnały dźwiękowe o dużej liczbie
+składowych harmonicznych, takie jak sygnał piłokształtny lub kwadratowy.
+Podstawową barwę dźwięku uzyskuje się przez dobór kilku sygnałów
+o różnych kształtach, następnie sygnał jest filtrowany za pomocą filtrów
+dolno-, górno- i pasmoprzepusowych~\cite{digital_filters}, aby
+usunąć wybrane przez użytkownika składowe częstotliwościowe.
+Dynamiczne zmiany w barwie dźwięku uzyskuje się poprzez modulowanie
+częstotliwości odcięcia filtru.
+
+\subsubsection{Algorytmy \textit{physical modeling}}
+
+Algorytmy typu \textit{physical modeling} wykorzystują uproszczone
+modele fizyczne rzeczywistych obiektów wytwarzających sygnały dźwiękowe,
+takie jak struny czy membrany~\cite{lisp_synthesis}.
+
+
+\subsubsection{symulacja efektu pogłosu/echa~\cite{reverb}~\cite{freeverb}}
+
+Sygnał wygenerowany przez dany algorytm syntezy (lub połączenie wielu algorytmów)
+może być przetworzony przez algorytmy symulujące echo lub pogłos (\textit{reverb, delay}).
+Tego typu algorytmy naśladują roznoszenie się dźwięku w pudle rezonansowym
+instrumentu bądź w dużej przestrzeni (sala koncertowa, jaskinia).
+ 
+
 \subsection{Generowanie grafu przetwarzania sygnałów}
 
-Proces syntezy dźwięku może być przedstawiony jako graf przetwarzania sygnałów, w którym
+Proces syntezy dźwięku często jest przedstawiany jako graf przetwarzania sygnałów, w którym
 każdy węzeł wykonuje na sygnale określoną operację.
 Przykładowy graf przetwarzania sygnału dla syntezatora analogowego subtraktywnego
 przedstawiony jest na schemacie~\ref{fig:minilogue_diagram}.
-Pierwsze zagadnienie sprowadza się do opracowania algorytmu pozwalającego na wygenerowanie
+Pierwsze zagadnienie poruszane w pracy sprowadza się do opracowania algorytmu pozwalającego na wygenerowanie
 grafu przetwarzania sygnałów DSP oraz jego późniejszą modyfikację. Przykładem modyfikacji grafu
 może być wprowadzanie do niego nowych źródeł modulacji bądź zmiana algorytmu generującego sygnał.
 
@@ -181,14 +224,8 @@ Finalnie, badania dążą do wyznaczenia algorytmu o następujący właściwośc
 \end{enumerate}
 
 \noindent
-Elementami grafu przetwarzania sygnałów są używane powszechnie w syntezie dźwięku algorytmy:
-
-\begin{enumerate}
-  \item modulacja FM~\cite{spectral_audio_processing}~\cite{computational_music_synthesis},
-  \item synteza subtraktywna~\cite{computational_music_synthesis}~\cite{digital_filters},
-  \item algorytmy \textit{physical modeling}~\cite{lisp_synthesis}~\cite{computational_music_synthesis},
-  \item symulacja efektu pogłosu/echa~\cite{reverb}~\cite{freeverb}.
-\end{enumerate}
+Elementami grafu przetwarzania sygnałów są używane powszechnie w syntezie dźwięku algorytmy,
+opisane w sekcji~\ref{sec:basics_of_sound_synthesis}.
 
 \subsection{Dobór funkcji błędu: różnica między wygenerowanym a docelowym sygnałem dźwiękowym}
 
