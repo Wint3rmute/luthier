@@ -84,7 +84,7 @@ składowe częstotliwościowe.
     \includegraphics[width=0.6\linewidth]{rys06/flute_target_fun_values.png}
     \caption{
       Zmiany wartości funkcji celu podczas optymalizacji.
-    }%\label{fig:evolved_literature_flute}
+    }\label{fig:flute_target_fun_values}
 \end{figure}
 
 
@@ -151,7 +151,7 @@ sygnał wygenerowany na syntezatorze jest bardziej stabilny.
     \includegraphics[width=0.6\linewidth]{rys06/op1_target_fun_values.png}
     \caption{
       Zmiany wartości funkcji celu podczas optymalizacji.
-    }%\label{fig:evolved_literature_flute}
+    }\label{fig:op1_target_fun_values}
 \end{figure}
 
 Zaimplementowany algorytm generuje dźwięk bliski do szumu, wygenerowane
@@ -210,10 +210,16 @@ Tego typu dźwięki przypominają brzmienie instrumentów klawiszowych: fortepia
     \includegraphics[width=0.6\linewidth]{rys06/transient_target_fun_values.png}
     \caption{
       Zmiany wartości funkcji celu podczas optymalizacji.
-    }%\label{fig:evolved_literature_flute}
+    }\label{fig:transient_target_fun_values}
 \end{figure}
 
-\begin{figure}
+
+Wygenerowany sygnał nie pokrywa się z dźwiękiem docelowym. Zaimplementowany
+algorytm częściowo odtwarza najsłabszą częstotliwość składową, widoczną
+na rysunku~\ref{fig:evolved_transient_sound_overview}, występującą
+w okolicach 64Hz, wraz ze zmianami w jej dynamice.
+
+\begin{figure}[H]
     \centering
     \includegraphics[angle=90,width=0.35\linewidth]{rys06/evolved_graph_transient.png}
     \caption{
@@ -222,7 +228,15 @@ Tego typu dźwięki przypominają brzmienie instrumentów klawiszowych: fortepia
     }\label{fig:evolved_graph_transient}
 \end{figure}
 
+\subsection{Podsumowanie}
 
+Zaimplementowany w ramach pracy algorytm nie jest w stanie odtworzyć dźwięków
+docelowych w większym stopniu niż algorytm z literatury~\cite{evolutionary_puredata}.
+Wykresy prezentujące zmiany wartości funkcji celu, przedstawione na
+rysunkach~\ref{fig:transient_target_fun_values},~\ref{fig:op1_target_fun_values}
+oraz~\ref{fig:flute_target_fun_values} sugerują, że wykorzystany
+rozmiar populacji był za mały, gdyż większość iteracji nie poprawiało
+najlepszej wartości funkcji celu.
 
 \section{Dźwięki inne niż przykłady z literatury}\label{sec:non_literature_samples}
 
@@ -253,6 +267,12 @@ subtraktywną~\ref{fig:minilogue_target_sample}.
 \end{figure}
 % \end{multicols}
 
+Wygenerowany przez algorytm dźwięk, przedstawiony na
+rysunku~\ref{fig:evolved_minilogue_sample}, przypomina
+dźwięk docelowy znacznie bardziej niż dźwięki wytworzone
+podczas testów porównawczych. Poprawnie odtworzony
+jest przebieg dynamiczny dźwięku, filtr dolnoprzepustowy
+oraz modulacja częstotliwości odcięcia filtru.
 
 \begin{figure}
     \centering
