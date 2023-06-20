@@ -172,22 +172,20 @@ za pomocą algorytmu \textit{Karplus-Strong}.
 W pracy wykorzystano gotową implementację filtru cyfrowego, emulującego
 rezonansowy filtr drabinkowy~\cite{ladder_filter_rust}. Implementacja została
 wykorzystana do wytworzenia filtrów dolno oraz górnoprzepustowego.
-Węzeł filtra posiada 3 wejścia:
+Węzeł filtru posiada 3 wejścia:
 
 \begin{enumerate}
-  \item częstotliwość odcięcia,
-  \item intensywność rezonansu,
+  \item częstotliwość odcięcia -- kontroluje zakres częstotliwości,
+    które nie są tłumione przez filtr,
+  \item intensywność rezonansu -- kontroluje intensywność wzmocnienia częstotliwości
+    bliskich częstotliwości odcięcia filtru,
   \item sygnał poddawany filtracji.
 \end{enumerate}
 
 
-
 \section{Wybór efektów}
 
-W pracy wykorzystano gotowy algorytm pogłosu (\textit{reverb}) oparty na~\cite{reverb}.
-Algorytm generujący echo (\textit{delay}) został zaimplementowany jako bufor kołowy.
-Algorym generujący efekt \textit{chorus} został zaimplementowany jako wariant algorytmu \textit{delay},
-w którym długość bufora jest modulowana przez falę sinusoidalną. Efekty połączone sa w łańcuch
+Efekty połączone sa w łańcuch
 $chorus \rightarrow delay \rightarrow reverb$. Algorytm generacji wybiera, które efekty będą obecne w grafie.
 Diagram~\ref{fig:example_generated_effects} ilustruje fragment grafu,
 w którego strukturze znajdują się wszystkie 3 efekty.
@@ -199,3 +197,41 @@ w którego strukturze znajdują się wszystkie 3 efekty.
       Przykładowy łańcuch efektów w grafie.
     }\label{fig:example_generated_effects}
 \end{figure}
+
+\subsubsection{Pogłos}
+
+W pracy wykorzystano gotowy algorytm pogłosu (\textit{reverb}) oparty na~\cite{reverb}.
+Węzeł \texttt{reverb} posiada następujące parametry:
+\begin{enumerate}
+  \item \texttt{input\_size} -- kontroluje rozmiar symulowanej przestrzeni, małe
+    wartości generują pogłos typowy dla małych pokojów lub kameralnych sal koncertowych,
+    duże wartości symulują pogłos dużych hal,
+  \item \texttt{input\_decay} -- kontroluje prędkość spadku poziomu
+    głośności wygenerowanego pogłosu,
+  \item \texttt{input\_dry}, \texttt{input\_wet} -- określa balans głośności
+    między surowym sygnałem wejściowym a wygenerowanym pogłosem.
+\end{enumerate}
+
+\subsubsection{Echo}
+
+Algorytm generujący echo (\textit{delay}) został zaimplementowany jako bufor kołowy. Występują
+w nim parametry:
+\begin{enumerate}
+  \item \texttt{input\_length} -- długość bufora kołowego, duże wartości spowodują
+    że echo będzie słyszalne po dłuższym czasie,
+  \item \texttt{input\_feedback} -- kontroluje prędkość spadku głośności echa.
+  \item \texttt{input\_dry}, \texttt{input\_wet} -- tak samo jak w węźle \texttt{reverb}.
+\end{enumerate}
+
+\subsubsection{\textit{Chorus}}
+
+Algorym generujący efekt \textit{chorus} został zaimplementowany jako wariant algorytmu \textit{delay},
+w którym długość bufora jest modulowana przez falę sinusoidalną. Węzeł \texttt{chorus}
+posiada następujące parametry:
+
+\begin{enumerate}
+  \item \texttt{input\_feedback} -- tak samo jak w węźle \texttt{delay}.
+  \item \texttt{input\_dry}, \texttt{input\_wet} -- tak samo jak w węźle \texttt{reverb}.
+\end{enumerate}
+
+
