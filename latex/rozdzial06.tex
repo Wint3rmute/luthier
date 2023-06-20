@@ -1,4 +1,4 @@
-\chapter{Wyniki badań}\label{chap:research}
+\chapter{Badania symulacyjne}\label{chap:research}
 
 
 % \section{Porównanie wyników optymalizacji z literaturą~\cite{evolutionary_puredata}}
@@ -28,12 +28,14 @@ W badaniach zastosowano następujące parametry algorytmu genetycznego:
   \item rozmiar populacji: \texttt{50},
   \item liczba iteracji: \texttt{200},
   \item strategia mutacji: \texttt{best1bin},
-  \item rekombinacja: \texttt{0.7}
+  \item rekombinacja: \texttt{0.7}.
 \end{enumerate}
 
-Ze względu na długi czas działania zaimplementowanego algorytmu optymalizacji,
+Ze względu na długi czas działania zaimplementowanego algorytmu optymalizacji
+(średnio 10 minut na pojedynczą iterację),
 w pracy nie udało się porównać jak różne parametry algorytmu genetycznego
-wpływają na proces optymalizacji.
+wpływają na proces optymalizacji. Finalnie wykonano tylko jedną pełną optymalizację
+dla każdego z testowanych dźwięków.
 
 \newpage
 
@@ -44,21 +46,21 @@ jest nagraniem prawdziwego instrumentu dętego. Kształt fali jest nieregularny,
 charakterystyka spektralna zawiera dynamicznie pojawiające się i słabnące 
 składowe częstotliwościowe.
 
-\begin{multicols}{3}
+% \begin{multicols}{3}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/target_sample_flute_literature.png}
+    \includegraphics[width=0.7\linewidth]{rys06/target_sample_flute_literature.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku \texttt{flute.wav} wykorzystywanego
+      Spektrogram i wykres fali dla dźwięku \texttt{flute.wav} wykorzystywanego
       do eksperymentów w~\cite{evolutionary_puredata_results}.
     }\label{fig:literature_flute_sound_overview}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/evolved_sample_flute.png}
+    \includegraphics[width=0.7\linewidth]{rys06/evolved_sample_flute.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku \texttt{flute.wav}
+      Spektrogram i wykres fali dla dźwięku \texttt{flute.wav}
       wytworzonego przez zaimplementowany algorytm optymalizacji
       dla dźwięku \texttt{flute.wav}.
     }\label{fig:evolved_flute_sound_overview}
@@ -66,14 +68,22 @@ składowe częstotliwościowe.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/macret_evolved_flute.png}
+    \includegraphics[width=0.7\linewidth]{rys06/macret_evolved_flute.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku
+      Spektrogram i wykres fali dla dźwięku
       wygenerowanego przez algorym z literatury~\cite{evolutionary_puredata}
       na wzór \texttt{flute.wav}.
     }\label{fig:evolved_literature_flute}
 \end{figure}
-\end{multicols}
+% \end{multicols}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{rys06/flute_target_fun_values.png}
+    \caption{
+      Zmiany wartości funkcji celu podczas optymalizacji.
+    }%\label{fig:evolved_literature_flute}
+\end{figure}
 
 
 
@@ -84,12 +94,12 @@ zasymulowania dźwięku instrumentu dętego przez syntezator. Podobnie jak w prz
 prawdziwego dźwięku fletu, widoczne są zmienne w czasie składowe harmoniczne, jednak
 sygnał wygenerowany na syntezatorze jest bardziej stabilny.
 
-\begin{multicols}{3}
+% \begin{multicols}{3}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/target_sample_op1_literature.png}
+    \includegraphics[width=0.7\linewidth]{rys06/target_sample_op1_literature.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku \texttt{op1\_1.wav} wykorzystywanego
+      Spektrogram i wykres fali dla dźwięku \texttt{op1\_1.wav} wykorzystywanego
       do eksperymentów w~\cite{evolutionary_puredata_results}.
     }\label{fig:literature_op_1_sound_overview}
 \end{figure}
@@ -97,9 +107,9 @@ sygnał wygenerowany na syntezatorze jest bardziej stabilny.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/evolved_sample_op1.png}
+    \includegraphics[width=0.7\linewidth]{rys06/evolved_sample_op1.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku wygenerowanego
+      Spektrogram i wykres fali dla dźwięku wygenerowanego
       przez algorytm optymalizacji na wzór \texttt{op1\_1.wav}.
     }\label{fig:evolved_op1_sound_overview}
 \end{figure}
@@ -107,13 +117,13 @@ sygnał wygenerowany na syntezatorze jest bardziej stabilny.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/macret_evolved_op1.png}
+    \includegraphics[width=0.7\linewidth]{rys06/macret_evolved_op1.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku wygenerowanego
+      Spektrogram i wykres fali dla dźwięku wygenerowanego
       przez algorytm z literatury~\cite{evolutionary_puredata} na wzór \texttt{op1\_1.wav}.
     }\label{fig:evolved_literature_op1_sound_overview}
 \end{figure}
-\end{multicols}
+% \end{multicols}
 
 \begin{figure}
     \centering
@@ -124,7 +134,14 @@ sygnał wygenerowany na syntezatorze jest bardziej stabilny.
     }\label{fig:evolved_graph_op1}
 \end{figure}
 
-\newpage
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{rys06/op1_target_fun_values.png}
+    \caption{
+      Zmiany wartości funkcji celu podczas optymalizacji.
+    }%\label{fig:evolved_literature_flute}
+\end{figure}
 
 \section{Transjent}
 
@@ -133,35 +150,43 @@ został wykorzystany w literaturze~\cite{evolutionary_puredata} do sprawdzenia j
 generujący dźwięk potrafi przybliżyć dźwięki o dynamicznych zmianach w charakterystyce spektralnej.
 Tego typu dźwięki przypominają brzmienie instrumentów klawiszowych: fortepianu lub klawesynu.
 
-\begin{multicols}{3}
+% \begin{multicols}{3}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/transient_sample_literature.png}
+    \includegraphics[width=0.7\linewidth]{rys06/transient_sample_literature.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku \texttt{transient.wav} wykorzystywanego
+      Spektrogram i wykres fali dla dźwięku \texttt{transient.wav} wykorzystywanego
       do eksperymentów w~\cite{evolutionary_puredata_results}.
     }\label{fig:literature_transient_sound_overview}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/evolved_sample_transient.png}
+    \includegraphics[width=0.7\linewidth]{rys06/evolved_sample_transient.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku wygenerowanego na wzór
+      Spektrogram i wykres fali dla dźwięku wygenerowanego na wzór
       \texttt{transient.wav}.
     }\label{fig:evolved_transient_sound_overview}.
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\linewidth]{rys06/macret_evolved_transient.png}
+    \includegraphics[width=0.7\linewidth]{rys06/macret_evolved_transient.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku wygenerowanego 
+      Spektrogram i wykres fali dla dźwięku wygenerowanego 
       przez algorytm z literatury~\cite{evolutionary_puredata} na wzór
       \texttt{transient.wav}.
     }\label{fig:evolved_literature_transient_sound_overview}.
 \end{figure}
-\end{multicols}
+% \end{multicols}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\linewidth]{rys06/transient_target_fun_values.png}
+    \caption{
+      Zmiany wartości funkcji celu podczas optymalizacji.
+    }%\label{fig:evolved_literature_flute}
+\end{figure}
 
 \begin{figure}
     \centering
@@ -172,7 +197,8 @@ Tego typu dźwięki przypominają brzmienie instrumentów klawiszowych: fortepia
     }\label{fig:evolved_graph_transient}
 \end{figure}
 
-\newpage
+
+
 \section{Dźwięki inne niż przykłady z literatury}\label{sec:non_literature_samples}
 
 Badania przeprowadzone w ramach~\cite{evolutionary_puredata}
@@ -181,26 +207,26 @@ się na instrumentach dętych i syntezie FM\@. Algorytm przetestowano
 również na samodzielnie wytworzonych dźwiękach, wykorzystując syntezę
 subtraktywną~\ref{fig:minilogue_target_sample}.
 
-\begin{multicols}{2}
+% \begin{multicols}{2}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\linewidth]{rys06/target_minilogue.png}
+    \includegraphics[width=0.7\linewidth]{rys06/target_minilogue.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku wygenerowanego 
+      Spektrogram i wykres fali dla dźwięku wygenerowanego 
       na syntezatorze \textit{Korg Minilogue xd}.
     }\label{fig:minilogue_target_sample}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\linewidth]{rys06/evolved_minilogue.png}
+    \includegraphics[width=0.7\linewidth]{rys06/evolved_minilogue.png}
     \caption{
-      Spektrum fouriera i współczynniki MFCC dla dźwięku wygenerowanego 
+      Spektrogram i wykres fali dla dźwięku wygenerowanego 
       przez zaimplementowany w ramach pracy algorytm na
       wzór~\ref{fig:minilogue_target_sample}.
     }\label{fig:evolved_minilogue_sample}.
 \end{figure}
-\end{multicols}
+% \end{multicols}
 
 
 \begin{figure}
