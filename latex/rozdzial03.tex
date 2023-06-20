@@ -77,6 +77,20 @@ Funkcje celu zostały wpierw przetestowane poprzez wykonanie
 zbioru przekrojów przez uproszczony problem syntezy typu FM\@.
 Następnie przeprowadzono próby automatycznego dostosowania parametrów dwóch grafów
 o predefiniowanej strukturze, dla syntezy FM oraz \textit{analog modeling}.
+Ponieważ barwa dźwięku jest odczuciem z natury subiektywnym~\cite{ji2020comprehensive},
+ostateczna decyzja dotycząca wyboru funkcji celu została dokonana
+przez autora pracy, proces decyzyjny został opisany w
+sekcjach~\ref{sec:problem_crossection_results_analysis}
+oraz~\ref{sec:fixed_structure_optimisation_results}.
+
+\section{Prezentacja wyników}
+
+Próbki dźwięku (docelowe oraz wygenerowane) zaprezentowane są w pracy w formie
+spektrogramów, ponieważ taki format jest najbardziej czytelny dla
+człowieka~\cite{computational_music_synthesis}
+i pozwala ocenić skuteczność algorytmu optymalizacji.
+Inne prace w podobnych dziedzinach również wykorzystują
+spektrogramy~\cite{evolutionary_puredata}~\cite{engel2020ddsp}.
 
 \section{Przekrój wartości funkcji celu dla prostego problemu syntezy typu FM}\label{sec:fm_synth_params_cross_section}
 
@@ -103,7 +117,7 @@ Modyfikowane parametry odpowiadają za różne cechy barwy uzyskanego dźwięku:
     }
 \end{figure}
 
-\subsection{Analiza wyników}
+\subsection{Analiza wyników}\label{sec:problem_crossection_results_analysis}
 
 Wyniki testów zaprezentowane na wykresach~\ref{fig:target_function_testing} pozwalają na
 wyeliminowanie różnicy między spektrogramami jako funkcji celu,
@@ -136,7 +150,7 @@ grafów syntezy FM oraz \textit{analog modeling}}
 Drugą częścią procesu testowania funkcji celu z literatury było zweryfikowanie skuteczności
 każdej z funkcji w uproszczonym problemie optymalizacyjnym, polegającym jedynie na odnalezieniu właściwych
 parametrów dla predefiniowanej struktury grafu DSP\@. Wykorzystano dwa grafy
-DSP~(\ref{fig:analog_graph_for_benchmarks},~\ref{fig:fm_graph_for_benchmarks}),
+DSP~(rysunki~\ref{fig:analog_graph_for_benchmarks} i~\ref{fig:fm_graph_for_benchmarks}),
 wykonujące różne rodzaje syntezy.
 
 \subsection{Synteza FM}
@@ -210,7 +224,7 @@ Zastosowano następujące parametry algorytmu genetycznego:
 \end{enumerate}
 
 
-\subsection{Wyniki testów}
+\subsection{Wyniki testów}\label{sec:fixed_structure_optimisation_results}
 
 \begin{figure}[H]
     \centering
