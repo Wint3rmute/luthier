@@ -91,13 +91,13 @@ liczbowy, optymalizowany na podstawie wartości funkcji celu~(\ref{eq:target_fun
 W~przypadku schematu~\ref{fig:minilogue_diagram} takimi~,,wolnymi'' wejściami są przykładowo
 sygnał określający częstotliwość odcięcia filtru sygnału lub parametry określające parametry
 generatora obwiedni~(\textit{EG}).
-W~pracy wykorzystano algorytm genetyczny \textit{differential evolution}~\cite{2020SciPy-NMeth}
-do wygenerowania struktury i parametrów grafu.
-Genotyp opisujący dany graf przetwarzania sygnałów składa się z dwóch części:
+Graf przetwarzania sygnałów wykorzystywany w pracy wytwarzany
+jest na podstawie dwóch list parametrów sterujących:
 \begin{enumerate}
-  \item fragment decydujący o strukturze grafu, $S = [s_1, s_2,~\ldots]$,
-  \item fragment decydujący o wartości parametrów w wolnych wejściach, $P = [p_2, p_2,~\ldots]$.
+  \item parametry definujące strukturę grafu, $S = [s_1, s_2,~\ldots]$,
+  \item lista wartości parametrów w wolnych wejściach, $P = [p_2, p_2,~\ldots]$.
 \end{enumerate}
+
 
 \subsection{Struktura grafu}\label{sec:graph_structure_definition}
 
