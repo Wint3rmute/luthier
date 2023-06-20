@@ -4,8 +4,8 @@ Rozpowszechnione algorytmy sztucznej inteligencji wspomagające pracę inżynier
 można podzielić na trzy główne kategorie~\cite{ji2020comprehensive}~\cite{analysis_generative}~\label{traditional_algos}:
 
 \begin{enumerate}
-    \item algorytmy generujące symboliczny zapis muzyki (nuty lub dane MIDI) (\ref{fig:lamus_notes}),~\cite{zhang2023language},
-    \item algorytmy generujące gotowy plik audio na podstawie opisu użytkownika (\ref{fig:riffusion_spectro}).
+    \item algorytmy generujące symboliczny zapis muzyki (nuty lub dane MIDI) (rysunek \ref{fig:lamus_notes}),~\cite{zhang2023language},
+    \item algorytmy generujące gotowy plik audio na podstawie opisu użytkownika (rysunek \ref{fig:riffusion_spectro}).
     \item algorytmy symulujące brzmienie instrumentów muzycznych~\cite{engel2017neural}.
 \end{enumerate}
 
@@ -185,7 +185,11 @@ może być wprowadzanie do niego nowych źródeł modulacji bądź zmiana algory
 Drugie zagadnienie obejmuje przetestowanie szeregu algorytmów, które można
 wykorzystać do zbudowania funkcji celu, która będzie optymalizowana
 poprzez~,,dostrajanie'' parametrów i struktury grafu przetwarzania sygnałów dźwiękowych.
-% todo: więcej o funkcji celu
+Problem porównywania barwy dwóch sygnałów dźwiękowych nie jest problemem trywialnym,
+ponieważ wymaga zamodelowania wrażeń psychoakustycznych~\cite{engel2020ddsp} odczuwanych
+podczas odsługu próbki dźwięku.
+Skuteczność danej funkcji celu finalnie musi być poddana subiektywnej ocenie,
+ponieważ nie istnieją obiektywne metryki mierzące z natury subiektywne odczucia słuchacza.
 Praca proponuje wykorzystanie współczynników cepstralnych sygnału (MFCC) w połączeniu
 z dynamicznym skalowaniem czasu (\textit{dynamic time wrapping}, DTW) jako funkcji celu.
 Proces wyboru funkcji celu został
