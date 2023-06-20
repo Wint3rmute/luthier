@@ -10,7 +10,7 @@ bibtex Dyplom && pdflatex -interaction=nonstopmode Dyplom.tex
 
 ## Finalne poprawki
 
-- usunąć obramowania przy łączach
+<!-- - usunąć obramowania przy łączach -->
 - odwołując się do rysunków w tekście podać rys. numer, albo rysunek numer
 
 <!-- 3 zbędne: "W przeciwieństwie do technik wykorzystujących sieci neuronowe jako narzędzia syntezy" -->
@@ -77,17 +77,17 @@ Jeśli na początku ma być ogólnie o problematyce syntezy dźwięku, to ten fr
 "A Comprehensive Survey on Deep Music Generation: Multi-level Representations, Algorithms, Evaluations, and Future Directions" SHULEI JI, JING LUO, and XINYU YANG
 Konkretniej, w rozdziale 2 Related Work, autorzy powołują się na kilka prac przeglądowych. Może warto je odszukać i wykorzystać.
 
-Jest tutaj kluczowe, żeby jasno napisać czym jest sam problem syntezy dźwięku. Nie jakie są do tego stosowane algorytmy, ale czym jest sam problem. O algorytmach można kawałek dalej.
+<!-- Jest tutaj kluczowe, żeby jasno napisać czym jest sam problem syntezy dźwięku. Nie jakie są do tego stosowane algorytmy, ale czym jest sam problem. O algorytmach można kawałek dalej. -->
 
-Ostatni akapit to łagodne wprowadzenie w wykorzystanie grafów DSP, czyli do podpunktu 1.1.
+<!-- Ostatni akapit to łagodne wprowadzenie w wykorzystanie grafów DSP, czyli do podpunktu 1.1. -->
 
-Potem należy zrobić przegląd literaturowy dotyczący właściwego problemu, czyli generacji/zastosowania grafów DSP. Najpierw należy napisać czym jest graf DSP - to będzie kolejny podrozdział. Jeszcze niekoniecznie formalnie. Tutaj trzeba podać i opisać jakąś literaturę na temat grafów DSP. Dlaczego się z nich korzysta. Gdzie zostały skutecznie wykorzystane. A co najważniejsze: czego jeszcze nie zrobiono. Wszystko wspomagane odwołaniami do literatury.
+<!-- Potem należy zrobić przegląd literaturowy dotyczący właściwego problemu, czyli generacji/zastosowania grafów DSP. Najpierw należy napisać czym jest graf DSP - to będzie kolejny podrozdział. Jeszcze niekoniecznie formalnie. Tutaj trzeba podać i opisać jakąś literaturę na temat grafów DSP. Dlaczego się z nich korzysta. Gdzie zostały skutecznie wykorzystane. A co najważniejsze: czego jeszcze nie zrobiono. Wszystko wspomagane odwołaniami do literatury. -->
 
 Później podajemy cel pracy, to jest podpunkt 1.2. (Cel i zakres pracy) Celem pracy jest opracowanie algorytmu generacji grafu DSP do rozwiązywania problemu syntezy dźwięku (tak jak w tytule). Potem podajemy zadania szczegółowe. Wybór/opracowanie funkcji celu najpierw (bo taka jest kolejność). Opracowanie algorytmu później. A na końcu przeprowadzenie badań.
 
 Potem akapit albo dwa (albo i trzy) o strukturze pracy. Tak, żeby względnie łatwo było powiązać zadania szczegółowe i rozdziały pracy.
 
-W pracy są też Dodatki (może lepiej Załączniki) - o nich też należy wspomnieć.
+<!-- W pracy są też Dodatki (może lepiej Załączniki) - o nich też należy wspomnieć. -->
 
 # Rozdział 2
 
