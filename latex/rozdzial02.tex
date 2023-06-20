@@ -140,7 +140,7 @@ Gdzie $MFCC$ oznacza \textit{mel-frequency cepstrum coefficients}~(\ref{fig:mfcc
 natomiast $DTW$ oznacza algorytm \textit{dynamic time warping}~\cite{mfcc_dtw}.
 Uzasadnienie wybranej funkcji celu opisane jest w rozdziale~\ref{target_function_chapter}.
 
-\subsection{Wyliczanie współczynników MFCC~\cite{kacprzak2010inteligentne}}
+\subsection{Wyliczanie współczynników MFCC}
 
 \begin{figure}[H]\label{fig:mfcc_calculation_diagram}
 \centering
@@ -214,6 +214,35 @@ wykorzystuje się logarytm energii pasma:
 Gdzie M to liczba użytych filtrów w zbiorze~\ref{eq:band_energy},
 a $i$ jest numerem współczynnika.
 
+\subsection{Porównywanie wektorów MFCC z wykorzystaniem DTW}
+
+Algorytm DTW służy do porównywania sekwencji punktów lub wektorów, które
+różnią się między sobą pod względem prędkości zmian w czasie~\cite{dtw_time_complexity}~\cite{mfcc_dtw}.
+Dla danych sekwencji $A~=~(p_1, \ldots, p_n)$, $B = (q_1, \ldots, q_m)$
+oraz funkcji $dist(p_i, q_j)$ obliczającej różnicę między dwoma dowolnymi elementami w sekwencjach,
+zdefiniowane są możliwe połączenia (\textit{coupling}) $C = (c_1, \ldots, c_k)$:
+
+\begin{equation}
+  c_r(p_i, q_j) = c_{r+1} \in \{ (p_{i+1}, q_j), (p_i, q_{j+1}), (p_{i+1}, q_{j+1}) \},
+  \label{eq:dtw_coupling}
+\end{equation}
+
+Dystans między sekwencjami $A$ i $B$ to takie połączenie $c_r$, dla którego
+suma dystansów $dist(p_i, q_j)$ między elementami sekwencji w przypisaniu
+jest najmniejsza:
+
+\begin{equation}
+  dtw(A,B) = \min_{C: coupling} \{ \sum_{(p_i, q_j) \in C} dist(p_i, q_j) \}
+  \label{eq:dtw_distance}
+\end{equation}
+
+Funkcja $dist(p_i, q_j)$ wykorzystana w pracy to długość wektora będącego 
+różnicą między~$p_i$~i~$q_j$:
+
+\begin{equation}
+  dist(p_i, q_j) = \|p_i - q_j\|
+  \label{eq:dtw_dist_function}
+\end{equation}
 
 \section{Ograniczenia}
 
