@@ -657,10 +657,10 @@ Listing \thelstlisting: #1\hfill%\hfill%
 
 % INFO: definicje etykiet i tytułów spisów
 
-%\AtBeginDocument{% 
-        \addto\captionspolish{% 
-        \renewcommand{\tablename}{Tab.}%% INFO: Przedefiniowanie etykiet w podpisach tabel 
-}%} 
+%%\AtBeginDocument{% 
+%        \addto\captionspolish{% 
+%        \renewcommand{\tablename}{Tab.}%% INFO: Przedefiniowanie etykiet w podpisach tabel 
+%}%} 
 
 %\AtBeginDocument{% 
 %        \addto\captionspolish{% 
@@ -690,10 +690,10 @@ Listing \thelstlisting: #1\hfill%\hfill%
         \renewcommand{\listfigurename}{Spis rysunków}%% INFO: Przedefiniowanie nazwy spisu rysunków 
 }%}
 
-%\AtBeginDocument{% 
-        \addto\captionspolish{% 
-        \renewcommand{\listtablename}{Spis tabel}%% INFO: Przedefiniowanie nazwy spisu tabel 
-}%}
+%%\AtBeginDocument{% 
+%        \addto\captionspolish{% 
+%        \renewcommand{\listtablename}{Spis tabel}%% INFO: Przedefiniowanie nazwy spisu tabel 
+%}%}
 
 %\AtBeginDocument{% 
         \addto\captionspolish{% 
@@ -958,11 +958,11 @@ Licencja nie dotyczy latexowego kodu szablonu. Sam szablon (tj.\ zbiór przygoto
 \listoffigures*
 \clearpage
 % SPIS TABEL (zostanie wygenerowany automatycznie)
-\pdfbookmark[0]{Spis tabel}{spisTabel.1} %
+% \pdfbookmark[0]{Spis tabel}{spisTabel.1} %
 %%\phantomsection
 %%\addcontentsline{toc}{chapter}{Spis tabel}
-\listoftables*
-\clearpage
+% \listoftables*
+% \clearpage
 % SPIS LISTINGÓW (zostanie wygenerowany automatycznie)
 \pdfbookmark[0]{Spis listingów}{spisListingow.1} %
 %%\phantomsection
