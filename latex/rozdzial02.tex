@@ -69,16 +69,16 @@ Przykładowo, dla syntezy subtraktywnej powszechnie wykorzystywane są następuj
 Pełny graf przetwarzania można opisać za pomocą zbioru węzłów oraz
 listy połączeń między węzłami:
 
-$N = [n_1, n_2, .., n_n]$ - liczba węzłów,
+$N = [n_1, n_2, .., n_i]$ - zbiór węzłów,
 
-$i_{j} = [ p_1, p_2, \ldots, p_m ]$ -- Zbiór wejść (\textit{inputs}) j-go węzła. $i_{l, m}$ oznacza $m$-te wejście $l$-go węzła.
+$I = [ i_{1, 1}, i_{1, 2}, \ldots, i_{l, m} ]$ -- zbiór wejść węzłów, $i_{l, m}$ oznacza $m$-te wejście $l$-go węzła.
 
-$o_{j} = [ p_1, p_2, \ldots, p_m ]$ -- Zbiór wyjść (\textit{outputs}) j-go węzła,
+$O = [ o_{1,1}, o_{1,2}, \ldots, o_{j, k} ]$ -- zbiór wyjść węzłów, $o_{j, k}$ oznacza $k$-te wyjście $j$-go węzła,
 
-$f_i(x)$ -- operacja wykonywana na sygnale przez i-ty węzeł. % chtex 8
+% $f_i(x)$ -- operacja wykonywana na sygnale przez i-ty węzeł. % chtex 8
 
 % $C = [ \{ o_{(j, k)}, i_{(l, m)} \}, \ldots ] $: lista połączeń między węzłami, opisujący, które 
-$C = [ \{ (j, k), (l, m) \}, \ldots ] $: lista połączeń między węzłami, opisujący, które 
+$C = [ \{ (j, k), (l, m) \}, \ldots ] $ -- lista połączeń między węzłami, opisujący, które 
 $k$-te wyjście $j$-go węzła podłączone jest do którego $m$-go wejścia $l$-go węzła. Przykładowo,
 dla diagramu~\ref{fig:example_graph_definition_chapter}, jednym z połączeń będzie $\{(1, 0), (5, 0)\}$,
 ponieważ zerowe wyjście węzła \texttt{BaseFrequency~\#1} podłączone jest do zerowego
@@ -95,20 +95,20 @@ Graf przetwarzania sygnałów wykorzystywany w pracy wytwarzany
 jest na podstawie dwóch list parametrów sterujących:
 \begin{enumerate}
   \item parametry definujące strukturę grafu, $S = [s_1, s_2,~\ldots]$,
-  \item lista wartości parametrów w wolnych wejściach, $P = [p_2, p_2,~\ldots]$.
+  \item parametry przypisywane do wolnych wejść w grafie, $P = [p_2, p_2,~\ldots]$.
 \end{enumerate}
 
 
-\subsection{Struktura grafu}\label{sec:graph_structure_definition}
+\subsection{Generowanie struktury grafu}\label{sec:graph_structure_definition}
 
 Różne rodzaje syntezy dźwięku wykorzystują różnorodne struktury grafu przetwarzania
 sygnałów~\cite{minilogue_diagram}~\cite{digitone_manual}.
 Aby umożliwić dostosowanie grafu przetwarzania sygnałów do wykonywania różnych
 rodzajów syntezy, struktura grafu przetwarzania sygnałów jest dynamicznie
 modyfikowana przez algorytm optymalizacji. Algorytm generujący określoną
-strukturę grafu na podstawie genotypu opisany jest w rozdziale~\ref{chap:solution_algorithm}.
-Genotyp odpowiadający za strukturę grafu ma formę krotki liczb rzeczywistych $S$.
-Praca definiuje funkcję generującą strukturę grafu $G_s$ z genotypu:
+strukturę grafu na podstawie parametrów $S$ opisany jest w rozdziale~\ref{chap:solution_algorithm}.
+Praca definiuje funkcję generującą strukturę grafu, czyli dany zestaw węzłów
+i połączeń z parametrów $S$:
 \begin{equation}
   G_s(S) = N, C
   \label{eq:graph_structure_generation_function}
@@ -116,19 +116,21 @@ Praca definiuje funkcję generującą strukturę grafu $G_s$ z genotypu:
 
 \subsection{Przypisanie parametrów do~,,wolnych wejść''}\label{sec:graph_params_definition}
 
-Po stworzeniu grafu o danej strukturze $G_s$, druga część genotypu wykorzystywana
-jest jako wartości poszczególnych parametrów $P$ dla wolnych wejść w grafie przetwarzania
-sygnału.
+Po stworzeniu grafu o danej strukturze $G_s$, parametry $P$ wykorzystywane
+są jako wartości dla wolnych wejść w grafie przetwarzania
+sygnałów.
 
 \begin{equation}
-  \forall_{(l,m)} (l, m) \notin C, i_{l,m} = P_j
+  \forall_{p_j} \in P, \forall_{i_{l,m}} \in I,  (l, m) \notin C, i_{l,m} = p_j
   \label{eq:graph_params_assignment}
 \end{equation}
 
 \section{Funkcja celu}
 
-Wykorzystana w pracy funkcja celu $F$, oceniająca, jak sygnał wygenerowany ($\bar{x}$) przez algorytm
-jest bliski sygnałowi docelowemu ($x$) przedstawiona jest w następujący sposób:
+Wykorzystana w pracy funkcja celu $F$, oceniająca, jak sygnał
+$\bar{X} = [\bar{x_1}, \bar{x_2}, \ldots, \bar{x_n}]$ wygenerowany przez algorytm
+jest bliski sygnałowi docelowemu $X = [x_1, x_2, \ldots, x_n]$
+przedstawiona jest w następujący sposób:
 
 \begin{equation}
   F(x, \bar{x}) = DTW(MFCC(x),~MFCC(\bar{x}))
@@ -228,7 +230,7 @@ zdefiniowane są możliwe połączenia (\textit{coupling}) $C = (c_1, \ldots, c_
 \end{equation}
 
 Dystans między sekwencjami $A$ i $B$ to takie połączenie $c_r$, dla którego
-suma dystansów $dist(p_i, q_j)$ między elementami sekwencji w przypisaniu
+suma dystansów $dist(p_i, q_j)$ między elementami sekwencji w połączeniu
 jest najmniejsza:
 
 \begin{equation}
@@ -242,19 +244,6 @@ różnicą między~$p_i$~i~$q_j$:
 \begin{equation}
   dist(p_i, q_j) = \|p_i - q_j\|
   \label{eq:dtw_dist_function}
-\end{equation}
-
-\section{Ograniczenia}
-
-W algorytmach DSP powszechnie wykorzystuje się ograniczenie wartości
-sygnału do przedziału $(-1.0, 1.0)$, gdy implementacja danego algorytmu wykorzystuje 
-typ \texttt{float} do przechowywania wartości sygnałów. Środowisko zaimplementowane
-w ramach pracy oczekuje, że wartości sygnałów i parametrów sterujących
-będą znajdowały się w tym przedziale:
-
-\begin{equation}
-  \forall p_j \in P,  -1.0 \leq p_j \leq 1.0, \quad \forall s_i \in S, -1.0 \leq s_i \leq 1.0
-  \label{eq:parameter_bounds}
 \end{equation}
 
 \section{Definicja problemu optymalizacyjnego}
@@ -271,7 +260,7 @@ Gdzie $G$ jest funkcją generującą sygnał dźwiękowy dla konkretnej struktur
 $G_s$~(\ref{sec:graph_structure_definition},~\ref{eq:graph_structure_generation_function}),
 dla wartości parametrów przypisanych z
 $P$~(\ref{sec:graph_params_definition},~\ref{eq:graph_params_assignment}).
-Dla parametrów $S$ oraz $P$, ograniczonych przez~\ref{eq:parameter_bounds},
+Dla parametrów $S$ oraz $P$,
 rozwiązywany jest problem optymalizacyjny:
 
 \begin{equation}

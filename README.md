@@ -53,14 +53,14 @@ gramach typu digital audio workstation (1.4)."
 jest tutaj zupełnie zbędny; ma być prosto: cel pracy to XXX, a zadania szczegółowe to YYY; zadań szczegółowych jest za mało, np. robione są też badania
 - Rozpisałem zadania szczegółowe. Nie do końca zgadzam się ze stwierdzeniem że ten akapit jest zbędny, chciałbym podać potencjalne zastosowania takiego algorytmu, żeby to nie było "badanie żeby odbębnić magisterkę"
 
-15 należy napisać, że dobór funkcji celu nie jest problemem trywialnym, żeby nie niepokoić czytelnika zaznajomionego z optymalizacją (ale o tym więcej dalej)
+<!-- 15 należy napisać, że dobór funkcji celu nie jest problemem trywialnym, żeby nie niepokoić czytelnika zaznajomionego z optymalizacją (ale o tym więcej dalej) -->
 
 <!-- 15 Pana postulat jest taki, że wygenerowany graf można wykorzystać jako instrument muzyczny; pewnie jakoś i można, ale co my o tym instrumencie wiemy, poza tym, że poprawnie generuje dokładnie jeden dźwięk (próbkę); może nie warto o tym wspominać, bo jednak cały instrument nie jest w jakiś sposób optymalizowany; nie ma wielu próbek -->
 - Zmieniłem stwierdzenie "gotowy instrument" na "przepis na instrument", bo nie zdążyłem w ramach pracy dopisać modułu, który
 pozwalałby uruchomić graf tak, żeby działał w czasie rzeczywistym jak instrument. Niemniej jednak parametry syntezy i struktura
 grafu są przepisem na instrument i można je wykorzystać dalej.
 
-15 "Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika" to nic nie znaczy; przejrzysta, czyli jaka? czy to będzie w funkcji celu? nie będzie, więc po co o tym
+<!-- 15 "Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika" to nic nie znaczy; przejrzysta, czyli jaka? czy to będzie w funkcji celu? nie będzie, więc po co o tym -->
 
 16 "algorytm maksymalizuje wykorzystanie poszczególnych bloków przetwarzania w grafie" co to znaczy?
 16 czym jest krzyżowanie dwóch grafów przetwarzania sygnału? to nie zostało wcześniej nigdzie opisane i w dalszej części pracy też nie, czyli nie zostało zrobione
@@ -105,116 +105,124 @@ Potem akapit albo dwa (albo i trzy) o strukturze pracy. Tak, żeby względnie ł
 
 19 Rysunek 2.2 jest nieczytelny; w zasadzie wszystkie rysunki z grafami są nieczytelne i wymagają przeróbki (a może umieścić je w pracy poziomo?)
 
-19 N to w końcu zbiór czy ciąg (tak jak jest zapisane, to ciąg)? Bo na pewno nie "liczba węzłów"
-19 po co są dwa oznaczenia na pojedyncze wejście: p_1 i i_{l, m} ? ujednolicić
-19 oznaczenia p_1, p_2, itd. są zduplikowane; nie mam tu na myśli tylko tego, że są w wejściach i wyjściach, ale też w tym, że duplikują się między węzłami
-19 f_i(x) czym jest x? jak się ma to do wejść i wyjść
-19 postać C nie jest do końca jasna, proszę ją sformalizować
+<!-- 19 N to w końcu zbiór czy ciąg (tak jak jest zapisane, to ciąg)? Bo na pewno nie "liczba węzłów" -->
+- poprawione
 
-19 "W pracy wykorzystano algorytm genetyczny differential evolution [40] do wygenerowania struk-
-tury i parametrów grafu. Genotyp opisujący dany graf przetwarzania sygnałów składa się z
-dwóch części:
-1. fragment decydujący o strukturze grafu, S = [s1 , s2 , . . .],
-2. fragment decydujący o wartości parametrów w wolnych wejściach, P = [p2 , p2 , . . .]."
-to nie tutaj; najlepiej w algorytmie rozwiązania; zresztą ten opis genotypu jest zupełnie niejasny o czym powiem jeszcze w rodziale a algorytmem rozwiązania
+<!-- 19 po co są dwa oznaczenia na pojedyncze wejście: p_1 i i_{l, m} ? ujednolicić -->
+<!-- 19 oznaczenia p_1, p_2, itd. są zduplikowane; nie mam tu na myśli tylko tego, że są w wejściach i wyjściach, ale też w tym, że duplikują się między węzłami -->
 
-19 "2.1.1. Struktura grafu" strukturę grafu już opisaliśmy więc nie ma sensu takie tytułowanie tego podpunktu
-19 wzór (2.1) zupełnie nie ma sensu
-19 dla każdego (l, m) z jakiego zakresu wartości; dodatkowo, (l, m) nie może należeć do C, bo C jest listą zbiorów; ponownie, opis genotypu to nie tutaj; algorytm genetyczny będzie dopiero częścią rozwiązania i w części z rozwiązaniem powinien zostać opisany
+<!-- 19 f_i(x) czym jest x? jak się ma to do wejść i wyjść -->
+<!-- 19 postać C nie jest do końca jasna, proszę ją sformalizować -->
 
-20 czy coś wiemy o postać x i \hat{x} ? dalej są wykorzystywane we wzorach (2.4) i dalej; trzeba to formalnie wprowadzić
-20 czym jest 'a', czym jest 'N' (bo chyba nie liczbą węzłów w grafie DSP - konflikt oznaczeń)
-20 jak obliczać X_r(k), czym jest i jak obliczać H_m(k) ?
+<!-- 19 "W pracy wykorzystano algorytm genetyczny differential evolution [40] do wygenerowania struk- -->
+<!-- tury i parametrów grafu. Genotyp opisujący dany graf przetwarzania sygnałów składa się z -->
+<!-- dwóch części: -->
+<!-- 1. fragment decydujący o strukturze grafu, S = [s1 , s2 , . . .], -->
+<!-- 2. fragment decydujący o wartości parametrów w wolnych wejściach, P = [p2 , p2 , . . .]." -->
+<!-- to nie tutaj; najlepiej w algorytmie rozwiązania; zresztą ten opis genotypu jest zupełnie niejasny o czym powiem jeszcze w rodziale a algorytmem rozwiązania -->
 
-21 te ograniczenia (2.8) też powinny wywędrować do algorytmu rozwiązania; nie może być mowy o jakichś ograniczeniach wynikających z implementacji na etapie formułowania problemu; żadnego float; natomiast powinny się tu pojawić ograniczenia na graf DSP - w końcu w rozdziale "cel pracy" pojawiły się wymagania co do tego grafu DSP, to teraz powinny pojawić się tutaj stosowne ograniczenia inaczej nie możemy dalej mówić o optymalizacji
+<!-- 19 "2.1.1. Struktura grafu" strukturę grafu już opisaliśmy więc nie ma sensu takie tytułowanie tego podpunktu -->
+<!-- 19 wzór (2.1) zupełnie nie ma sensu -->
+<!-- 19 dla każdego (l, m) z jakiego zakresu wartości; dodatkowo, (l, m) nie może należeć do C, bo C jest listą zbiorów; ponownie, opis genotypu to nie tutaj; algorytm genetyczny będzie dopiero częścią rozwiązania i w części z rozwiązaniem powinien zostać opisany -->
 
-21 należy odczepić zmienne decyzyjne od postaci algorytmu genetycznego; tutaj definiujemy zmienne decyzyjne w ogólności, dopiero potem skorzystamy z algorytmu genetycznego, który te zmienne decyzyjne będzie jakoś wewnętrznie reprezentować; w konsekwencji, nie może być mowy o S, P będących fragmentami jakiegoś genotypu.
+<!-- 20 czy coś wiemy o postać x i \hat{x} ? dalej są wykorzystywane we wzorach (2.4) i dalej; trzeba to formalnie wprowadzić -->
+<!-- 20 czym jest 'a', czym jest 'N' (bo chyba nie liczbą węzłów w grafie DSP - konflikt oznaczeń) -->
+<!-- 20 jak obliczać X_r(k), czym jest i jak obliczać H_m(k) ? -->
 
-Same oznaczenia S, P mogą oczywiście zostać, ale trzeba je jasno przedstawić, odnieść do struktury grafu, bo to strukturę grafu optymalizujemy.
+<!-- 21 te ograniczenia (2.8) też powinny wywędrować do algorytmu rozwiązania; -->
+<!-- nie może być mowy o jakichś ograniczeniach wynikających z implementacji na  -->
+<!-- etapie formułowania problemu; żadnego float; natomiast powinny się tu pojawić -->
+<!-- ograniczenia na graf DSP - w końcu w rozdziale "cel pracy" -->
+<!-- pojawiły się wymagania co do tego grafu DSP, to teraz powinny -->
+<!-- pojawić się tutaj stosowne ograniczenia inaczej nie możemy dalej mówić o optymalizacji -->
+
+<!-- 21 należy odczepić zmienne decyzyjne od postaci algorytmu genetycznego; tutaj definiujemy zmienne decyzyjne w ogólności, dopiero potem skorzystamy z algorytmu genetycznego, który te zmienne decyzyjne będzie jakoś wewnętrznie reprezentować; w konsekwencji, nie może być mowy o S, P będących fragmentami jakiegoś genotypu. -->
+
+<!-- Same oznaczenia S, P mogą oczywiście zostać, ale trzeba je jasno przedstawić, odnieść do struktury grafu, bo to strukturę grafu optymalizujemy. -->
 
 # Rozdział 3
 
-22 "Aby stopniowo dostosować graf przetwarzania sygnałów zaimplementowany w rozdziale" grafu nie będzie nikt implementować, implementowany będzie algorytm generacji grafu; odwołanie do rodziału nr 5 jest tu zbędne
+<!-- 22 "Aby stopniowo dostosować graf przetwarzania sygnałów zaimplementowany w rozdziale" grafu nie będzie nikt implementować, implementowany będzie algorytm generacji grafu; odwołanie do rodziału nr 5 jest tu zbędne -->
 <!-- 22 "Autoregressive, Waveform != Perception" trzymajmy się polskiego -->
-- Usunięty angielski podpis
+<!-- - Usunięty angielski podpis -->
 
-22 brak odwołania w tekście do rys 3.1 (jest do 3)
-22 może warto te prace 17, 19, 12 (kolejność??) itd. opisać
+<!-- 22 brak odwołania w tekście do rys 3.1 (jest do 3) -->
+<!-- 22 może warto te prace 17, 19, 12 (kolejność??) itd. opisać -->
 
 <!-- 23 "dwóch cech:" -- kropka -->
 
-23 czy RMS i DTW można jakoś wyjaśnić?
+<!-- 23 czy RMS i DTW można jakoś wyjaśnić? -->
 
 <!-- 27 "TODO: obrazek" -->
-- usunięte, obrazek już dodany
+<!-- - usunięte, obrazek już dodany -->
 
-Przyznam się, po dokładnym przeczytaniu tego rozdziału, że proces doboru funkcji celu jest niezrozumiały. Dlaczego? Ano dlatego, że spodziewałem się analizy własności funkcji celu pod kątem percepcji słuchacza; w końcu tak zaczyna się rozdział. Ostatecznie dostajemy coś zupełnie innego.
+<!-- Przyznam się, po dokładnym przeczytaniu tego rozdziału, że proces doboru funkcji celu jest niezrozumiały. Dlaczego? Ano dlatego, że spodziewałem się analizy własności funkcji celu pod kątem percepcji słuchacza; w końcu tak zaczyna się rozdział. Ostatecznie dostajemy coś zupełnie innego. -->
 
-Dobór różnych funkcji celu prowadzi do różnych problemów optymalizacji. Trudno o jakieś podstawy do ich porównania.
+<!-- Dobór różnych funkcji celu prowadzi do różnych problemów optymalizacji. Trudno o jakieś podstawy do ich porównania. -->
 
-Popatrzmy na punkt 3.3.1. Jest mowa o "właściwych parametrach" albo o "niedokładnym odwzorowaniu dynamiki" albo o "poprawnej wartości parametru". Z czego mamy te parametry odniesienia względem których można porównywać funkcje celu? Jak są wyznaczane? Mowa jest o karach? Jakie kary, z czego wynikają?
+<!-- Popatrzmy na punkt 3.3.1. Jest mowa o "właściwych parametrach" albo o "niedokładnym odwzorowaniu dynamiki" albo o "poprawnej wartości parametru". Z czego mamy te parametry odniesienia względem których można porównywać funkcje celu? Jak są wyznaczane? Mowa jest o karach? Jakie kary, z czego wynikają? -->
 
-Inaczej: jakie kryterium zostało wykorzystane do porównania funkcji celu wyjściowego problemu generacji grafu (czy faktycznie - problemów, bo mamy różne funkcje celu).
+<!-- Inaczej: jakie kryterium zostało wykorzystane do porównania funkcji celu wyjściowego problemu generacji grafu (czy faktycznie - problemów, bo mamy różne funkcje celu). -->
 
-Popatrzmy teraz na punkt 3.4. Jest mowa o "zweryfikowanie skuteczności każdej z funkcji w uproszczonym problemie optymalizacyjnym". W jakim problemie optymalizacyjnym, skoro mamy różne funkcje celu a w konsekwencji - różne problemy optymalizacyjne?
+<!-- Popatrzmy teraz na punkt 3.4. Jest mowa o "zweryfikowanie skuteczności każdej z funkcji w uproszczonym problemie optymalizacyjnym". W jakim problemie optymalizacyjnym, skoro mamy różne funkcje celu a w konsekwencji - różne problemy optymalizacyjne? -->
 
-To co jest tutaj badane, to nie funkcje celu, tylko grupa algorytmów (i to heurystyk) generacji dźwięku. Tylko po co, skoro i tak całość jest porównywana przez sprowadzenie do spektrogramu?
+<!-- To co jest tutaj badane, to nie funkcje celu, tylko grupa algorytmów (i to heurystyk) generacji dźwięku. Tylko po co, skoro i tak całość jest porównywana przez sprowadzenie do spektrogramu? -->
 
-Czemu nie wybrać spektrogramu jako bazy do stworzenia kryterium?
+<!-- Czemu nie wybrać spektrogramu jako bazy do stworzenia kryterium? -->
 
-Moze jest jakiś powód. Za długo się liczy? Za trudno?
+<!-- Moze jest jakiś powód. Za długo się liczy? Za trudno? -->
 
 # Rozdział 4
 
-29 Nie zaczynajmy od rysunku. Zacznijmy od opisu.
+<!-- 29 Nie zaczynajmy od rysunku. Zacznijmy od opisu. -->
 
-Najpierw trzeba opisać rysunek 4.1. Czy w zasadzie zacząć od opisu, a potem pokazać ten rysunek. Rysunek jest tylko wsparciem. Sam niewiele wyjaśnia.
+<!-- Najpierw trzeba opisać rysunek 4.1. Czy w zasadzie zacząć od opisu, a potem pokazać ten rysunek. Rysunek jest tylko wsparciem. Sam niewiele wyjaśnia. -->
 
-Dalej trzeba opisać algorytm genetyczny. To co pojawiło się w sformułowaniu problemu, a dotyczyło algorytmu genetycznego należy przenieść tutaj.
+<!-- Dalej trzeba opisać algorytm genetyczny. To co pojawiło się w sformułowaniu problemu, a dotyczyło algorytmu genetycznego należy przenieść tutaj. -->
 
-Ale nawet gdyby to wszystko tu przenieść, to nadal jest zdecydowanie za mało. Proszę zamieścić schemat/pseudokod stosowanego algorytmu genetycznego, opisać wszystkie parametry - jak była robiona selekcja, krzyżowanie i mutacja. Dokładnie pokazać kodowanie (i dekodowanie).
+<!-- Ale nawet gdyby to wszystko tu przenieść, to nadal jest zdecydowanie za mało. Proszę zamieścić schemat/pseudokod stosowanego algorytmu genetycznego, opisać wszystkie parametry - jak była robiona selekcja, krzyżowanie i mutacja. Dokładnie pokazać kodowanie (i dekodowanie). -->
 
-Patrząc się na rysunek 4.1, w samym algorytmie generującym graf mamy trzy bloki, z czego - jeśli rozumiem - budowa/modyfikacja grafu, oraz optymalizacja parametrów bloków DSP w grafie to części składowe. Gdzie tu wykorzystujemy algorytm genetyczny, a gdzie nie? Jeśli wszędzie, to czemu jest rozbicie na dwa podproblemy?
+<!-- Patrząc się na rysunek 4.1, w samym algorytmie generującym graf mamy trzy bloki, z czego - jeśli rozumiem - budowa/modyfikacja grafu, oraz optymalizacja parametrów bloków DSP w grafie to części składowe. Gdzie tu wykorzystujemy algorytm genetyczny, a gdzie nie? Jeśli wszędzie, to czemu jest rozbicie na dwa podproblemy? -->
 
-Dalej jest mowa o wyborze źródeł sygnału. Czy korzystamy tu z algorytmu genetycznego? Bo moglibyśmy. Czy np. jest tak, że algorytm genetyczny tylko wybiera z jednego z predefiniowanych źródeł sygnału, czy też może źródła sygnału (które są przecież fragmentem grafu DSP) tworzyć od podstaw?
+<!-- Dalej jest mowa o wyborze źródeł sygnału. Czy korzystamy tu z algorytmu genetycznego? Bo moglibyśmy. Czy np. jest tak, że algorytm genetyczny tylko wybiera z jednego z predefiniowanych źródeł sygnału, czy też może źródła sygnału (które są przecież fragmentem grafu DSP) tworzyć od podstaw? -->
 
-Punkt 4.1 - czy można coś o tych generatorach powiedzieć dokładniej? Dlaczego te zostały wybrane? Czym może tu manipulować algorytm genetyczny.
+<!-- Punkt 4.1 - czy można coś o tych generatorach powiedzieć dokładniej? Dlaczego te zostały wybrane? Czym może tu manipulować algorytm genetyczny. -->
 
 <!-- Punkt 4.2 - tu na pewno trzeba napisać zdecydowanie więcej; co to za filtr, jakie ma parametry, czym może manipulować algorytm genetyczny. -->
-- dopisałem trochę więcej, ale tutaj opis z perspektywy "co filtr potrafi" jest wystarczający
+<!-- - dopisałem trochę więcej, ale tutaj opis z perspektywy "co filtr potrafi" jest wystarczający -->
 
-Punkt 4.3 - analogicznie, jakie parametry mają te efekty, czym manipuluje algorytm genetyczny, co wchodzi w skład osobnika? Pojawia się też pytanie, dlaczego mamy strukturę chorus -> delay -> reverb. W końcu czy nie było zamiarem pracy strukturę generować dynamicznie?
+<!-- Punkt 4.3 - analogicznie, jakie parametry mają te efekty, czym manipuluje algorytm genetyczny, co wchodzi w skład osobnika? Pojawia się też pytanie, dlaczego mamy strukturę chorus -> delay -> reverb. W końcu czy nie było zamiarem pracy strukturę generować dynamicznie? -->
 
-Wracając do rysunku 4.1 - jest cała część algorytmu opisująca ocenę wygenerowanego dźwięku. Spodziewałem, się, że tu będzie stosowane wybrane wcześniej kryterium jakości MFCC. A nagle pojawia się też analiza spektralna i jeszcze zupełnie niewyjaśnione algorytmy symulujące odczucia psychoakustyczne (z których warto było skorzystać przy wyborze funkcji celu, a niekoniecznie tutaj).
+<!-- Wracając do rysunku 4.1 - jest cała część algorytmu opisująca ocenę wygenerowanego dźwięku. Spodziewałem, się, że tu będzie stosowane wybrane wcześniej kryterium jakości MFCC. A nagle pojawia się też analiza spektralna i jeszcze zupełnie niewyjaśnione algorytmy symulujące odczucia psychoakustyczne (z których warto było skorzystać przy wyborze funkcji celu, a niekoniecznie tutaj). -->
 
-Podsumowując, nie jest jasne jak ten algorytm działa. Nie jest jasne, jakie są jego elementy składowe. Na podstawie tego, co zostało przedstawione nikt nie będzie w stanie odtworzyć tego algorytmu (a powinien móc).
+<!-- Podsumowując, nie jest jasne jak ten algorytm działa. Nie jest jasne, jakie są jego elementy składowe. Na podstawie tego, co zostało przedstawione nikt nie będzie w stanie odtworzyć tego algorytmu (a powinien móc). -->
 
 # Rozdział 5
 
 <!-- - ten rozdział faktycznie jest o implementacji; tak go należy nazwać -->
-- nazwano
+<!-- - nazwano -->
 
-- punkt 5.1 "Podstawy syntezy dźwięku w syntezatorach modułowych" to zupełnie nie tutaj. Tutaj już musimy mieć wszystkie podstawy i wstępy teoretyczne daleko za sobą. Tutaj jest już tylko na temat przygotowanego rozwiązania. Tego rodzaju informacje można przenieść do wstępu (do opisu grafu DSP), albo do sformułowania problemu.
-35 "Pojedynczy węzeł DSP ..." to już było w sformułowaniu.
-- nie wiem czy warto tutaj wspominać o "wymaganiach" - one wynikają z rozwiązywanego problemu; jeśli faktycznie jest to istotne, to może warto je zebrać na początku rozdziału
-- natomiast jest za mało o samej implementacji; jakie moduły programu utworzono, jakie funkcje, itd. jak przekazywane są dane (może warto podać format)
+<!-- - punkt 5.1 "Podstawy syntezy dźwięku w syntezatorach modułowych" to zupełnie nie tutaj. Tutaj już musimy mieć wszystkie podstawy i wstępy teoretyczne daleko za sobą. Tutaj jest już tylko na temat przygotowanego rozwiązania. Tego rodzaju informacje można przenieść do wstępu (do opisu grafu DSP), albo do sformułowania problemu. -->
+<!-- 35 "Pojedynczy węzeł DSP ..." to już było w sformułowaniu. -->
+<!-- - nie wiem czy warto tutaj wspominać o "wymaganiach" - one wynikają z rozwiązywanego problemu; jeśli faktycznie jest to istotne, to może warto je zebrać na początku rozdziału -->
+<!-- - natomiast jest za mało o samej implementacji; jakie moduły programu utworzono, jakie funkcje, itd. jak przekazywane są dane (może warto podać format) -->
 
 # Rozdział 6
 - praca wykorzystuje próbki z literatury; jakie próbki, co o nich wiemy? czemu te?
-- czym jest "Pure Data"; skoro jest tak kluczowy, to dlaczego nie ma o nim słowa w przeglądzie literaturowym
-- proszę wyjaśnić proces ustalania częstotliwości podstawowej, czemu ma on jakiekolwiek znaczenie? Może coś o samym algorytmie YIN.
+<!-- - czym jest "Pure Data"; skoro jest tak kluczowy, to dlaczego nie ma o nim słowa w przeglądzie literaturowym -->
+<!-- - proszę wyjaśnić proces ustalania częstotliwości podstawowej, czemu ma on jakiekolwiek znaczenie? Może coś o samym algorytmie YIN. -->
 
-Badania z ustalonymi wartościami parametrów: rozmiar populacji 50, liczba iteracji 200 są niewystarczające. To faktycznie nie są badania, a uruchomienia.
+<!-- Badania z ustalonymi wartościami parametrów: rozmiar populacji 50, liczba iteracji 200 są niewystarczające. To faktycznie nie są badania, a uruchomienia. -->
 
-Wypadałoby przebadać jaki wpływ mają te parametry na przygotowany algorytm. Zresztą 200 iteracji to jest stanowczo za mało jak na algorytm genetyczny (chyba, że akurat tutaj wyszłoby inaczej, ale to musiałyby potwierdzić badania).
+<!-- Wypadałoby przebadać jaki wpływ mają te parametry na przygotowany algorytm. Zresztą 200 iteracji to jest stanowczo za mało jak na algorytm genetyczny (chyba, że akurat tutaj wyszłoby inaczej, ale to musiałyby potwierdzić badania). -->
 
-I robimy badania tylko na 3 próbkach (bo co jest w rozdziale 6.4 trudno powiedzieć)? To żadne testy. Zdecydowanie za mało.
+<!-- I robimy badania tylko na 3 próbkach (bo co jest w rozdziale 6.4 trudno powiedzieć)? To żadne testy. Zdecydowanie za mało. -->
 
-Spodziewałbym się przynajmniej wykresów wartości funkcji celu w zależności od a. rozmiaru populacji, b. liczby iteracji. A inne parametry algorytmu genetycznego (np. elitaryzm)?
+<!-- Spodziewałbym się przynajmniej wykresów wartości funkcji celu w zależności od a. rozmiaru populacji, b. liczby iteracji. A inne parametry algorytmu genetycznego (np. elitaryzm)? -->
 
-Co z czasem działania? To też kluczowe kryterium, które możnaby przebadać.
+<!-- Co z czasem działania? To też kluczowe kryterium, które możnaby przebadać. -->
 
-Czy można wynik z czymś porównać? Np. z innymi algorytmami? Czemu nie porównać bezpośrednio z pracą [32]?
+<!-- Czy można wynik z czymś porównać? Np. z innymi algorytmami? Czemu nie porównać bezpośrednio z pracą [32]? -->
 
 # Rozdział 7
 - tak jak wspominałem, to co dotyczy badań idzie do rozdziału z badaniami.

@@ -216,25 +216,31 @@ graf może być wykorzystany jako elektroniczny instrument muzyczny.
 
 \subsection{Metody generowania grafu przetwarzania sygnałów oraz późniejsza modyfikacja grafu}
 
-Głównym problemem przy generowaniu grafu przetwarzania sygnałów są ograniczenia nałożone na strukturę grafu,
-które należy spełnić, by graf był logicznie interpretowalny jako łańcuch przetwarzania sygnałów.
-Graf musi być grafem skierowanym, który nie zawiera pętli o dodatnim sprzężeniu zwrotnym.
-% Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika. 
-Automatyczna ewolucja może dążyć w kierunku wykorzystania nadmiarowej liczby
-bloków przetwarzania sygnału, jeśli funkcja celu nie będzie zawierała kary za zbyt złożone grafy.
-Podobne prace~\cite{evolutionary_puredata} wykorzystują podejście oparte o 
-\textit{mixed-typed carthesian genetic programming}, które będzie punktem startowym dla pracy.
-Finalnie, badania dążą do wyznaczenia algorytmu o następujący właściwościach:
-
-\begin{enumerate}
-    \item algorytm generuje grafy będące logicznie spójnymi łańcuchami przetwarzania dźwięku (skierowany, bez pętli o dodatnim sprzężeniu zwrotnym w natężeniu sygnału),
-    \item algorytm maksymalizuje wykorzystanie poszczególnych bloków przetwarzania w grafie, co minimalizuje finalny rozmiar grafu, czyniąc go bardziej czytelnym,
-    \item generowany graf posiada reprezentację umożliwiającą wykonanie krzyżowania dwóch grafów przetwarzania sygnału. Graf będący wynikiem krzyżowania nadal musi być poprawnym grafem przetwarzania sygnału.
-\end{enumerate}
-
-\noindent
-Elementami grafu przetwarzania sygnałów są używane powszechnie w syntezie dźwięku algorytmy,
+Praca proponuje algorytm generujący strukturę grafu przetwarzania sygnałów na
+podstawie zbioru parametrów, dobieranych przez algorytm optymalizacji.
+Badania symulacyjne wykonanie w pracy sprawdzają, czy algorytm optymalizacji
+wykorzysuje węzły przetwarzania sygnału, które powinny być wykorzystane dla danego
+typu dźwięku.
+Praca wykorzystuje powszechnie używane w syntezie dźwięku algorytmy,
 opisane w sekcji~\ref{sec:basics_of_sound_synthesis}.
+
+% Głównym problemem przy generowaniu grafu przetwarzania sygnałów są ograniczenia nałożone na strukturę grafu,
+% które należy spełnić, by graf był logicznie interpretowalny jako łańcuch przetwarzania sygnałów.
+% Graf musi być grafem skierowanym, który nie zawiera pętli o dodatnim sprzężeniu zwrotnym.
+% % Struktura grafu powinna być możliwie jak najbardziej przejrzysta dla użytkownika. 
+% Automatyczna ewolucja może dążyć w kierunku wykorzystania nadmiarowej liczby
+% bloków przetwarzania sygnału, jeśli funkcja celu nie będzie zawierała kary za zbyt złożone grafy.
+% Podobne prace~\cite{evolutionary_puredata} wykorzystują podejście oparte o 
+% \textit{mixed-typed carthesian genetic programming}, które będzie punktem startowym dla pracy.
+% Finalnie, badania dążą do wyznaczenia algorytmu o następujący właściwościach:
+
+% \begin{enumerate}
+%     \item algorytm generuje grafy będące logicznie spójnymi łańcuchami przetwarzania dźwięku (skierowany, bez pętli o dodatnim sprzężeniu zwrotnym w natężeniu sygnału),
+%     \item algorytm maksymalizuje wykorzystanie poszczególnych bloków przetwarzania w grafie, co minimalizuje finalny rozmiar grafu, czyniąc go bardziej czytelnym,
+%     \item generowany graf posiada reprezentację umożliwiającą wykonanie krzyżowania dwóch grafów przetwarzania sygnału. Graf będący wynikiem krzyżowania nadal musi być poprawnym grafem przetwarzania sygnału.
+% \end{enumerate}
+
+% \noindent
 
 \subsection{Dobór funkcji błędu: różnica między wygenerowanym a docelowym sygnałem dźwiękowym}
 

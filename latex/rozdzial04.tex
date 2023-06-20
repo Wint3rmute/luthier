@@ -22,8 +22,9 @@ rysunku~\ref{fig:solution_algorithm_diagram}.
 \end{figure}
 
 Praca wykorzystuje algorytm genetyczny~\cite{2020SciPy-NMeth}, w którym genotyp odpowiada za
-strukturę grafu~\ref{fig:example_generated_graph} oraz wartości
-przypisane do parametrów grafu~(\ref{eq:graph_structure_generation_function},~\ref{eq:graph_params_assignment}).
+strukturę grafu~(rysunek~\ref{fig:example_generated_graph}) oraz wartości
+przypisane do parametrów
+grafu~(\ref{eq:graph_structure_generation_function},~\ref{eq:graph_params_assignment}).
 % Diagram blokowy~\ref{fig:solution_algorithm_diagram} ilustruje zaimplementowany algorytm.
 Algorytm generuje różne warianty grafów przetwarzania sygnałów powszechnie
 wykorzystywane w syntezatorach dźwięku~\cite{minilogue_diagram}~\cite{digitone_manual}~\cite{yamaha_dx7_manual}.
@@ -31,6 +32,19 @@ Takie podejście pozwala na dostosowanie grafu do danego rodzaju syntezy,
 lub połączenie wielu typów syntezy w celu uzyskania bardziej złożonego brzmienia.
 Algorytm wybiera węzły dla każdej sekcji
 zilustrowanej na rysunku~\ref{fig:synth_architecture_diagram}.
+
+\section{Ograniczenia}
+
+W algorytmach DSP powszechnie wykorzystuje się ograniczenie wartości
+sygnału do przedziału $(-1.0, 1.0)$, gdy implementacja danego algorytmu wykorzystuje 
+typ danych \texttt{floating point} do przechowywania wartości sygnałów. Środowisko zaimplementowane
+w ramach pracy oczekuje, że wartości sygnałów i parametrów sterujących
+będą znajdowały się w tym przedziale:
+
+\begin{equation}
+  \forall p_j \in P,  -1.0 \leq p_j \leq 1.0, \quad \forall s_i \in S, -1.0 \leq s_i \leq 1.0
+  \label{eq:parameter_bounds}
+\end{equation}
 
 \begin{figure}[H]
     \centering
@@ -149,7 +163,7 @@ pozwala na uzyskanie sygnałów piłokształtnych.
     }\label{fig:gene_an3}
 \end{figure}
 
-Źródło \texttt{AN3}, (diagram~\ref{fig:gene_an3}), generuje sygnały trójkątne.
+Źródło \texttt{AN3} (diagram~\ref{fig:gene_an3}) generuje sygnały trójkątne.
 
 
 \subsection{Synteza \textit{physical modeling}}
@@ -168,7 +182,7 @@ podstawowy wariant algorytmu \textit{Karplus-Strong}.
     }\label{fig:gene_an3}
 \end{figure}
 
-Źródło \texttt{PM1} generuje sygnał przypominający strunę gitarową 
+Źródło \texttt{PM1} generuje sygnał przypominający dźwięk struny gitarowej 
 za pomocą algorytmu \textit{Karplus-Strong}.
 
 \section{Wybór filtrów}\label{sec:filters_selection_graph_structure}
