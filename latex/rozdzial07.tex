@@ -1,17 +1,24 @@
-\chapter{Analiza wyników, możliwe drogi dalszych badań}\label{chap:results_analysis}
+\chapter{Podsumowanie, możliwe drogi dalszych badań}\label{chap:results_analysis}
 
-
-% Wyniki uzyskane przez zaimplementowany algorytm optymalizacji
-% opisane w rozdziałach~\ref{chap:research} oraz~\ref{target_function_chapter} pozwalają
 
 Wyniki przedstawione w rozdziałach~\ref{chap:research} oraz~\ref{target_function_chapter}
 wskazują, że zaimplementowany algorytm optymalizacji wytwarza poprawne rozwiązania
-dla części problemów. Nawet gdy finalnie wygenerowane brzmienie różni
-się od dźwięku docelowego, algorytm wytwarza interesujące barwy dźwięku,
-które można zakwalifikować jako~,,wariacje'' na temat oryginalnego sygnału.
-Tego typu wyniki mogą być wartościowe dla potencjalnych użytkowników algorytmu.
-W niniejszym rozdziale przeprowadzono szczegółową analizę obserwacji,
-uzyskanych podczas procesu badawaczego.
+dla prostych problemów, przedstawionych w sekcji~\ref{sec:predefined_graph_optimisation},
+jednak nie potrafi odtworzyć bardziej złozonych dźwięków -- w porównaniu
+wypada gorzej niż algorytm z literatury~\cite{evolutionary_puredata}.
+Testy wykonane w rozdziale~\ref{target_function_chapter} pokazują,
+że zaproponowana w pracy funkcja celu prowadzi do udanej optymalizacji
+struktury i parametrów grafu dla prostych wariantów problemów.
+Wygenerowane struktury grafu opisane w rozdziale~\ref{chap:research} pokazują
+poprawnie odtworzone węzły DSP typowe dla syntezy, która powinna zostać
+wykorzystana do wytworzenia konkretnych rodzajów dźwięków.
+
+% Nawet gdy finalnie wygenerowane brzmienie różni się od dźwięku docelowego,
+% algorytm wytwarza interesujące barwy dźwięku,
+% które można zakwalifikować jako~,,wariacje'' na temat oryginalnego sygnału.
+% Tego typu wyniki mogą być wartościowe dla potencjalnych użytkowników algorytmu.
+% W niniejszym rozdziale przeprowadzono szczegółową analizę obserwacji,
+% uzyskanych podczas procesu badawaczego.
 
 
 \section{Zbiór danych testowych}\label{sec:not_enough_benchmarking_data}
@@ -27,28 +34,7 @@ Jak pokazały wyniki opisane w sekcji~\ref{sec:non_literature_samples},
 zaimplementowany algorytm generuje lepsze rozwiązania w przypadku
 syntezy \textit{analog modeling}, podczas gdy praca służąca
 za porównanie~\cite{evolutionary_puredata} zawiera głownie dźwięki wytworzone
-za pomocą syntezy FM oraz nagrania instrumentów dętych. Sugestie dotyczące
-stworzenia bardziej różnorodnego zbioru dźwięków o różnych barwach
-i dynamice zawarto w sekcji~\ref{sec:potential_improvements}.
-
-
-\section{Optymalizacja parametrów grafu dla problemów o małej złożoności}
-
-Jak wykazały testy przeprowadzone w rozdziale~\ref{target_function_chapter},
-zaimplementowany algorytm jest w stanie dokładnie odtworzyć wartości
-parametrów grafu dla prostych problemów syntezy
-FM~(\ref{fig:param_optimisation_results_spectrograms})
-i umiarkowanie złożonych problemów syntezy
-\textit{analog modeling}~(\ref{fig:am_param_optimisation_results_spectrograms}).
-Testy na małej próbie słuchaczy pozwalają stwierdzić,
-że \textbf{nie są oni w stanie odróżnić} sygnałów wygenerowanych
-dla problemów z rozdziału~\ref{target_function_chapter}
-od dźwięków docelowych.
-
-% \begin{enumerate}
-%   \item Nawet jak nie działa to idzie w kierunku celu, często generując interesujące brzmienia po drodze,
-%   \item Problemy ze zmianami w dynamice, szczególnie pierwsze ułamki sekund,
-% \end{enumerate}
+za pomocą syntezy FM oraz nagrania instrumentów dętych.
 
 
 \section{Potencjał wykorzystania w przemyśle muzycznym}\label{sec:music_industry_usage}
@@ -104,36 +90,6 @@ kompilowanym języku programowania może znacząco poprawić szybkość działa
 
 \section{Potencjalne drogi dalszego rozwoju algorytmu}\label{sec:potential_improvements}
 
-Pierwszym krokiem, który należy wykonać w celu usprawnienia
-algorytmu optymalizacji jest przygotowanie zbioru dźwięków,
-które będą służyły za \textbf{zbiór weryfikujący poprawność działania algorytmu}.
-Przykłady zaczerpnięte z literatury~\cite{evolutionary_puredata_results}
-nie zawierają wystarczająco bogatej gamy możliwych do wygenerowania
-barw dźwięku, które wymusiłyby na algorytmie optymalizacji wykorzystanie
-różnorodnych algorytmów syntezy i struktur grafu DSP\@. Wyniki
-eksperymentów wykonanych w rozdziale~\ref{chap:research} pozwalają
-na zasugerowanie zbioru cech dźwięków, których warianty
-powinny być zawarte w zbiorze weryfikującym:
-
-\begin{enumerate}
-  \item Typ syntezy:
-  \begin{itemize}
-    \item synteza \textit{analog modeling},
-    \item synteza FM,
-    \item synteza \textit{physical modeling}.
-  \end{itemize}
-  \item Dynamika dźwięku:
-    \begin{itemize}
-      \item Głośny od samego początku, dynamicznie słabnący,
-      \item Równomiernie głośny przez całą długość nagrania,
-      \item Powoli narastający i powoli słabnący.
-    \end{itemize}
-\end{enumerate}
-
-% Po przygotowaniu zbioru walidacyjnego
-
-% Podczas implementacji algorytmu optymalizacji grafu oraz prowadzenia badań
-
 \subsection{Rozmiar okna w algorytmie DTW}
 
 W domyślnym wariancie, algorytm DTW przeszukuje cały sygnał
@@ -179,28 +135,6 @@ nie jest szeroko zbadanym problemem i istnieje potencjał na opracowanie
 nowych rozwiązań.
 
 
-\subsection{Trenowanie na coraz dłuższych fragmentach dźwięku}
-
-Ponieważ złożoność czasowa algorytmu DTW wynosi $O(N^2/\log\log N)$~\cite{dtw_time_complexity},
-im dłuższy jest zadany sygnał dźwiękowy, tym bardziej czas wyliczenia
-wartości funkcji celu dominuje nad czasem syntezy sygnału dźwiękowego. Potencjalnym
-rozwiązaniem tego problemu jest podzielenie optymalizacji na etapy, w których
-do optymalizacji grafu DSP wykorzystywane są coraz dłuższe fragmenty dźwięku docelowego.
-
-\subsection{Rozszerzenie liczby dostępnych w grafie DSP węzłów}
-
-Poza zasugerowaną w sekcji~\ref{sec:music_industry_usage} integracją
-zaimplementowanego algorytmu z oprogramowaniem typu \textit{digital audio workstation},
-możliwe jest również dalsze implementowanie kolejnych węzłów generujących
-i przetwarzających sygnał. Ze względu na ograniczenia czasowe,
-w pracy nie zaimplementowano wielu rodzajów filtrów
-(przykładowo o różnych szerokościach pasma przepustowego) ani wielu rodzajów
-efektów \textit{delay} oraz \textit{reverb}. Zastosowanie ręcznie zaimplementowanych
-węzłów przetwarzania sygnału może pozwolić na przeprowadzenie dokładniejszych
-testów algorytmu optymalizacji (jak dostępne węzły wpływają na sprawność optymalizacji),
-niż w przypadku wykorzystania gotowych wtyczek
-\texttt{VST}, które spowodują znaczne zwiększenie liczby modyfikowalnych parametrów w grafie.
-
 \subsection{Rozszerzenie genotypu grafu DSP o dodatkowe źródła modulacji}
 
 W syntezatorach dźwięku często wykorzystuje się sygnały modulujące (przedstawione
@@ -216,12 +150,12 @@ moduluje inne parametry w grafie DSP może znacząco zwiększyć różnorodnoś�
 generowanych barw dźwięku.
 
 
-\section{Subiektywna natura porównania}
+% \section{Subiektywna natura porównania}
 
-Generowanie dźwięku stanowi zagadnienie,
-które w dużej mierze zależy od subiektywnego odbioru słuchaczy.
-Ocena zgodności barwy dźwięku dźwięku według określonej funkcji celu
-niekoniecznie przekłada się na subiektywną preferencję użytkownika.
-Istnieje możliwość, że niedoskonałości funkcji celu mogą wpływać korzystnie na 
-odbiór przez słuchaczy, ponieważ dostarczą nieoczekiwanych efektów, 
-które mogą być wykorzystane jako źródło inspiracji w procesie kreatywnym.
+% Generowanie dźwięku stanowi zagadnienie,
+% które w dużej mierze zależy od subiektywnego odbioru słuchaczy.
+% Ocena zgodności barwy dźwięku dźwięku według określonej funkcji celu
+% niekoniecznie przekłada się na subiektywną preferencję użytkownika.
+% Istnieje możliwość, że niedoskonałości funkcji celu mogą wpływać korzystnie na 
+% odbiór przez słuchaczy, ponieważ dostarczą nieoczekiwanych efektów, 
+% które mogą być wykorzystane jako źródło inspiracji w procesie kreatywnym.
