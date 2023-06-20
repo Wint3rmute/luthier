@@ -7,9 +7,12 @@ Praca wykorzystuje próbki dźwięku z literatury~\cite{evolutionary_puredata_re
 aby przetestować zaimplementowany algorytm i jednocześnie porównać jego wyniki
 z podobną pracą. Wykorzystano te próbki dźwięku
 z literatury, które \textbf{nie zostały wygenerowane} za pomocą
-\textit{Pure Data}~\cite{pure_data}, ponieważ oryginalna praca wykorzystywała
+oprogramowania do syntezy \textit{Pure Data}~\cite{pure_data},
+ponieważ oryginalna praca wykorzystywała
 to oprogramowanie jako środowisko do syntezy dźwięku -- takie porównanie
-nie byłoby miarodajne.
+nie byłoby miarodajne, ponieważ algorytm z literatury miałby do dyspozycji
+dokładnie takie same algorytmy, które zostały wykorzystane do wygenerowania
+dźwięków docelowych.
 Przed przeprowadzeniem optymalizacji ustalono wartość częstotliwości podstawowej~$f_0$
 dla każdego z testowanych dźwięków. Zastosowano implementację algorytmu
 estymującego częstotliwość podstawową
@@ -22,13 +25,21 @@ dźwięków umieszczony jest na płycie CD, co opisuje dodatek~\ref{chap:opis-pl
 W badaniach zastosowano następujące parametry algorytmu genetycznego:
 
 \begin{enumerate}
-  \item Rozmiar populacji: 50,
-  \item Liczba iteracji: 200.
+  \item rozmiar populacji: \texttt{50},
+  \item liczba iteracji: \texttt{200},
+  \item strategia mutacji: \texttt{best1bin},
+  \item rekombinacja: \texttt{0.7}
 \end{enumerate}
+
+Ze względu na długi czas działania zaimplementowanego algorytmu optymalizacji,
+w pracy nie udało się porównać jak różne parametry algorytmu genetycznego
+wpływają na proces optymalizacji.
+
+\newpage
 
 \section{Dźwięk fletu}
 
-Dźwięk \texttt{flute\_.wav}~(rysunel~\ref{fig:literature_flute_sound_overview})
+Dźwięk \texttt{flute.wav}~(rysunel~\ref{fig:literature_flute_sound_overview})
 jest nagraniem prawdziwego instrumentu dętego. Kształt fali jest nieregularny,
 charakterystyka spektralna zawiera dynamicznie pojawiające się i słabnące 
 składowe częstotliwościowe.
